@@ -807,8 +807,7 @@ async function callClaude(base64Image, prompt, maxTokens = 256) {
   const data = await response.json();
   if (data.error) throw new Error(data.error.message);
   const text = data.content?.find(b => b.type === "text")?.text || "";
-  const clean = text.replace(/```json[\s\S]*?```|```/g, "").trim();
-  const jsonMatch = clean.match(/\{[\s\S]*\}/);
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("No JSON in response: " + text.slice(0, 100));
   return JSON.parse(jsonMatch[0]);
 }
@@ -948,7 +947,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
       setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: result } : p));
     } catch(err) {
       console.error(err);
-      setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: { status: "healthy", headline: "Could not analyse", recommendation: "Make sure the photo is clear and try again.", urgency: "low", waitDays: null } } : p));
+      setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: { status: "healthy", headline: "Could not analyse", recommendation: err?.message || "Unknown error", urgency: "low", waitDays: null } } : p));
     }
     setAnalysing(false);
     e.target.value = "";
