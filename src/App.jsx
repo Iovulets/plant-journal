@@ -5,7 +5,7 @@ import ivyImg from "./assets/plants/ivy.jpg";
 import dracaenaImg from "./assets/plants/dracaena.jpg";
 import ficusImg from "./assets/plants/ficus.jpg";
 import zzImg from "./assets/plants/zz.jpg";
-import bgPhoto from "./assets/background.jpg";
+import bgPhoto from "./assets/background.webp";
 
 
 
@@ -223,13 +223,13 @@ const css = `
     top: 0; left: 50%; transform: translateX(-50%);
     width: 430px; height: 100vh;
     background:
-      linear-gradient(to bottom, rgba(10,20,10,0.55) 0%, rgba(8,16,8,0.72) 60%, rgba(5,12,5,0.85) 100%),
+      linear-gradient(to bottom, rgba(20,14,5,0.72) 0%, rgba(15,10,3,0.82) 60%, rgba(10,7,2,0.90) 100%),
       radial-gradient(ellipse 110% 50% at 75% 35%,
-        rgba(180,220,100,0.22) 0%,
-        rgba(100,180,40,0.10) 40%,
+        rgba(200,160,60,0.15) 0%,
+        rgba(120,100,20,0.06) 40%,
         transparent 65%),
       radial-gradient(ellipse 60% 40% at 20% 50%,
-        rgba(200,160,80,0.12) 0%,
+        rgba(80,120,40,0.10) 0%,
         transparent 55%);
     pointer-events: none;
     z-index: 0;
