@@ -223,13 +223,13 @@ const css = `
     top: 0; left: 50%; transform: translateX(-50%);
     width: 430px; height: 100vh;
     background:
-      linear-gradient(to bottom, rgba(20,14,5,0.72) 0%, rgba(15,10,3,0.82) 60%, rgba(10,7,2,0.90) 100%),
+      linear-gradient(to bottom, rgba(20,14,5,0.45) 0%, rgba(15,10,3,0.58) 60%, rgba(10,7,2,0.70) 100%),
       radial-gradient(ellipse 110% 50% at 75% 35%,
-        rgba(200,160,60,0.15) 0%,
-        rgba(120,100,20,0.06) 40%,
+        rgba(200,160,60,0.10) 0%,
+        rgba(120,100,20,0.04) 40%,
         transparent 65%),
       radial-gradient(ellipse 60% 40% at 20% 50%,
-        rgba(80,120,40,0.10) 0%,
+        rgba(80,120,40,0.07) 0%,
         transparent 55%);
     pointer-events: none;
     z-index: 0;
@@ -1934,10 +1934,6 @@ export default function App() {
 
         {screen === "overview" && (
           <div className="fade-up">
-            <div className="ov-hero">
-              <div className="ov-tag">Plant Journal</div>
-              <div className="ov-heading">My little <em>garden</em></div>
-            </div>
             <GlassContainer gap={10} style={{ padding: "16px 16px 0", gridAutoRows: "130px" }}>
               <GlassCard borderRadius={20} style={{ height: 130 }}><div className="stat"><div className="stat-n">{PLANTS.length}</div><div className="stat-l">Total plants</div></div></GlassCard>
               {(() => {
@@ -1978,6 +1974,9 @@ export default function App() {
               </GlassCard>
             </GlassContainer>
 
+            <div style={{ padding: "20px 24px 0" }}>
+              <div className="ov-heading">My little <em>garden</em></div>
+            </div>
             <div className="list-head">Your plants</div>
             <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "0 14px 32px" }}>
               {PLANTS.map((p, i) => {
