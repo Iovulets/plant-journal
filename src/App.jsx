@@ -872,7 +872,7 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
       {/* Main photo */}
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
         <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}>
-          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 340, height: 420, objectFit: "cover" }} />
           <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "#aaa", fontStyle: "italic" }}>
             {new Date(photos[current].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
           </div>
@@ -959,7 +959,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       {/* Photo stack */}
-      <div style={{ position: "relative", width: 380, height: 265, marginBottom: 8 }}>
+      <div style={{ position: "relative", width: 380, height: 490, marginBottom: 8 }}>
         {/* Render stack back to front */}
         {stackPhotos.slice(1).reverse().map((photo, i) => {
           const stackIdx = stackPhotos.length - 1 - i;
@@ -968,7 +968,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           return (
             <div key={i} style={{ position: "absolute", top: offset, left: "50%", transform: `translateX(-50%) rotate(${rot}deg)`, zIndex: stackIdx }}>
               <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 4px 16px rgba(60,30,10,0.14)" }}>
-                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 340, height: 420, objectFit: "cover" }} />
               </div>
             </div>
           );
@@ -986,7 +986,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           <div style={{ transform: `rotate(${tilt}deg)` }}>
             <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)" }}>
               <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name}
-                style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+                style={{ display: "block", width: 340, height: 420, objectFit: "cover" }} />
             </div>
           </div>
         </div>
