@@ -899,6 +899,30 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   );
 }
 
+async function resizeImageForAPI(file, maxWidth = 800) {
+  const originalDataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("FileReader failed"));
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error("Image decode failed"));
+    i.src = originalDataUrl;
+  });
+  const scale = Math.min(1, maxWidth / img.width);
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.60);
+  const base64 = dataUrl.split(",")[1];
+  return { base64, dataUrl, mediaType: "image/jpeg" };
+}
+
 function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext }) {
   const [analysing, setAnalysing] = useState(false);
   const [gallery, setGallery] = useState(false);
@@ -1360,37 +1384,6 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
 }
 
 
-
-async function resizeImageForAPI(file, maxWidth = 800) {
-    // Step 1: read file as data URL via FileReader (works in sandboxed iframes)
-    const originalDataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error("FileReader failed"));
-      reader.readAsDataURL(file);
-    });
-
-    // Step 2: load into Image using data URL (no createObjectURL needed)
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error("Image decode failed"));
-      i.src = originalDataUrl;
-    });
-
-    // Step 3: resize on canvas
-    const scale = Math.min(1, maxWidth / img.width);
-    const w = Math.round(img.width * scale);
-    const h = Math.round(img.height * scale);
-    const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-
-    // Step 4: export as JPEG data URL
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.60);
-    const base64 = dataUrl.split(",")[1];
-    return { base64, dataUrl, mediaType: "image/jpeg" };
-  }
 
 // ScanButton — self-contained component that lives inside the render tree
 // This ensures fetch works via the artifact proxy, same as PlantPhotoStack
