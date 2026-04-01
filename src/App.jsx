@@ -148,14 +148,13 @@ const css = `
     --soft-brown: rgba(255,255,255,0.5);
   }
 
-  body { background: #0f1a0f; }
+  body { background: #d4b896; }
 
   .app {
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
-    /* Bright vibrant background - light source top-right like the reference */
-    background: #0f1a0f;
+    background: transparent;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
     user-select: none;
@@ -222,15 +221,7 @@ const css = `
     position: fixed;
     top: 0; left: 50%; transform: translateX(-50%);
     width: 430px; height: 100vh;
-    background:
-      linear-gradient(to bottom, rgba(20,14,5,0.45) 0%, rgba(15,10,3,0.58) 60%, rgba(10,7,2,0.70) 100%),
-      radial-gradient(ellipse 110% 50% at 75% 35%,
-        rgba(200,160,60,0.10) 0%,
-        rgba(120,100,20,0.04) 40%,
-        transparent 65%),
-      radial-gradient(ellipse 60% 40% at 20% 50%,
-        rgba(80,120,40,0.07) 0%,
-        transparent 55%);
+    background: linear-gradient(to bottom, transparent 0%, rgba(10,7,2,0.25) 100%);
     pointer-events: none;
     z-index: 0;
   }
@@ -239,8 +230,8 @@ const css = `
   /* ─── OVERVIEW ──────────────────────────────────────────────── */
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
-  .ov-heading { font-family: 'DM Sans', sans-serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: var(--text); }
-  .ov-heading em { font-style: normal; color: var(--green); }
+  .ov-heading { font-family: 'DM Sans', sans-serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: #1a1208; }
+  .ov-heading em { font-style: normal; color: #2d6a2d; }
   .ov-since { margin-top: 8px; font-size: 12px; color: var(--text-2); font-weight: 300; }
 
   /* ov-stats handled by GlassContainer */
@@ -276,7 +267,7 @@ const css = `
     pointer-events: none;
   }
 
-  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text-2); }
+  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(30,20,5,0.55); }
 
   /* plant-list handled by GlassContainer */
 
