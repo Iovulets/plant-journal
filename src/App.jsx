@@ -1486,6 +1486,104 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
   );
 }
 
+// ── Fertilize Modal ────────────────────────────────────────────────────────
+function FertilizeModal({ onConfirm, onClose }) {
+  const DOSES = [0, 0.5, 1];
+  const DOSE_LABELS = { 0: "No dose", 0.5: "½ dose", 1: "Full dose" };
+  const DOSE_DESC = { 0: "Log the event, no fertilizer applied", 0.5: "Half the recommended amount", 1: "Full recommended amount" };
+  const [selected, setSelected] = useState(1);
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      display: "flex", flexDirection: "column", justifyContent: "flex-end",
+      background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#0f1a0f",
+        borderTop: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: "24px 24px 0 0",
+        padding: "24px 24px 40px",
+        maxWidth: 430, width: "100%", margin: "0 auto",
+      }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(212,147,90,0.8)", marginBottom: 2 }}>Fertilize</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>How much did you use?</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+
+        {/* 3-stop slider */}
+        <div style={{ marginBottom: 24 }}>
+          {/* Track + stops */}
+          <div style={{ position: "relative", height: 48, display: "flex", alignItems: "center" }}>
+            {/* Track background */}
+            <div style={{ position: "absolute", left: 0, right: 0, height: 4, background: "rgba(255,255,255,0.12)", borderRadius: 2 }} />
+            {/* Active fill */}
+            <div style={{
+              position: "absolute", left: 0, height: 4, borderRadius: 2,
+              background: "linear-gradient(90deg, rgba(212,147,90,0.6), rgba(212,147,90,1))",
+              width: selected === 0 ? "0%" : selected === 0.5 ? "50%" : "100%",
+              transition: "width 0.2s ease",
+            }} />
+            {/* Stop dots */}
+            {DOSES.map((dose, i) => (
+              <button key={dose} onClick={() => setSelected(dose)} style={{
+                position: "absolute",
+                left: i === 0 ? "0%" : i === 1 ? "50%" : "100%",
+                transform: "translateX(-50%)",
+                width: 28, height: 28, borderRadius: "50%",
+                background: selected === dose ? "rgba(212,147,90,1)" : "rgba(255,255,255,0.15)",
+                border: selected === dose ? "2px solid rgba(240,190,140,0.8)" : "2px solid rgba(255,255,255,0.2)",
+                cursor: "pointer",
+                transition: "all 0.15s",
+                boxShadow: selected === dose ? "0 0 12px rgba(212,147,90,0.5)" : "none",
+                zIndex: 1,
+              }} />
+            ))}
+          </div>
+          {/* Labels */}
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+            {DOSES.map(dose => (
+              <div key={dose} onClick={() => setSelected(dose)} style={{
+                fontSize: 11, cursor: "pointer",
+                color: selected === dose ? "rgba(212,147,90,1)" : "rgba(255,255,255,0.4)",
+                fontWeight: selected === dose ? 500 : 400,
+                transition: "color 0.15s",
+                width: "33%",
+                textAlign: dose === 0 ? "left" : dose === 0.5 ? "center" : "right",
+              }}>
+                {DOSE_LABELS[dose]}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div style={{ background: "rgba(212,147,90,0.08)", border: "1px solid rgba(212,147,90,0.2)", borderRadius: 12, padding: "10px 14px", fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 20, minHeight: 38, transition: "all 0.2s" }}>
+          {DOSE_DESC[selected]}
+        </div>
+
+        {/* Confirm button */}
+        <button onClick={() => onConfirm(selected)} style={{
+          width: "100%", padding: "14px",
+          background: "rgba(212,147,90,0.22)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(212,147,90,0.4)",
+          borderTopColor: "rgba(240,190,140,0.7)",
+          borderRadius: 20,
+          color: "#ffe0b0", fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: "pointer", letterSpacing: "0.5px",
+        }}>
+          Log {DOSE_LABELS[selected]}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Consult Gardener Drawer ────────────────────────────────────────────────
 function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext, onClose }) {
   const [messages, setMessages] = useState([]);
@@ -1627,6 +1725,7 @@ export default function App() {
   const [editingNick, setEditingNick] = useState(null);
   const [nickInput, setNickInput] = useState("");
   const [gardenerOpen, setGardenerOpen] = useState(false);
+  const [fertilizeModalOpen, setFertilizeModalOpen] = useState(false);
   const touchX = useRef(null);
 
   // ── Persisted state ──────────────────────────────────────────────────────
@@ -1662,9 +1761,12 @@ export default function App() {
   const plant = PLANTS[idx];
   const lastWatered = waterLog[plant?.id] || null;
   const lastFertilized = fertilizeLog[plant?.id] || null;
+  // Support both old string format and new {date, dose} object format
+  const lastFertilizedDate = lastFertilized ? (typeof lastFertilized === 'string' ? lastFertilized : lastFertilized.date) : null;
+  const lastFertilizedDose = lastFertilized ? (typeof lastFertilized === 'string' ? 1 : lastFertilized.dose) : null;
   const status = plant ? getStatus(plant, lastWatered) : "unknown";
   const days = daysSince(lastWatered);
-  const fertDays = daysSince(lastFertilized);
+  const fertDays = daysSince(lastFertilizedDate);
   const pct = days !== null ? Math.min((days / plant.waterEveryDays) * 100, 100) : 0;
   const fillColor = pct >= 100 ? "var(--red)" : pct >= 70 ? "var(--orange)" : "var(--green)";
 
@@ -1676,7 +1778,8 @@ export default function App() {
   // Fertilize button label (every 30 days)
   const FERTILIZE_EVERY = 30;
   const fertDaysLeft = fertDays !== null ? FERTILIZE_EVERY - fertDays : null;
-  const fertBtnLabel = fertDays === null ? "Fertilize now" : fertDaysLeft <= 0 ? "Overdue — fertilize" : `${fertDaysLeft}d until fertilize`;
+  const fertDoseLabel = lastFertilizedDose === 0.5 ? " · ½ dose" : lastFertilizedDose === 0 ? " · no dose" : "";
+  const fertBtnLabel = fertDays === null ? "Fertilize now" : fertDaysLeft <= 0 ? "Overdue — fertilize" : `${fertDaysLeft}d until fertilize${fertDoseLabel}`;
   const fertBtnDone = fertDays !== null && fertDaysLeft > 0;
 
   const careContext = {
@@ -1697,7 +1800,7 @@ export default function App() {
 
   function waterPlant(id) { setWaterLog(p => ({ ...p, [id]: new Date().toISOString() })); }
   function resetWater(id) { setWaterLog(p => { const n = { ...p }; delete n[id]; return n; }); }
-  function fertilizePlant(id) { setFertilizeLog(p => ({ ...p, [id]: new Date().toISOString() })); }
+  function fertilizePlant(id, dose = 1) { setFertilizeLog(p => ({ ...p, [id]: { date: new Date().toISOString(), dose } })); }
   function dismissWarning(id) { setDismissedWarnings(p => ({ ...p, [id]: true })); }
   function saveNick(id) {
     if (nickInput.trim()) setNicknames(p => ({ ...p, [id]: nickInput.trim() }));
@@ -1983,7 +2086,7 @@ export default function App() {
                 </button>
 
                 {/* Fertilize button */}
-                <button onClick={() => fertilizePlant(plant.id)} style={{
+                <button onClick={() => setFertilizeModalOpen(true)} style={{
                   flex: 1, padding: "12px 8px",
                   background: fertBtnDone
                     ? "rgba(255,255,255,0.06)"
@@ -2027,6 +2130,13 @@ export default function App() {
               <div className="swipe-hint">swipe left or right to browse</div>
             </div>
           </div>
+        )}
+
+        {fertilizeModalOpen && screen === "detail" && (
+          <FertilizeModal
+            onConfirm={(dose) => { fertilizePlant(plant.id, dose); setFertilizeModalOpen(false); }}
+            onClose={() => setFertilizeModalOpen(false)}
+          />
         )}
 
         {gardenerOpen && screen === "detail" && (
