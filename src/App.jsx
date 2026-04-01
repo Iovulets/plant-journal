@@ -2057,15 +2057,26 @@ export default function App() {
               <div className="rule" />
               <div className="d-row"><span className="d-key">Light</span><span className="d-val">{plant.light}</span></div>
               <div className="d-row"><span className="d-key">Water every</span><span className="d-val">{plant.waterEveryDays} days</span></div>
-              <div className="d-row"><span className="d-key">Status</span><span className="d-val" style={{ color: STATUS_COLOR[status] }}>{STATUS_LABEL[status]}</span></div>
-              <div className="progress-wrap">
-                <div className="progress-labels">
-                  <span>{lastWatered ? (days === 0 ? "Watered today" : `${days}d ago`) : "Never logged"}</span>
-                  <span>{lastWatered ? `next in ${Math.max(0, plant.waterEveryDays - (days || 0))}d` : "—"}</span>
-                </div>
-                <div className="progress-track">
-                  <div className="progress-fill" style={{ width: `${pct}%`, background: fillColor }} />
-                </div>
+
+              {/* Water status */}
+              <div className="d-row">
+                <span className="d-key">Water</span>
+                <span className="d-val" style={{ color: STATUS_COLOR[status] }}>
+                  {lastWatered
+                    ? days === 0 ? "Watered today" : `${days}d ago`
+                    : "Not logged"}
+                </span>
+              </div>
+
+              {/* Fertilizer status */}
+              <div className="d-row">
+                <span className="d-key">Fertilizer</span>
+                <span className="d-val" style={{ color: fertDays === null ? "#b0998e" : fertDaysLeft <= 0 ? "#c46860" : "#94b88a" }}>
+                  {fertDays === null ? "Not logged"
+                    : fertDays === 0
+                      ? `${lastFertilizedDose === 1 ? "Full dose" : lastFertilizedDose === 0.5 ? "½ dose" : "0 dose"} today`
+                      : `${lastFertilizedDose === 1 ? "Full dose" : lastFertilizedDose === 0.5 ? "½ dose" : "0 dose"} · ${fertDays}d ago`}
+                </span>
               </div>
               <div className="care-box">{plant.care}</div>
               {/* Action buttons */}
