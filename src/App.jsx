@@ -386,7 +386,7 @@ const css = `
   /* ─── LIQUID GLASS WATER BUTTON ─────────────────────────────── */
   /* .btn-water — prominent glass button */
   .btn-water {
-    width: 100%; padding: 15px;
+    width: 100%; padding: 12px 8px;
     background: rgba(100,220,80,0.22);
     backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
     -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
@@ -397,9 +397,10 @@ const css = `
     box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
     font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500;
-    letter-spacing: 1.5px; text-transform: uppercase;
+    letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.22s ease;
     position: relative; overflow: hidden;
+    text-align: center;
   }
   .btn-water::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 52%;
@@ -812,7 +813,7 @@ async function callClaude(base64Image, prompt, maxTokens = 256) {
   return JSON.parse(jsonMatch[0]);
 }
 
-async function analyseWithClaude(base64Image, plant) {
+async function analyseWithClaude(base64Image, plant, careContext = {}) {
   if (plant._identifyMode) {
     return callClaude(base64Image,
       `Identify this plant. Reply ONLY with JSON:
@@ -820,10 +821,17 @@ async function analyseWithClaude(base64Image, plant) {
       200
     );
   }
+  const { lastWateredDaysAgo, lastFertilizedDaysAgo } = careContext;
+  const waterCtx = lastWateredDaysAgo !== null && lastWateredDaysAgo !== undefined
+    ? `Last watered ${lastWateredDaysAgo} day(s) ago (schedule: every ${plant.waterEveryDays} days).`
+    : `Not yet watered (schedule: every ${plant.waterEveryDays} days).`;
+  const fertCtx = lastFertilizedDaysAgo !== null && lastFertilizedDaysAgo !== undefined
+    ? `Last fertilized ${lastFertilizedDaysAgo} day(s) ago (schedule: every 30 days).`
+    : `Never fertilized.`;
   return callClaude(base64Image,
-    `You are a botanist. Photo shows ${plant.name} (${plant.species}). Watering: every ${plant.waterEveryDays} days. Light: ${plant.light}.
+    `You are a botanist. Photo shows ${plant.name} (${plant.species}). Light: ${plant.light}. ${waterCtx} ${fertCtx}
 Reply ONLY with JSON: {"status":"healthy","headline":"","recommendation":"","waitDays":null,"urgency":"low"}`,
-    200
+    256
   );
 }
 
@@ -891,7 +899,7 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   );
 }
 
-function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos }) {
+function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext }) {
   const [analysing, setAnalysing] = useState(false);
   const [gallery, setGallery] = useState(false);
   const [galleryStart, setGalleryStart] = useState(0);
@@ -912,8 +920,8 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos }) {
       const dataUrl = `data:image/jpeg;base64,${base64}`;
       const newPhoto = { dataUrl, base64, date: new Date().toISOString(), analysis: null };
       setUserPhotos(prev => [...prev, newPhoto]);
-      // Analyse
-      const result = await analyseWithClaude(base64, plant);
+      // Analyse with care context
+      const result = await analyseWithClaude(base64, plant, careContext || {});
       setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: result } : p));
     } catch(err) {
       console.error(err);
@@ -1487,17 +1495,158 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
   );
 }
 
+// ── Consult Gardener Drawer ────────────────────────────────────────────────
+function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext, onClose }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef();
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
+
+  async function send() {
+    const text = input.trim();
+    if (!text || loading) return;
+    setInput("");
+    const userMsg = { role: "user", text };
+    setMessages(prev => [...prev, userMsg]);
+    setLoading(true);
+    try {
+      const systemContext = [
+        `You are a helpful plant care assistant. The user is asking about their ${plant.name} (${plant.species}).`,
+        `Light requirement: ${plant.light}. Water every ${plant.waterEveryDays} days.`,
+        careContext?.lastWateredDaysAgo != null ? `Last watered ${careContext.lastWateredDaysAgo} day(s) ago.` : "Not yet watered.",
+        careContext?.lastFertilizedDaysAgo != null ? `Last fertilized ${careContext.lastFertilizedDaysAgo} day(s) ago.` : "Never fertilized.",
+        latestAnalysis ? `Latest AI analysis: "${latestAnalysis.headline}" — ${latestAnalysis.recommendation}` : "",
+        plant.warning ? `Known issue: ${plant.warning}` : "",
+        "Give concise, practical answers. 2-4 sentences max.",
+      ].filter(Boolean).join(" ");
+
+      const history = messages.map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.text }));
+
+      const contentParts = [];
+      if (latestPhotoBase64 && messages.length === 0) {
+        contentParts.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: latestPhotoBase64 } });
+      }
+      contentParts.push({ type: "text", text });
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY || "",
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 300,
+          system: systemContext,
+          messages: [...history, { role: "user", content: contentParts }],
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      const reply = data.content?.find(b => b.type === "text")?.text || "Sorry, I couldn't answer that.";
+      setMessages(prev => [...prev, { role: "assistant", text: reply }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { role: "assistant", text: "Error: " + (err?.message || "unknown") }]);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      display: "flex", flexDirection: "column", justifyContent: "flex-end",
+      background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#0f1a0f",
+        borderTop: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: "24px 24px 0 0",
+        maxHeight: "75vh", display: "flex", flexDirection: "column",
+        maxWidth: 430, width: "100%", margin: "0 auto",
+      }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", padding: "16px 20px 12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>AI Assistant</div>
+            <div style={{ fontSize: 16, fontWeight: 500, color: "var(--text)" }}>Consult Gardener</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>✕</button>
+        </div>
+
+        {/* Messages */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 8px", display: "flex", flexDirection: "column", gap: 10 }}>
+          {messages.length === 0 && (
+            <div style={{ fontSize: 12, color: "var(--text-2)", lineHeight: 1.6, textAlign: "center", padding: "24px 16px", opacity: 0.7 }}>
+              Ask anything about your {plant.name}.<br />
+              {latestPhotoBase64 ? "Your latest photo will be included." : "Add a photo first for visual analysis."}
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div key={i} style={{
+              alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+              maxWidth: "82%",
+              background: m.role === "user" ? "rgba(74,222,128,0.18)" : "rgba(255,255,255,0.09)",
+              border: `1px solid ${m.role === "user" ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.15)"}`,
+              borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+              padding: "10px 14px", fontSize: 13, color: "var(--text)", lineHeight: 1.55,
+            }}>{m.text}</div>
+          ))}
+          {loading && (
+            <div style={{ alignSelf: "flex-start", background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", fontSize: 13, color: "var(--text-2)" }}>
+              <span style={{ opacity: 0.6 }}>Thinking…</span>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input */}
+        <div style={{ padding: "8px 12px 20px", display: "flex", gap: 8, alignItems: "center" }}>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && send()}
+            placeholder="Ask about your plant…"
+            style={{
+              flex: 1, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
+              borderRadius: 20, padding: "10px 16px", fontSize: 13, color: "var(--text)",
+              fontFamily: "'DM Sans', sans-serif", outline: "none",
+            }}
+          />
+          <button onClick={send} disabled={!input.trim() || loading} style={{
+            background: "var(--green)", border: "none", borderRadius: "50%",
+            width: 38, height: 38, fontSize: 16, cursor: "pointer",
+            color: "#0a1a0a", flexShrink: 0,
+            opacity: (!input.trim() || loading) ? 0.4 : 1,
+            transition: "opacity 0.15s",
+          }}>↑</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [screen, setScreen] = useState("overview");
   const [scanOpen, setScanOpen] = useState(false);
   const [idx, setIdx] = useState(0);
   const [editingNick, setEditingNick] = useState(null);
   const [nickInput, setNickInput] = useState("");
+  const [gardenerOpen, setGardenerOpen] = useState(false);
   const touchX = useRef(null);
 
   // ── Persisted state ──────────────────────────────────────────────────────
   const [waterLog, setWaterLog] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pt_waterLog")) || {}; } catch { return {}; }
+  });
+  const [fertilizeLog, setFertilizeLog] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pt_fertilizeLog")) || {}; } catch { return {}; }
+  });
+  const [dismissedWarnings, setDismissedWarnings] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pt_dismissedWarnings")) || {}; } catch { return {}; }
   });
   const [nicknames, setNicknames] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pt_nicknames")) || {}; } catch { return {}; }
@@ -1511,6 +1660,8 @@ export default function App() {
 
   // Persist to localStorage on every render (state changes trigger re-render)
   try { localStorage.setItem("pt_waterLog", JSON.stringify(waterLog)); } catch {}
+  try { localStorage.setItem("pt_fertilizeLog", JSON.stringify(fertilizeLog)); } catch {}
+  try { localStorage.setItem("pt_dismissedWarnings", JSON.stringify(dismissedWarnings)); } catch {}
   try { localStorage.setItem("pt_nicknames", JSON.stringify(nicknames)); } catch {}
   try { localStorage.setItem("pt_gardenLog", JSON.stringify(gardenLog)); } catch {}
   try { localStorage.setItem("pt_plantPhotos", JSON.stringify(plantPhotos)); } catch {}
@@ -1519,10 +1670,34 @@ export default function App() {
 
   const plant = PLANTS[idx];
   const lastWatered = waterLog[plant?.id] || null;
+  const lastFertilized = fertilizeLog[plant?.id] || null;
   const status = plant ? getStatus(plant, lastWatered) : "unknown";
   const days = daysSince(lastWatered);
+  const fertDays = daysSince(lastFertilized);
   const pct = days !== null ? Math.min((days / plant.waterEveryDays) * 100, 100) : 0;
   const fillColor = pct >= 100 ? "var(--red)" : pct >= 70 ? "var(--orange)" : "var(--green)";
+
+  // Water button label
+  const waterDaysLeft = days !== null ? plant.waterEveryDays - days : null;
+  const waterBtnLabel = days === null ? "Water now" : waterDaysLeft <= 0 ? "Overdue — water now" : waterDaysLeft === 0 ? "Water today" : `${waterDaysLeft}d until water`;
+  const waterBtnDone = days !== null && waterDaysLeft > 0;
+
+  // Fertilize button label (every 30 days)
+  const FERTILIZE_EVERY = 30;
+  const fertDaysLeft = fertDays !== null ? FERTILIZE_EVERY - fertDays : null;
+  const fertBtnLabel = fertDays === null ? "Fertilize now" : fertDaysLeft <= 0 ? "Overdue — fertilize" : `${fertDaysLeft}d until fertilize`;
+  const fertBtnDone = fertDays !== null && fertDaysLeft > 0;
+
+  const careContext = {
+    lastWateredDaysAgo: days,
+    lastFertilizedDaysAgo: fertDays,
+  };
+
+  // Latest photo base64 for gardener
+  const currentPhotos = plantPhotos[plant?.id] || [];
+  const latestPhoto = currentPhotos.length > 0 ? currentPhotos[currentPhotos.length - 1] : null;
+  const latestPhotoBase64 = latestPhoto?.base64 || null;
+  const latestAnalysis = latestPhoto?.analysis || null;
 
   const lastWateredAny = Object.values(waterLog).sort().reverse()[0];
   const lastWateredDisplay = lastWateredAny
@@ -1531,6 +1706,8 @@ export default function App() {
 
   function waterPlant(id) { setWaterLog(p => ({ ...p, [id]: new Date().toISOString() })); }
   function resetWater(id) { setWaterLog(p => { const n = { ...p }; delete n[id]; return n; }); }
+  function fertilizePlant(id) { setFertilizeLog(p => ({ ...p, [id]: new Date().toISOString() })); }
+  function dismissWarning(id) { setDismissedWarnings(p => ({ ...p, [id]: true })); }
   function saveNick(id) {
     if (nickInput.trim()) setNicknames(p => ({ ...p, [id]: nickInput.trim() }));
     else setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
@@ -1756,11 +1933,12 @@ export default function App() {
               {PLANTS.map((_, i) => <div key={i} className={`dot${i === idx ? " on" : ""}`} onClick={() => setIdx(i)} />)}
             </div>
 
-            <PlantPhotoStack plant={plant} tilt={TILTS[idx]} pinColor={PIN_COLORS[idx]} userPhotos={plantPhotos[plant.id] || []} setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === 'function' ? photos(prev[plant.id] || []) : photos }))} />
+            <PlantPhotoStack plant={plant} tilt={TILTS[idx]} pinColor={PIN_COLORS[idx]} userPhotos={plantPhotos[plant.id] || []} setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === 'function' ? photos(prev[plant.id] || []) : photos }))} careContext={careContext} />
 
-            {plant.warning && (
-              <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px", fontSize: 12, color: "var(--warn)" }}>
-                ⚠ {plant.warning}
+            {plant.warning && !dismissedWarnings[plant.id] && (
+              <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px 8px 14px", fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "flex-start", gap: 8 }}>
+                <span style={{ flex: 1 }}>⚠ {plant.warning}</span>
+                <button onClick={() => dismissWarning(plant.id)} style={{ background: "none", border: "none", color: "rgba(248,113,113,0.6)", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0, flexShrink: 0, marginTop: 1 }}>✕</button>
               </div>
             )}
 
@@ -1796,20 +1974,84 @@ export default function App() {
                 </div>
               </div>
               <div className="care-box">{plant.care}</div>
-              {plant.warning && <div className="warn-box">⚠ {plant.warning}</div>}
-              <button className="btn-water" onClick={() => waterPlant(plant.id)} style={lastWatered ? {
-                background: "linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(100,100,100,0.08) 100%)",
-                borderColor: "rgba(255,255,255,0.1)",
-                borderTopColor: "rgba(255,255,255,0.18)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                color: "rgba(255,255,255,0.38)",
-              } : {}}>
-                {lastWatered ? "Hydrated" : "Water now"}
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                {/* Water button */}
+                <button className="btn-water" onClick={() => waterPlant(plant.id)} style={{
+                  flex: 1,
+                  ...(waterBtnDone ? {
+                    background: "rgba(255,255,255,0.06)",
+                    borderColor: "rgba(255,255,255,0.1)",
+                    borderTopColor: "rgba(255,255,255,0.18)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    color: "rgba(255,255,255,0.45)",
+                  } : {}),
+                }}>
+                  <div style={{ fontSize: 16, marginBottom: 2 }}>💧</div>
+                  <div style={{ fontSize: 11, letterSpacing: "0.5px" }}>{waterBtnLabel}</div>
+                </button>
+
+                {/* Fertilize button */}
+                <button onClick={() => fertilizePlant(plant.id)} style={{
+                  flex: 1, padding: "12px 8px",
+                  background: fertBtnDone
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(212,147,90,0.22)",
+                  backdropFilter: "blur(20px) saturate(200%) brightness(1.18)",
+                  WebkitBackdropFilter: "blur(20px) saturate(200%) brightness(1.18)",
+                  border: `1px solid ${fertBtnDone ? "rgba(255,255,255,0.1)" : "rgba(212,147,90,0.4)"}`,
+                  borderTopColor: fertBtnDone ? "rgba(255,255,255,0.18)" : "rgba(240,190,140,0.7)",
+                  borderRadius: 20,
+                  boxShadow: fertBtnDone ? "0 2px 8px rgba(0,0,0,0.15)" : "0 4px 20px rgba(180,100,30,0.22), 0 1.5px 0 rgba(240,200,160,0.45) inset",
+                  color: fertBtnDone ? "rgba(255,255,255,0.45)" : "#ffe0b0",
+                  fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                  cursor: "pointer", transition: "all 0.22s ease",
+                  position: "relative", overflow: "hidden",
+                  textAlign: "center",
+                }}>
+                  <div style={{ fontSize: 16, marginBottom: 2 }}>🌿</div>
+                  <div style={{ fontSize: 11, letterSpacing: "0.5px" }}>{fertBtnLabel}</div>
+                </button>
+              </div>
+
+              {/* Consult Gardener button */}
+              <button onClick={() => setGardenerOpen(true)} style={{
+                width: "100%", padding: "13px",
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.18)",
+                borderTopColor: "rgba(255,255,255,0.35)",
+                borderRadius: 20,
+                color: "rgba(255,255,255,0.75)",
+                fontSize: 13, fontFamily: "'DM Sans', sans-serif", fontWeight: 400,
+                cursor: "pointer", letterSpacing: "0.5px",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                marginBottom: 8,
+              }}>
+                <span style={{ fontSize: 16 }}>🌱</span>
+                Consult Gardener
               </button>
-              {lastWatered && <button className="btn-reset" onClick={() => resetWater(plant.id)}>Reset log</button>}
+
+              {(lastWatered || lastFertilized) && (
+                <div style={{ display: "flex", gap: 6 }}>
+                  {lastWatered && <button className="btn-reset" style={{ flex: 1 }} onClick={() => resetWater(plant.id)}>Reset water log</button>}
+                  {lastFertilized && <button className="btn-reset" style={{ flex: 1 }} onClick={() => setFertilizeLog(p => { const n = { ...p }; delete n[plant.id]; return n; })}>Reset fertilize log</button>}
+                </div>
+              )}
               <div className="swipe-hint">swipe left or right to browse</div>
             </div>
           </div>
+        )}
+
+        {gardenerOpen && screen === "detail" && (
+          <ConsultGardener
+            plant={plant}
+            latestAnalysis={latestAnalysis}
+            latestPhotoBase64={latestPhotoBase64}
+            careContext={careContext}
+            onClose={() => setGardenerOpen(false)}
+          />
         )}
 
         {screen === "garden" && (
