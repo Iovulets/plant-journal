@@ -916,8 +916,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
     if (!file) return;
     setAnalysing(true);
     try {
-      const base64 = await fileToBase64(file);
-      const dataUrl = `data:image/jpeg;base64,${base64}`;
+      const { base64, dataUrl } = await resizeImageForAPI(file, 800);
       const newPhoto = { dataUrl, base64, date: new Date().toISOString(), analysis: null };
       setUserPhotos(prev => [...prev, newPhoto]);
       // Analyse with care context
@@ -2033,12 +2032,6 @@ export default function App() {
                 Consult Gardener
               </button>
 
-              {(lastWatered || lastFertilized) && (
-                <div style={{ display: "flex", gap: 6 }}>
-                  {lastWatered && <button className="btn-reset" style={{ flex: 1 }} onClick={() => resetWater(plant.id)}>Reset water log</button>}
-                  {lastFertilized && <button className="btn-reset" style={{ flex: 1 }} onClick={() => setFertilizeLog(p => { const n = { ...p }; delete n[plant.id]; return n; })}>Reset fertilize log</button>}
-                </div>
-              )}
               <div className="swipe-hint">swipe left or right to browse</div>
             </div>
           </div>
