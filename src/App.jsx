@@ -1506,6 +1506,154 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
   );
 }
 
+// ── Edit Date Modal ────────────────────────────────────────────────────────
+function EditDateModal({ type, currentDate, dose, onConfirm, onClose }) {
+  // Default to current logged date or today
+  const toLocalInput = (iso) => {
+    const d = iso ? new Date(iso) : new Date();
+    // Format as YYYY-MM-DDTHH:MM for datetime-local input
+    const pad = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  };
+  const [value, setValue] = useState(toLocalInput(currentDate));
+  const isWater = type === 'water';
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 201,
+      display: "flex", flexDirection: "column", justifyContent: "flex-end",
+      background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#0f1a0f",
+        borderTop: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: "24px 24px 0 0",
+        padding: "24px 24px 40px",
+        maxWidth: 430, width: "100%", margin: "0 auto",
+      }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: isWater ? "rgba(100,220,80,0.8)" : "rgba(212,147,90,0.8)", marginBottom: 2 }}>
+              Edit date
+            </div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>
+              When did you {isWater ? "water" : "fertilize"}?
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+
+        {/* Date/time picker */}
+        <input
+          type="datetime-local"
+          value={value}
+          max={toLocalInput(new Date().toISOString())}
+          onChange={e => setValue(e.target.value)}
+          style={{
+            width: "100%", padding: "14px 16px", marginBottom: 20,
+            background: "rgba(255,255,255,0.08)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            borderRadius: 16, fontSize: 15,
+            color: "var(--text)", fontFamily: "'DM Sans', sans-serif",
+            outline: "none", colorScheme: "dark",
+          }}
+        />
+
+        {/* Confirm */}
+        <button onClick={() => onConfirm(new Date(value).toISOString(), dose)} style={{
+          width: "100%", padding: "14px",
+          background: isWater ? "rgba(100,220,80,0.22)" : "rgba(212,147,90,0.22)",
+          backdropFilter: "blur(20px)",
+          border: `1px solid ${isWater ? "rgba(150,255,100,0.4)" : "rgba(212,147,90,0.4)"}`,
+          borderTopColor: isWater ? "rgba(200,255,160,0.7)" : "rgba(240,190,140,0.7)",
+          borderRadius: 20,
+          color: isWater ? "#d4ffb0" : "#ffe0b0",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: "pointer", letterSpacing: "0.5px",
+        }}>
+          Save date
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Edit Date Modal ────────────────────────────────────────────────────────
+function EditDateModal({ type, currentDate, onConfirm, onClose }) {
+  // Format date as YYYY-MM-DD for the input default
+  const toInputVal = (iso) => {
+    if (!iso) return new Date().toISOString().slice(0, 10);
+    return new Date(iso).toISOString().slice(0, 10);
+  };
+  const [dateVal, setDateVal] = useState(toInputVal(currentDate));
+  const isWater = type === 'water';
+  const accent = isWater ? "rgba(100,220,80,1)" : "rgba(212,147,90,1)";
+  const accentBg = isWater ? "rgba(100,220,80,0.12)" : "rgba(212,147,90,0.10)";
+  const accentBorder = isWater ? "rgba(100,220,80,0.3)" : "rgba(212,147,90,0.3)";
+  const label = isWater ? "Watered on" : "Fertilized on";
+  const emoji = isWater ? "💧" : "🌿";
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      display: "flex", flexDirection: "column", justifyContent: "flex-end",
+      background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#0f1a0f",
+        borderTop: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: "24px 24px 0 0",
+        padding: "24px 24px 40px",
+        maxWidth: 430, width: "100%", margin: "0 auto",
+      }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: accent, marginBottom: 2 }}>Edit date</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>{emoji} {label}</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+
+        {/* Date input */}
+        <div style={{ background: accentBg, border: `1px solid ${accentBorder}`, borderRadius: 16, padding: "4px 16px", marginBottom: 20 }}>
+          <input
+            type="date"
+            value={dateVal}
+            max={new Date().toISOString().slice(0, 10)}
+            onChange={e => setDateVal(e.target.value)}
+            style={{
+              width: "100%", background: "transparent", border: "none", outline: "none",
+              fontSize: 18, fontFamily: "'DM Sans', sans-serif", color: "var(--text)",
+              padding: "12px 0", cursor: "pointer",
+            }}
+          />
+        </div>
+
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 20, textAlign: "center" }}>
+          This edit will be logged in your care history.
+        </div>
+
+        {/* Confirm */}
+        <button onClick={() => onConfirm(dateVal)} style={{
+          width: "100%", padding: "14px",
+          background: isWater ? "rgba(100,220,80,0.22)" : "rgba(212,147,90,0.22)",
+          backdropFilter: "blur(20px)",
+          border: `1px solid ${isWater ? "rgba(150,255,100,0.4)" : "rgba(212,147,90,0.4)"}`,
+          borderTopColor: isWater ? "rgba(200,255,160,0.7)" : "rgba(240,190,140,0.7)",
+          borderRadius: 20,
+          color: isWater ? "#d4ffb0" : "#ffe0b0",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: "pointer", letterSpacing: "0.5px",
+        }}>
+          Save date
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Fertilize Modal ────────────────────────────────────────────────────────
 function FertilizeModal({ onConfirm, onClose }) {
   const DOSES = [0, 0.5, 1];
@@ -1746,6 +1894,8 @@ export default function App() {
   const [nickInput, setNickInput] = useState("");
   const [gardenerOpen, setGardenerOpen] = useState(false);
   const [fertilizeModalOpen, setFertilizeModalOpen] = useState(false);
+  const [editDateModal, setEditDateModal] = useState(null); // { type: 'water'|'fertilize' }
+  const [editDateModal, setEditDateModal] = useState(null); // { type: 'water'|'fertilize', plantId, currentDate, dose }
   const touchX = useRef(null);
 
   // ── State ────────────────────────────────────────────────────────────────
@@ -1866,12 +2016,33 @@ export default function App() {
     const now = new Date().toISOString();
     setWaterLog(p => ({ ...p, [id]: now }));
     await supabase.from("water_log").insert({ plant_id: id, watered_at: now });
+    await supabase.from("care_log").insert({ plant_id: id, type: "water", action: "log", new_value: now });
   }
 
   async function fertilizePlant(id, dose = 1) {
     const now = new Date().toISOString();
     setFertilizeLog(p => ({ ...p, [id]: { date: now, dose } }));
     await supabase.from("fertilize_log").insert({ plant_id: id, fertilized_at: now, dose });
+    await supabase.from("care_log").insert({ plant_id: id, type: "fertilize", action: "log", new_value: now, dose });
+  }
+
+  async function editWaterDate(id, newDateStr) {
+    const oldValue = waterLog[id] || null;
+    const newValue = new Date(newDateStr).toISOString();
+    setWaterLog(p => ({ ...p, [id]: newValue }));
+    // Update latest record in water_log
+    const { data: rows } = await supabase.from("water_log").select("id").eq("plant_id", id).order("watered_at", { ascending: false }).limit(1);
+    if (rows?.length) await supabase.from("water_log").update({ watered_at: newValue }).eq("id", rows[0].id);
+    await supabase.from("care_log").insert({ plant_id: id, type: "water", action: "edit", old_value: oldValue, new_value: newValue });
+  }
+
+  async function editFertilizeDate(id, newDateStr) {
+    const oldValue = lastFertilizedDate;
+    const newValue = new Date(newDateStr).toISOString();
+    setFertilizeLog(p => ({ ...p, [id]: { date: newValue, dose: lastFertilizedDose } }));
+    const { data: rows } = await supabase.from("fertilize_log").select("id").eq("plant_id", id).order("fertilized_at", { ascending: false }).limit(1);
+    if (rows?.length) await supabase.from("fertilize_log").update({ fertilized_at: newValue }).eq("id", rows[0].id);
+    await supabase.from("care_log").insert({ plant_id: id, type: "fertilize", action: "edit", old_value: oldValue, new_value: newValue, dose: lastFertilizedDose });
   }
 
   async function dismissWarning(id) {
@@ -1890,7 +2061,25 @@ export default function App() {
     }
     setEditingNick(null); setNickInput("");
   }
-  function openDetail(i) { setIdx(i); setScreen("detail"); }
+  async function editDate(type, plantId, newIso, dose) {
+    const originalDate = type === 'water' ? lastWatered : lastFertilizedDate;
+    if (type === 'water') {
+      setWaterLog(p => ({ ...p, [plantId]: newIso }));
+      await supabase.from("water_log").insert({ plant_id: plantId, watered_at: newIso });
+    } else {
+      const d = dose ?? lastFertilizedDose ?? 1;
+      setFertilizeLog(p => ({ ...p, [plantId]: { date: newIso, dose: d } }));
+      await supabase.from("fertilize_log").insert({ plant_id: plantId, fertilized_at: newIso, dose: d });
+    }
+    // Audit log
+    await supabase.from("care_edits").insert({
+      plant_id: plantId, type,
+      original_date: originalDate,
+      new_date: newIso,
+      dose: type === 'fertilize' ? (dose ?? lastFertilizedDose ?? 1) : null,
+    });
+    setEditDateModal(null);
+  }
 
   async function handleScan(e) {
     const file = e.target.files?.[0];
@@ -2153,24 +2342,28 @@ export default function App() {
               <div className="d-row"><span className="d-key">Light</span><span className="d-val">{plant.light}</span></div>
               <div className="d-row"><span className="d-key">Water every</span><span className="d-val">{plant.waterEveryDays} days</span></div>
 
-              {/* Water status */}
-              <div className="d-row">
+              {/* Water status — tap to edit */}
+              <div className="d-row" onClick={() => lastWatered && setEditDateModal({ type: 'water', plantId: plant.id, currentDate: lastWatered })}
+                style={{ cursor: lastWatered ? "pointer" : "default" }}>
                 <span className="d-key">Water</span>
-                <span className="d-val" style={{ color: STATUS_COLOR[status] }}>
+                <span className="d-val" style={{ color: STATUS_COLOR[status], display: "flex", alignItems: "center", gap: 5 }}>
                   {lastWatered
                     ? days === 0 ? "Watered today" : `${days}d ago`
                     : "Not logged"}
+                  {lastWatered && <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span>}
                 </span>
               </div>
 
-              {/* Fertilizer status */}
-              <div className="d-row">
+              {/* Fertilizer status — tap to edit */}
+              <div className="d-row" onClick={() => lastFertilizedDate && setEditDateModal({ type: 'fertilize', plantId: plant.id, currentDate: lastFertilizedDate, dose: lastFertilizedDose })}
+                style={{ cursor: lastFertilizedDate ? "pointer" : "default" }}>
                 <span className="d-key">Fertilizer</span>
-                <span className="d-val" style={{ color: fertDays === null ? "#b0998e" : fertDaysLeft <= 0 ? "#c46860" : "#94b88a" }}>
+                <span className="d-val" style={{ color: fertDays === null ? "#b0998e" : fertDaysLeft <= 0 ? "#c46860" : "#94b88a", display: "flex", alignItems: "center", gap: 5 }}>
                   {fertDays === null ? "Not logged"
                     : fertDays === 0
                       ? `${lastFertilizedDose === 1 ? "Full dose" : lastFertilizedDose === 0.5 ? "½ dose" : "0 dose"} today`
                       : `${lastFertilizedDose === 1 ? "Full dose" : lastFertilizedDose === 0.5 ? "½ dose" : "0 dose"} · ${fertDays}d ago`}
+                  {lastFertilizedDate && <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span>}
                 </span>
               </div>
               <div className="care-box">{plant.care}</div>
@@ -2236,6 +2429,29 @@ export default function App() {
               <div className="swipe-hint">swipe left or right to browse</div>
             </div>
           </div>
+        )}
+
+        {editDateModal && screen === "detail" && (
+          <EditDateModal
+            type={editDateModal.type}
+            currentDate={editDateModal.currentDate}
+            dose={editDateModal.dose}
+            onConfirm={(newIso, dose) => editDate(editDateModal.type, editDateModal.plantId, newIso, dose)}
+            onClose={() => setEditDateModal(null)}
+          />
+        )}
+
+        {editDateModal && screen === "detail" && (
+          <EditDateModal
+            type={editDateModal.type}
+            currentDate={editDateModal.type === 'water' ? lastWatered : lastFertilizedDate}
+            onConfirm={(dateStr) => {
+              if (editDateModal.type === 'water') editWaterDate(plant.id, dateStr);
+              else editFertilizeDate(plant.id, dateStr);
+              setEditDateModal(null);
+            }}
+            onClose={() => setEditDateModal(null)}
+          />
         )}
 
         {fertilizeModalOpen && screen === "detail" && (
