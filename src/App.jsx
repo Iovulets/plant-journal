@@ -222,7 +222,7 @@ const css = `
     position: fixed;
     top: 0; left: 50%; transform: translateX(-50%);
     width: 430px; height: 100vh;
-    background: rgba(8, 16, 8, 0.78);
+    background: rgba(8, 16, 8, 0.55);
     pointer-events: none;
     z-index: 0;
   }
@@ -1274,14 +1274,7 @@ function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
       gap,
       ...style,
     }} className={className}>
-      {/* Shared glass layer behind all children — this is the key to merging */}
-      <div style={{
-        position: "absolute", inset: -1,
-        backdropFilter: GLASS_VARS.regular.blur,
-        WebkitBackdropFilter: GLASS_VARS.regular.blur,
-        borderRadius: 22,
-        zIndex: 0, pointerEvents: "none",
-      }} />
+
       {children}
     </div>
   );
