@@ -148,14 +148,13 @@ const css = `
     --soft-brown: rgba(255,255,255,0.5);
   }
 
-  body { background: #0f1a0f; }
+  body { background: #d4b896; }
 
   .app {
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
-    /* Bright vibrant background - light source top-right like the reference */
-    background: #0f1a0f;
+    background: transparent;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
     user-select: none;
@@ -217,22 +216,15 @@ const css = `
     z-index: 1;
   }
 
-  /* Dark overlay - uniform so photo shows subtly everywhere, no colour bleed */
-  .sun-overlay {
-    position: fixed;
-    top: 0; left: 50%; transform: translateX(-50%);
-    width: 430px; height: 100vh;
-    background: rgba(8, 16, 8, 0.55);
-    pointer-events: none;
-    z-index: 0;
-  }
+  /* Sun overlay - fixed so it persists while scrolling */
+  .sun-overlay { display: none; }
   .app > *:not(.sun-overlay) { position: relative; z-index: 1; }
 
   /* ─── OVERVIEW ──────────────────────────────────────────────── */
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
-  .ov-heading { font-family: 'DM Sans', sans-serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: var(--text); }
-  .ov-heading em { font-style: normal; color: var(--green); }
+  .ov-heading { font-family: 'DM Sans', sans-serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: #1a1208; }
+  .ov-heading em { font-style: normal; color: #2d6a2d; }
   .ov-since { margin-top: 8px; font-size: 12px; color: var(--text-2); font-weight: 300; }
 
   /* ov-stats handled by GlassContainer */
@@ -268,7 +260,7 @@ const css = `
     pointer-events: none;
   }
 
-  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: var(--text-2); }
+  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(30,20,5,0.55); }
 
   /* plant-list handled by GlassContainer */
 
@@ -378,7 +370,7 @@ const css = `
   /* ─── LIQUID GLASS WATER BUTTON ─────────────────────────────── */
   /* .btn-water — prominent glass button */
   .btn-water {
-    width: 100%; padding: 15px;
+    width: 100%; padding: 12px 8px;
     background: rgba(100,220,80,0.22);
     backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
     -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
@@ -389,9 +381,10 @@ const css = `
     box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
     font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500;
-    letter-spacing: 1.5px; text-transform: uppercase;
+    letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.22s ease;
     position: relative; overflow: hidden;
+    text-align: center;
   }
   .btn-water::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 52%;
@@ -798,13 +791,12 @@ async function callClaude(base64Image, prompt, maxTokens = 256) {
   const data = await response.json();
   if (data.error) throw new Error(data.error.message);
   const text = data.content?.find(b => b.type === "text")?.text || "";
-  const clean = text.replace(/```json[\s\S]*?```|```/g, "").trim();
-  const jsonMatch = clean.match(/\{[\s\S]*\}/);
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) throw new Error("No JSON in response: " + text.slice(0, 100));
   return JSON.parse(jsonMatch[0]);
 }
 
-async function analyseWithClaude(base64Image, plant) {
+async function analyseWithClaude(base64Image, plant, careContext = {}) {
   if (plant._identifyMode) {
     return callClaude(base64Image,
       `Identify this plant. Reply ONLY with JSON:
@@ -812,10 +804,17 @@ async function analyseWithClaude(base64Image, plant) {
       200
     );
   }
+  const { lastWateredDaysAgo, lastFertilizedDaysAgo } = careContext;
+  const waterCtx = lastWateredDaysAgo !== null && lastWateredDaysAgo !== undefined
+    ? `Last watered ${lastWateredDaysAgo} day(s) ago (schedule: every ${plant.waterEveryDays} days).`
+    : `Not yet watered (schedule: every ${plant.waterEveryDays} days).`;
+  const fertCtx = lastFertilizedDaysAgo !== null && lastFertilizedDaysAgo !== undefined
+    ? `Last fertilized ${lastFertilizedDaysAgo} day(s) ago (schedule: every 30 days).`
+    : `Never fertilized.`;
   return callClaude(base64Image,
-    `You are a botanist. Photo shows ${plant.name} (${plant.species}). Watering: every ${plant.waterEveryDays} days. Light: ${plant.light}.
+    `You are a botanist. Photo shows ${plant.name} (${plant.species}). Light: ${plant.light}. ${waterCtx} ${fertCtx}
 Reply ONLY with JSON: {"status":"healthy","headline":"","recommendation":"","waitDays":null,"urgency":"low"}`,
-    200
+    256
   );
 }
 
@@ -857,7 +856,7 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
       {/* Main photo */}
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
         <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}>
-          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 340, height: 420, objectFit: "cover" }} />
           <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "#aaa", fontStyle: "italic" }}>
             {new Date(photos[current].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
           </div>
@@ -883,7 +882,31 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   );
 }
 
-function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos }) {
+async function resizeImageForAPI(file, maxWidth = 800) {
+  const originalDataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("FileReader failed"));
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error("Image decode failed"));
+    i.src = originalDataUrl;
+  });
+  const scale = Math.min(1, maxWidth / img.width);
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.60);
+  const base64 = dataUrl.split(",")[1];
+  return { base64, dataUrl, mediaType: "image/jpeg" };
+}
+
+function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext }) {
   const [analysing, setAnalysing] = useState(false);
   const [gallery, setGallery] = useState(false);
   const [galleryStart, setGalleryStart] = useState(0);
@@ -900,16 +923,15 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos }) {
     if (!file) return;
     setAnalysing(true);
     try {
-      const base64 = await fileToBase64(file);
-      const dataUrl = `data:image/jpeg;base64,${base64}`;
+      const { base64, dataUrl } = await resizeImageForAPI(file, 800);
       const newPhoto = { dataUrl, base64, date: new Date().toISOString(), analysis: null };
       setUserPhotos(prev => [...prev, newPhoto]);
-      // Analyse
-      const result = await analyseWithClaude(base64, plant);
+      // Analyse with care context
+      const result = await analyseWithClaude(base64, plant, careContext || {});
       setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: result } : p));
     } catch(err) {
       console.error(err);
-      setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: { status: "healthy", headline: "Could not analyse", recommendation: "Make sure the photo is clear and try again.", urgency: "low", waitDays: null } } : p));
+      setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: { status: "healthy", headline: "Could not analyse", recommendation: err?.message || "Unknown error", urgency: "low", waitDays: null } } : p));
     }
     setAnalysing(false);
     e.target.value = "";
@@ -921,7 +943,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos }) {
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       {/* Photo stack */}
-      <div style={{ position: "relative", width: 380, height: 265, marginBottom: 8 }}>
+      <div style={{ position: "relative", width: 380, height: 490, marginBottom: 8 }}>
         {/* Render stack back to front */}
         {stackPhotos.slice(1).reverse().map((photo, i) => {
           const stackIdx = stackPhotos.length - 1 - i;
@@ -930,7 +952,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos }) {
           return (
             <div key={i} style={{ position: "absolute", top: offset, left: "50%", transform: `translateX(-50%) rotate(${rot}deg)`, zIndex: stackIdx }}>
               <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 4px 16px rgba(60,30,10,0.14)" }}>
-                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 340, height: 420, objectFit: "cover" }} />
               </div>
             </div>
           );
@@ -948,7 +970,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos }) {
           <div style={{ transform: `rotate(${tilt}deg)` }}>
             <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)" }}>
               <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name}
-                style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+                style={{ display: "block", width: 340, height: 420, objectFit: "cover" }} />
             </div>
           </div>
         </div>
@@ -1274,7 +1296,14 @@ function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
       gap,
       ...style,
     }} className={className}>
-
+      {/* Shared glass layer behind all children — this is the key to merging */}
+      <div style={{
+        position: "absolute", inset: -1,
+        backdropFilter: GLASS_VARS.regular.blur,
+        WebkitBackdropFilter: GLASS_VARS.regular.blur,
+        borderRadius: 22,
+        zIndex: 0, pointerEvents: "none",
+      }} />
       {children}
     </div>
   );
@@ -1338,37 +1367,6 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
 }
 
 
-
-async function resizeImageForAPI(file, maxWidth = 800) {
-    // Step 1: read file as data URL via FileReader (works in sandboxed iframes)
-    const originalDataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error("FileReader failed"));
-      reader.readAsDataURL(file);
-    });
-
-    // Step 2: load into Image using data URL (no createObjectURL needed)
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error("Image decode failed"));
-      i.src = originalDataUrl;
-    });
-
-    // Step 3: resize on canvas
-    const scale = Math.min(1, maxWidth / img.width);
-    const w = Math.round(img.width * scale);
-    const h = Math.round(img.height * scale);
-    const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-
-    // Step 4: export as JPEG data URL
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.60);
-    const base64 = dataUrl.split(",")[1];
-    return { base64, dataUrl, mediaType: "image/jpeg" };
-  }
 
 // ScanButton — self-contained component that lives inside the render tree
 // This ensures fetch works via the artifact proxy, same as PlantPhotoStack
@@ -1472,17 +1470,257 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
   );
 }
 
+// ── Fertilize Modal ────────────────────────────────────────────────────────
+function FertilizeModal({ onConfirm, onClose }) {
+  const DOSES = [0, 0.5, 1];
+  const DOSE_LABELS = { 0: "No dose", 0.5: "½ dose", 1: "Full dose" };
+  const DOSE_DESC = { 0: "Log the event, no fertilizer applied", 0.5: "Half the recommended amount", 1: "Full recommended amount" };
+  const [selected, setSelected] = useState(1);
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      display: "flex", flexDirection: "column", justifyContent: "flex-end",
+      background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#0f1a0f",
+        borderTop: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: "24px 24px 0 0",
+        padding: "24px 24px 40px",
+        maxWidth: 430, width: "100%", margin: "0 auto",
+      }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(212,147,90,0.8)", marginBottom: 2 }}>Fertilize</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>How much did you use?</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+
+        {/* 3-stop slider */}
+        <div style={{ marginBottom: 24 }}>
+          {/* Track + stops */}
+          <div style={{ position: "relative", height: 48, display: "flex", alignItems: "center" }}>
+            {/* Track background */}
+            <div style={{ position: "absolute", left: 0, right: 0, height: 4, background: "rgba(255,255,255,0.12)", borderRadius: 2 }} />
+            {/* Active fill */}
+            <div style={{
+              position: "absolute", left: 0, height: 4, borderRadius: 2,
+              background: "linear-gradient(90deg, rgba(212,147,90,0.6), rgba(212,147,90,1))",
+              width: selected === 0 ? "0%" : selected === 0.5 ? "50%" : "100%",
+              transition: "width 0.2s ease",
+            }} />
+            {/* Stop dots */}
+            {DOSES.map((dose, i) => (
+              <button key={dose} onClick={() => setSelected(dose)} style={{
+                position: "absolute",
+                left: i === 0 ? "0%" : i === 1 ? "50%" : "100%",
+                transform: "translateX(-50%)",
+                width: 28, height: 28, borderRadius: "50%",
+                background: selected === dose ? "rgba(212,147,90,1)" : "rgba(255,255,255,0.15)",
+                border: selected === dose ? "2px solid rgba(240,190,140,0.8)" : "2px solid rgba(255,255,255,0.2)",
+                cursor: "pointer",
+                transition: "all 0.15s",
+                boxShadow: selected === dose ? "0 0 12px rgba(212,147,90,0.5)" : "none",
+                zIndex: 1,
+              }} />
+            ))}
+          </div>
+          {/* Labels */}
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+            {DOSES.map(dose => (
+              <div key={dose} onClick={() => setSelected(dose)} style={{
+                fontSize: 11, cursor: "pointer",
+                color: selected === dose ? "rgba(212,147,90,1)" : "rgba(255,255,255,0.4)",
+                fontWeight: selected === dose ? 500 : 400,
+                transition: "color 0.15s",
+                width: "33%",
+                textAlign: dose === 0 ? "left" : dose === 0.5 ? "center" : "right",
+              }}>
+                {DOSE_LABELS[dose]}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div style={{ background: "rgba(212,147,90,0.08)", border: "1px solid rgba(212,147,90,0.2)", borderRadius: 12, padding: "10px 14px", fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 20, minHeight: 38, transition: "all 0.2s" }}>
+          {DOSE_DESC[selected]}
+        </div>
+
+        {/* Confirm button */}
+        <button onClick={() => onConfirm(selected)} style={{
+          width: "100%", padding: "14px",
+          background: "rgba(212,147,90,0.22)",
+          backdropFilter: "blur(20px)",
+          border: "1px solid rgba(212,147,90,0.4)",
+          borderTopColor: "rgba(240,190,140,0.7)",
+          borderRadius: 20,
+          color: "#ffe0b0", fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: "pointer", letterSpacing: "0.5px",
+        }}>
+          Log {DOSE_LABELS[selected]}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Consult Gardener Drawer ────────────────────────────────────────────────
+function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext, onClose }) {
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef();
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: "smooth" }); }, [messages, loading]);
+
+  async function send() {
+    const text = input.trim();
+    if (!text || loading) return;
+    setInput("");
+    const userMsg = { role: "user", text };
+    setMessages(prev => [...prev, userMsg]);
+    setLoading(true);
+    try {
+      const systemContext = [
+        `You are a helpful plant care assistant. The user is asking about their ${plant.name} (${plant.species}).`,
+        `Light requirement: ${plant.light}. Water every ${plant.waterEveryDays} days.`,
+        careContext?.lastWateredDaysAgo != null ? `Last watered ${careContext.lastWateredDaysAgo} day(s) ago.` : "Not yet watered.",
+        careContext?.lastFertilizedDaysAgo != null ? `Last fertilized ${careContext.lastFertilizedDaysAgo} day(s) ago.` : "Never fertilized.",
+        latestAnalysis ? `Latest AI analysis: "${latestAnalysis.headline}" — ${latestAnalysis.recommendation}` : "",
+        plant.warning ? `Known issue: ${plant.warning}` : "",
+        "Give concise, practical answers. 2-4 sentences max.",
+      ].filter(Boolean).join(" ");
+
+      const history = messages.map(m => ({ role: m.role === "user" ? "user" : "assistant", content: m.text }));
+
+      const contentParts = [];
+      if (latestPhotoBase64 && messages.length === 0) {
+        contentParts.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: latestPhotoBase64 } });
+      }
+      contentParts.push({ type: "text", text });
+
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY || "",
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 300,
+          system: systemContext,
+          messages: [...history, { role: "user", content: contentParts }],
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      const reply = data.content?.find(b => b.type === "text")?.text || "Sorry, I couldn't answer that.";
+      setMessages(prev => [...prev, { role: "assistant", text: reply }]);
+    } catch (err) {
+      setMessages(prev => [...prev, { role: "assistant", text: "Error: " + (err?.message || "unknown") }]);
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 200,
+      display: "flex", flexDirection: "column", justifyContent: "flex-end",
+      background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "#0f1a0f",
+        borderTop: "1px solid rgba(255,255,255,0.15)",
+        borderRadius: "24px 24px 0 0",
+        maxHeight: "75vh", display: "flex", flexDirection: "column",
+        maxWidth: 430, width: "100%", margin: "0 auto",
+      }}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", padding: "16px 20px 12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>AI Assistant</div>
+            <div style={{ fontSize: 16, fontWeight: 500, color: "var(--text)" }}>Consult Gardener</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>✕</button>
+        </div>
+
+        {/* Messages */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 8px", display: "flex", flexDirection: "column", gap: 10 }}>
+          {messages.length === 0 && (
+            <div style={{ fontSize: 12, color: "var(--text-2)", lineHeight: 1.6, textAlign: "center", padding: "24px 16px", opacity: 0.7 }}>
+              Ask anything about your {plant.name}.<br />
+              {latestPhotoBase64 ? "Your latest photo will be included." : "Add a photo first for visual analysis."}
+            </div>
+          )}
+          {messages.map((m, i) => (
+            <div key={i} style={{
+              alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+              maxWidth: "82%",
+              background: m.role === "user" ? "rgba(74,222,128,0.18)" : "rgba(255,255,255,0.09)",
+              border: `1px solid ${m.role === "user" ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.15)"}`,
+              borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+              padding: "10px 14px", fontSize: 13, color: "var(--text)", lineHeight: 1.55,
+            }}>{m.text}</div>
+          ))}
+          {loading && (
+            <div style={{ alignSelf: "flex-start", background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", fontSize: 13, color: "var(--text-2)" }}>
+              <span style={{ opacity: 0.6 }}>Thinking…</span>
+            </div>
+          )}
+          <div ref={bottomRef} />
+        </div>
+
+        {/* Input */}
+        <div style={{ padding: "8px 12px 20px", display: "flex", gap: 8, alignItems: "center" }}>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && send()}
+            placeholder="Ask about your plant…"
+            style={{
+              flex: 1, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
+              borderRadius: 20, padding: "10px 16px", fontSize: 13, color: "var(--text)",
+              fontFamily: "'DM Sans', sans-serif", outline: "none",
+            }}
+          />
+          <button onClick={send} disabled={!input.trim() || loading} style={{
+            background: "var(--green)", border: "none", borderRadius: "50%",
+            width: 38, height: 38, fontSize: 16, cursor: "pointer",
+            color: "#0a1a0a", flexShrink: 0,
+            opacity: (!input.trim() || loading) ? 0.4 : 1,
+            transition: "opacity 0.15s",
+          }}>↑</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
   const [screen, setScreen] = useState("overview");
   const [scanOpen, setScanOpen] = useState(false);
   const [idx, setIdx] = useState(0);
   const [editingNick, setEditingNick] = useState(null);
   const [nickInput, setNickInput] = useState("");
+  const [gardenerOpen, setGardenerOpen] = useState(false);
+  const [fertilizeModalOpen, setFertilizeModalOpen] = useState(false);
   const touchX = useRef(null);
 
   // ── Persisted state ──────────────────────────────────────────────────────
   const [waterLog, setWaterLog] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pt_waterLog")) || {}; } catch { return {}; }
+  });
+  const [fertilizeLog, setFertilizeLog] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pt_fertilizeLog")) || {}; } catch { return {}; }
+  });
+  const [dismissedWarnings, setDismissedWarnings] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("pt_dismissedWarnings")) || {}; } catch { return {}; }
   });
   const [nicknames, setNicknames] = useState(() => {
     try { return JSON.parse(localStorage.getItem("pt_nicknames")) || {}; } catch { return {}; }
@@ -1496,6 +1734,8 @@ export default function App() {
 
   // Persist to localStorage on every render (state changes trigger re-render)
   try { localStorage.setItem("pt_waterLog", JSON.stringify(waterLog)); } catch {}
+  try { localStorage.setItem("pt_fertilizeLog", JSON.stringify(fertilizeLog)); } catch {}
+  try { localStorage.setItem("pt_dismissedWarnings", JSON.stringify(dismissedWarnings)); } catch {}
   try { localStorage.setItem("pt_nicknames", JSON.stringify(nicknames)); } catch {}
   try { localStorage.setItem("pt_gardenLog", JSON.stringify(gardenLog)); } catch {}
   try { localStorage.setItem("pt_plantPhotos", JSON.stringify(plantPhotos)); } catch {}
@@ -1504,10 +1744,38 @@ export default function App() {
 
   const plant = PLANTS[idx];
   const lastWatered = waterLog[plant?.id] || null;
+  const lastFertilized = fertilizeLog[plant?.id] || null;
+  // Support both old string format and new {date, dose} object format
+  const lastFertilizedDate = lastFertilized ? (typeof lastFertilized === 'string' ? lastFertilized : lastFertilized.date) : null;
+  const lastFertilizedDose = lastFertilized ? (typeof lastFertilized === 'string' ? 1 : lastFertilized.dose) : null;
   const status = plant ? getStatus(plant, lastWatered) : "unknown";
   const days = daysSince(lastWatered);
+  const fertDays = daysSince(lastFertilizedDate);
   const pct = days !== null ? Math.min((days / plant.waterEveryDays) * 100, 100) : 0;
   const fillColor = pct >= 100 ? "var(--red)" : pct >= 70 ? "var(--orange)" : "var(--green)";
+
+  // Water button label
+  const waterDaysLeft = days !== null ? plant.waterEveryDays - days : null;
+  const waterBtnLabel = days === null ? "Water now" : waterDaysLeft <= 0 ? "Overdue — water now" : waterDaysLeft === 0 ? "Water today" : `${waterDaysLeft}d until water`;
+  const waterBtnDone = days !== null && waterDaysLeft > 0;
+
+  // Fertilize button label (every 30 days)
+  const FERTILIZE_EVERY = 30;
+  const fertDaysLeft = fertDays !== null ? FERTILIZE_EVERY - fertDays : null;
+  const fertDoseLabel = lastFertilizedDose === 0.5 ? " · ½ dose" : lastFertilizedDose === 0 ? " · no dose" : "";
+  const fertBtnLabel = fertDays === null ? "Fertilize now" : fertDaysLeft <= 0 ? "Overdue — fertilize" : `${fertDaysLeft}d until fertilize${fertDoseLabel}`;
+  const fertBtnDone = fertDays !== null && fertDaysLeft > 0;
+
+  const careContext = {
+    lastWateredDaysAgo: days,
+    lastFertilizedDaysAgo: fertDays,
+  };
+
+  // Latest photo base64 for gardener
+  const currentPhotos = plantPhotos[plant?.id] || [];
+  const latestPhoto = currentPhotos.length > 0 ? currentPhotos[currentPhotos.length - 1] : null;
+  const latestPhotoBase64 = latestPhoto?.base64 || null;
+  const latestAnalysis = latestPhoto?.analysis || null;
 
   const lastWateredAny = Object.values(waterLog).sort().reverse()[0];
   const lastWateredDisplay = lastWateredAny
@@ -1516,6 +1784,8 @@ export default function App() {
 
   function waterPlant(id) { setWaterLog(p => ({ ...p, [id]: new Date().toISOString() })); }
   function resetWater(id) { setWaterLog(p => { const n = { ...p }; delete n[id]; return n; }); }
+  function fertilizePlant(id, dose = 1) { setFertilizeLog(p => ({ ...p, [id]: { date: new Date().toISOString(), dose } })); }
+  function dismissWarning(id) { setDismissedWarnings(p => ({ ...p, [id]: true })); }
   function saveNick(id) {
     if (nickInput.trim()) setNicknames(p => ({ ...p, [id]: nickInput.trim() }));
     else setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
@@ -1648,10 +1918,6 @@ export default function App() {
 
         {screen === "overview" && (
           <div className="fade-up">
-            <div className="ov-hero">
-              <div className="ov-tag">Plant Journal</div>
-              <div className="ov-heading">My little <em>garden</em></div>
-            </div>
             <GlassContainer gap={10} style={{ padding: "16px 16px 0", gridAutoRows: "130px" }}>
               <GlassCard borderRadius={20} style={{ height: 130 }}><div className="stat"><div className="stat-n">{PLANTS.length}</div><div className="stat-l">Total plants</div></div></GlassCard>
               {(() => {
@@ -1692,6 +1958,9 @@ export default function App() {
               </GlassCard>
             </GlassContainer>
 
+            <div style={{ padding: "20px 24px 0" }}>
+              <div className="ov-heading">My little <em>garden</em></div>
+            </div>
             <div className="list-head">Your plants</div>
             <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "0 14px 32px" }}>
               {PLANTS.map((p, i) => {
@@ -1741,11 +2010,12 @@ export default function App() {
               {PLANTS.map((_, i) => <div key={i} className={`dot${i === idx ? " on" : ""}`} onClick={() => setIdx(i)} />)}
             </div>
 
-            <PlantPhotoStack plant={plant} tilt={TILTS[idx]} pinColor={PIN_COLORS[idx]} userPhotos={plantPhotos[plant.id] || []} setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === 'function' ? photos(prev[plant.id] || []) : photos }))} />
+            <PlantPhotoStack plant={plant} tilt={TILTS[idx]} pinColor={PIN_COLORS[idx]} userPhotos={plantPhotos[plant.id] || []} setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === 'function' ? photos(prev[plant.id] || []) : photos }))} careContext={careContext} />
 
-            {plant.warning && (
-              <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px", fontSize: 12, color: "var(--warn)" }}>
-                ⚠ {plant.warning}
+            {plant.warning && !dismissedWarnings[plant.id] && (
+              <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px 8px 14px", fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "flex-start", gap: 8 }}>
+                <span style={{ flex: 1 }}>⚠ {plant.warning}</span>
+                <button onClick={() => dismissWarning(plant.id)} style={{ background: "none", border: "none", color: "rgba(248,113,113,0.6)", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0, flexShrink: 0, marginTop: 1 }}>✕</button>
               </div>
             )}
 
@@ -1770,31 +2040,107 @@ export default function App() {
               <div className="rule" />
               <div className="d-row"><span className="d-key">Light</span><span className="d-val">{plant.light}</span></div>
               <div className="d-row"><span className="d-key">Water every</span><span className="d-val">{plant.waterEveryDays} days</span></div>
-              <div className="d-row"><span className="d-key">Status</span><span className="d-val" style={{ color: STATUS_COLOR[status] }}>{STATUS_LABEL[status]}</span></div>
-              <div className="progress-wrap">
-                <div className="progress-labels">
-                  <span>{lastWatered ? (days === 0 ? "Watered today" : `${days}d ago`) : "Never logged"}</span>
-                  <span>{lastWatered ? `next in ${Math.max(0, plant.waterEveryDays - (days || 0))}d` : "—"}</span>
-                </div>
-                <div className="progress-track">
-                  <div className="progress-fill" style={{ width: `${pct}%`, background: fillColor }} />
-                </div>
+
+              {/* Water status */}
+              <div className="d-row">
+                <span className="d-key">Water</span>
+                <span className="d-val" style={{ color: STATUS_COLOR[status] }}>
+                  {lastWatered
+                    ? days === 0 ? "Watered today" : `${days}d ago`
+                    : "Not logged"}
+                </span>
+              </div>
+
+              {/* Fertilizer status */}
+              <div className="d-row">
+                <span className="d-key">Fertilizer</span>
+                <span className="d-val" style={{ color: fertDays === null ? "#b0998e" : fertDaysLeft <= 0 ? "#c46860" : "#94b88a" }}>
+                  {fertDays === null ? "Not logged"
+                    : fertDays === 0
+                      ? `${lastFertilizedDose === 1 ? "Full dose" : lastFertilizedDose === 0.5 ? "½ dose" : "0 dose"} today`
+                      : `${lastFertilizedDose === 1 ? "Full dose" : lastFertilizedDose === 0.5 ? "½ dose" : "0 dose"} · ${fertDays}d ago`}
+                </span>
               </div>
               <div className="care-box">{plant.care}</div>
-              {plant.warning && <div className="warn-box">⚠ {plant.warning}</div>}
-              <button className="btn-water" onClick={() => waterPlant(plant.id)} style={lastWatered ? {
-                background: "linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(100,100,100,0.08) 100%)",
-                borderColor: "rgba(255,255,255,0.1)",
-                borderTopColor: "rgba(255,255,255,0.18)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                color: "rgba(255,255,255,0.38)",
-              } : {}}>
-                {lastWatered ? "Hydrated" : "Water now"}
+              {/* Action buttons */}
+              <div style={{ display: "flex", gap: 8, marginBottom: 8 }}>
+                {/* Water button */}
+                <button className="btn-water" onClick={() => waterPlant(plant.id)} style={{
+                  flex: 1,
+                  ...(waterBtnDone ? {
+                    background: "rgba(255,255,255,0.06)",
+                    borderColor: "rgba(255,255,255,0.1)",
+                    borderTopColor: "rgba(255,255,255,0.18)",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+                    color: "rgba(255,255,255,0.45)",
+                  } : {}),
+                }}>
+                  <div style={{ fontSize: 16, marginBottom: 2 }}>💧</div>
+                  <div style={{ fontSize: 11, letterSpacing: "0.5px" }}>{waterBtnLabel}</div>
+                </button>
+
+                {/* Fertilize button */}
+                <button onClick={() => setFertilizeModalOpen(true)} style={{
+                  flex: 1, padding: "12px 8px",
+                  background: fertBtnDone
+                    ? "rgba(255,255,255,0.06)"
+                    : "rgba(212,147,90,0.22)",
+                  backdropFilter: "blur(20px) saturate(200%) brightness(1.18)",
+                  WebkitBackdropFilter: "blur(20px) saturate(200%) brightness(1.18)",
+                  border: `1px solid ${fertBtnDone ? "rgba(255,255,255,0.1)" : "rgba(212,147,90,0.4)"}`,
+                  borderTopColor: fertBtnDone ? "rgba(255,255,255,0.18)" : "rgba(240,190,140,0.7)",
+                  borderRadius: 20,
+                  boxShadow: fertBtnDone ? "0 2px 8px rgba(0,0,0,0.15)" : "0 4px 20px rgba(180,100,30,0.22), 0 1.5px 0 rgba(240,200,160,0.45) inset",
+                  color: fertBtnDone ? "rgba(255,255,255,0.45)" : "#ffe0b0",
+                  fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                  cursor: "pointer", transition: "all 0.22s ease",
+                  position: "relative", overflow: "hidden",
+                  textAlign: "center",
+                }}>
+                  <div style={{ fontSize: 16, marginBottom: 2 }}>🌿</div>
+                  <div style={{ fontSize: 11, letterSpacing: "0.5px" }}>{fertBtnLabel}</div>
+                </button>
+              </div>
+
+              {/* Consult Gardener button */}
+              <button onClick={() => setGardenerOpen(true)} style={{
+                width: "100%", padding: "13px",
+                background: "rgba(255,255,255,0.08)",
+                backdropFilter: "blur(20px)",
+                WebkitBackdropFilter: "blur(20px)",
+                border: "1px solid rgba(255,255,255,0.18)",
+                borderTopColor: "rgba(255,255,255,0.35)",
+                borderRadius: 20,
+                color: "rgba(255,255,255,0.75)",
+                fontSize: 13, fontFamily: "'DM Sans', sans-serif", fontWeight: 400,
+                cursor: "pointer", letterSpacing: "0.5px",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                marginBottom: 8,
+              }}>
+                <span style={{ fontSize: 16 }}>🌱</span>
+                Consult Gardener
               </button>
-              {lastWatered && <button className="btn-reset" onClick={() => resetWater(plant.id)}>Reset log</button>}
+
               <div className="swipe-hint">swipe left or right to browse</div>
             </div>
           </div>
+        )}
+
+        {fertilizeModalOpen && screen === "detail" && (
+          <FertilizeModal
+            onConfirm={(dose) => { fertilizePlant(plant.id, dose); setFertilizeModalOpen(false); }}
+            onClose={() => setFertilizeModalOpen(false)}
+          />
+        )}
+
+        {gardenerOpen && screen === "detail" && (
+          <ConsultGardener
+            plant={plant}
+            latestAnalysis={latestAnalysis}
+            latestPhotoBase64={latestPhotoBase64}
+            careContext={careContext}
+            onClose={() => setGardenerOpen(false)}
+          />
         )}
 
         {screen === "garden" && (
