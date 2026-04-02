@@ -216,15 +216,24 @@ const css = `
     z-index: 1;
   }
 
-  /* Sun overlay - fixed so it persists while scrolling */
-  .sun-overlay { display: none; }
-  .app > *:not(.sun-overlay) { position: relative; z-index: 1; }
+  /* Full-screen glass layer — sits between photo and all content */
+  .glass-screen {
+    position: fixed;
+    top: 0; left: 50%; transform: translateX(-50%);
+    width: 430px; height: 100vh;
+    backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
+    background: rgba(255,255,255,0.18);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .app > *:not(.glass-screen) { position: relative; z-index: 1; }
 
   /* ─── OVERVIEW ──────────────────────────────────────────────── */
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
-  .ov-heading { font-family: 'DM Sans', sans-serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: #1a1208; }
-  .ov-heading em { font-style: normal; color: #2d6a2d; }
+  .ov-heading { font-family: 'DM Sans', sans-serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: #ffffff; }
+  .ov-heading em { font-style: normal; color: #c8f0a0; }
   .ov-since { margin-top: 8px; font-size: 12px; color: var(--text-2); font-weight: 300; }
 
   /* ov-stats handled by GlassContainer */
@@ -260,7 +269,7 @@ const css = `
     pointer-events: none;
   }
 
-  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(30,20,5,0.55); }
+  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
 
   /* plant-list handled by GlassContainer */
 
@@ -1898,7 +1907,7 @@ export default function App() {
           </defs>
         </svg>
       <div className="app" style={{ backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top", backgroundAttachment: "fixed" }}>
-        <div className="sun-overlay" />
+        <div className="glass-screen" />
         <svg style={{display:"none"}}>
           <defs>
             <filter id="liquid-refraction" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
