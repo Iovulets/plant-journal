@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { createClient } from "@supabase/supabase-js";
 import anthuriumImg from "./assets/plants/anthurium.jpg";
 import chrysanthemumImg from "./assets/plants/chrysanthemum.jpg";
 import ivyImg from "./assets/plants/ivy.jpg";
@@ -6,6 +7,11 @@ import dracaenaImg from "./assets/plants/dracaena.jpg";
 import ficusImg from "./assets/plants/ficus.jpg";
 import zzImg from "./assets/plants/zz.jpg";
 import bgPhoto from "./assets/background.webp";
+
+const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
 
 
 
@@ -915,7 +921,7 @@ async function resizeImageForAPI(file, maxWidth = 800) {
   return { base64, dataUrl, mediaType: "image/jpeg" };
 }
 
-function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext }) {
+function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext, db }) {
   const [analysing, setAnalysing] = useState(false);
   const [gallery, setGallery] = useState(false);
   const [galleryStart, setGalleryStart] = useState(0);
@@ -933,14 +939,35 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
     setAnalysing(true);
     try {
       const { base64, dataUrl } = await resizeImageForAPI(file, 800);
-      const newPhoto = { dataUrl, base64, date: new Date().toISOString(), analysis: null };
-      setUserPhotos(prev => [...prev, newPhoto]);
-      // Analyse with care context
+
+      // Upload to Supabase Storage
+      const path = `plant-${plant.id}/${Date.now()}.jpg`;
+      const blob = await fetch(dataUrl).then(r => r.blob());
+      await db.storage.from("plant-photos").upload(path, blob, { contentType: "image/jpeg" });
+      const { data: urlData } = db.storage.from("plant-photos").getPublicUrl(path);
+      const publicUrl = urlData?.publicUrl || dataUrl;
+
+      // Optimistically add to UI with dataUrl so it shows immediately
+      const tempPhoto = { dataUrl, base64, date: new Date().toISOString(), analysis: null, id: null };
+      setUserPhotos(prev => [...prev, tempPhoto]);
+
+      // Analyse
       const result = await analyseWithClaude(base64, plant, careContext || {});
-      setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: result } : p));
+
+      // Save to DB
+      const { data: dbRow } = await db.from("plant_photos").insert({
+        plant_id: plant.id, storage_path: path, data_url: publicUrl, analysis: result,
+      }).select().single();
+
+      // Update local state with final row
+      setUserPhotos(prev => prev.map((p, i) =>
+        i === prev.length - 1 ? { ...p, dataUrl: publicUrl, analysis: result, id: dbRow?.id } : p
+      ));
     } catch(err) {
       console.error(err);
-      setUserPhotos(prev => prev.map((p, i) => i === prev.length - 1 ? { ...p, analysis: { status: "healthy", headline: "Could not analyse", recommendation: err?.message || "Unknown error", urgency: "low", waitDays: null } } : p));
+      setUserPhotos(prev => prev.map((p, i) =>
+        i === prev.length - 1 ? { ...p, analysis: { status: "healthy", headline: "Could not analyse", recommendation: err?.message || "Unknown error", urgency: "low", waitDays: null } } : p
+      ));
     }
     setAnalysing(false);
     e.target.value = "";
@@ -1721,36 +1748,80 @@ export default function App() {
   const [fertilizeModalOpen, setFertilizeModalOpen] = useState(false);
   const touchX = useRef(null);
 
-  // ── Persisted state ──────────────────────────────────────────────────────
-  const [waterLog, setWaterLog] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pt_waterLog")) || {}; } catch { return {}; }
-  });
-  const [fertilizeLog, setFertilizeLog] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pt_fertilizeLog")) || {}; } catch { return {}; }
-  });
-  const [dismissedWarnings, setDismissedWarnings] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pt_dismissedWarnings")) || {}; } catch { return {}; }
-  });
-  const [nicknames, setNicknames] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pt_nicknames")) || {}; } catch { return {}; }
-  });
-  const [gardenLog, setGardenLog] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pt_gardenLog")) || []; } catch { return []; }
-  });
-  const [plantPhotos, setPlantPhotos] = useState(() => {
-    try { return JSON.parse(localStorage.getItem("pt_plantPhotos")) || {}; } catch { return {}; }
-  });
+  // ── State ────────────────────────────────────────────────────────────────
+  const [waterLog, setWaterLog] = useState({});       // { plantId: isoString }
+  const [fertilizeLog, setFertilizeLog] = useState({}); // { plantId: { date, dose } }
+  const [dismissedWarnings, setDismissedWarnings] = useState({});
+  const [nicknames, setNicknames] = useState({});
+  const [gardenLog, setGardenLog] = useState([]);
+  const [plantPhotos, setPlantPhotos] = useState({});  // { plantId: [{ dataUrl, base64, analysis, created_at, id }] }
+  const [loading, setLoading] = useState(true);
 
-  // Persist to localStorage on every render (state changes trigger re-render)
-  try { localStorage.setItem("pt_waterLog", JSON.stringify(waterLog)); } catch {}
-  try { localStorage.setItem("pt_fertilizeLog", JSON.stringify(fertilizeLog)); } catch {}
-  try { localStorage.setItem("pt_dismissedWarnings", JSON.stringify(dismissedWarnings)); } catch {}
-  try { localStorage.setItem("pt_nicknames", JSON.stringify(nicknames)); } catch {}
-  try { localStorage.setItem("pt_gardenLog", JSON.stringify(gardenLog)); } catch {}
-  try { localStorage.setItem("pt_plantPhotos", JSON.stringify(plantPhotos)); } catch {}
+  // ── Load all data from Supabase on mount ─────────────────────────────────
+  useEffect(() => {
+    async function loadAll() {
+      try {
+        const [wRes, fRes, dRes, nRes, gRes, pRes] = await Promise.all([
+          supabase.from("water_log").select("*").order("watered_at", { ascending: false }),
+          supabase.from("fertilize_log").select("*").order("fertilized_at", { ascending: false }),
+          supabase.from("dismissed_warnings").select("*"),
+          supabase.from("nicknames").select("*"),
+          supabase.from("garden_log").select("*").order("scanned_at", { ascending: false }),
+          supabase.from("plant_photos").select("*").order("created_at", { ascending: true }),
+        ]);
 
+        // Water log: keep latest per plant
+        const wl = {};
+        (wRes.data || []).forEach(r => { if (!wl[r.plant_id]) wl[r.plant_id] = r.watered_at; });
+        setWaterLog(wl);
 
+        // Fertilize log: keep latest per plant
+        const fl = {};
+        (fRes.data || []).forEach(r => { if (!fl[r.plant_id]) fl[r.plant_id] = { date: r.fertilized_at, dose: r.dose }; });
+        setFertilizeLog(fl);
 
+        // Dismissed warnings
+        const dw = {};
+        (dRes.data || []).forEach(r => { dw[r.plant_id] = true; });
+        setDismissedWarnings(dw);
+
+        // Nicknames
+        const nn = {};
+        (nRes.data || []).forEach(r => { nn[r.plant_id] = r.nickname; });
+        setNicknames(nn);
+
+        // Garden log
+        setGardenLog((gRes.data || []).map(r => ({
+          id: r.id, commonName: r.common_name, scientificName: r.scientific_name,
+          family: r.family, confidence: r.confidence, origin: r.origin,
+          funFact: r.fun_fact, careLevel: r.care_level, edible: r.edible,
+          toxic: r.toxic, toxicTo: r.toxic_to, dataUrl: r.data_url,
+          date: r.scanned_at,
+        })));
+
+        // Plant photos: group by plant_id, get public URL from storage
+        const pp = {};
+        for (const r of (pRes.data || [])) {
+          if (!pp[r.plant_id]) pp[r.plant_id] = [];
+          const { data: urlData } = supabase.storage.from("plant-photos").getPublicUrl(r.storage_path);
+          pp[r.plant_id].push({
+            id: r.id,
+            dataUrl: urlData?.publicUrl || r.data_url,
+            base64: null, // not stored in DB, only needed during upload
+            analysis: r.analysis,
+            date: r.created_at,
+          });
+        }
+        setPlantPhotos(pp);
+      } catch (err) {
+        console.error("Failed to load from Supabase:", err);
+      }
+      setLoading(false);
+    }
+    loadAll();
+  }, []);
+
+  // ── Derived values ────────────────────────────────────────────────────────
   const plant = PLANTS[idx];
   const lastWatered = waterLog[plant?.id] || null;
   const lastFertilized = fertilizeLog[plant?.id] || null;
@@ -1791,13 +1862,32 @@ export default function App() {
     ? new Date(lastWateredAny).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
     : "Not yet";
 
-  function waterPlant(id) { setWaterLog(p => ({ ...p, [id]: new Date().toISOString() })); }
-  function resetWater(id) { setWaterLog(p => { const n = { ...p }; delete n[id]; return n; }); }
-  function fertilizePlant(id, dose = 1) { setFertilizeLog(p => ({ ...p, [id]: { date: new Date().toISOString(), dose } })); }
-  function dismissWarning(id) { setDismissedWarnings(p => ({ ...p, [id]: true })); }
-  function saveNick(id) {
-    if (nickInput.trim()) setNicknames(p => ({ ...p, [id]: nickInput.trim() }));
-    else setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
+  async function waterPlant(id) {
+    const now = new Date().toISOString();
+    setWaterLog(p => ({ ...p, [id]: now }));
+    await supabase.from("water_log").insert({ plant_id: id, watered_at: now });
+  }
+
+  async function fertilizePlant(id, dose = 1) {
+    const now = new Date().toISOString();
+    setFertilizeLog(p => ({ ...p, [id]: { date: now, dose } }));
+    await supabase.from("fertilize_log").insert({ plant_id: id, fertilized_at: now, dose });
+  }
+
+  async function dismissWarning(id) {
+    setDismissedWarnings(p => ({ ...p, [id]: true }));
+    await supabase.from("dismissed_warnings").upsert({ plant_id: id });
+  }
+
+  async function saveNick(id) {
+    const nick = nickInput.trim();
+    if (nick) {
+      setNicknames(p => ({ ...p, [id]: nick }));
+      await supabase.from("nicknames").upsert({ plant_id: id, nickname: nick });
+    } else {
+      setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
+      await supabase.from("nicknames").delete().eq("plant_id", id);
+    }
     setEditingNick(null); setNickInput("");
   }
   function openDetail(i) { setIdx(i); setScreen("detail"); }
@@ -1908,6 +1998,12 @@ export default function App() {
         </svg>
       <div className="app" style={{ backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top", backgroundAttachment: "fixed" }}>
         <div className="glass-screen" />
+        {loading && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
+            <div style={{ fontSize: 32 }}>🌿</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", letterSpacing: 1 }}>Loading your garden…</div>
+          </div>
+        )}
         <svg style={{display:"none"}}>
           <defs>
             <filter id="liquid-refraction" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
@@ -1952,9 +2048,16 @@ export default function App() {
               })()}
               <GlassCard borderRadius={20} style={{ height: 130 }}>
               <ScanButton
-                onResult={(entry) => {
+                onResult={async (entry) => {
                   setGardenLog(prev => [entry, ...prev]);
                   setScreen("garden");
+                  await supabase.from("garden_log").insert({
+                    common_name: entry.commonName, scientific_name: entry.scientificName,
+                    family: entry.family, confidence: entry.confidence, origin: entry.origin,
+                    fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
+                    toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl,
+                    scanned_at: entry.date,
+                  });
                 }}
               />
               </GlassCard>
@@ -2019,7 +2122,7 @@ export default function App() {
               {PLANTS.map((_, i) => <div key={i} className={`dot${i === idx ? " on" : ""}`} onClick={() => setIdx(i)} />)}
             </div>
 
-            <PlantPhotoStack plant={plant} tilt={TILTS[idx]} pinColor={PIN_COLORS[idx]} userPhotos={plantPhotos[plant.id] || []} setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === 'function' ? photos(prev[plant.id] || []) : photos }))} careContext={careContext} />
+            <PlantPhotoStack plant={plant} tilt={TILTS[idx]} pinColor={PIN_COLORS[idx]} userPhotos={plantPhotos[plant.id] || []} setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === 'function' ? photos(prev[plant.id] || []) : photos }))} careContext={careContext} db={supabase} />
 
             {plant.warning && !dismissedWarnings[plant.id] && (
               <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px 8px 14px", fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "flex-start", gap: 8 }}>
@@ -2158,7 +2261,16 @@ export default function App() {
               <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", padding: "6px 0" }}>← Overview</button>
               <div style={{ flex: 1 }} />
               <ScanButton
-                onResult={(entry) => { setGardenLog(prev => [entry, ...prev]); }}
+                onResult={async (entry) => {
+                  setGardenLog(prev => [entry, ...prev]);
+                  await supabase.from("garden_log").insert({
+                    common_name: entry.commonName, scientific_name: entry.scientificName,
+                    family: entry.family, confidence: entry.confidence, origin: entry.origin,
+                    fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
+                    toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl,
+                    scanned_at: entry.date,
+                  });
+                }}
                 renderTrigger={(onClick, scanning) => (
                   <button onClick={onClick} style={{ background: "var(--green)", border: "none", borderRadius: 20, padding: "7px 16px", fontSize: 12, color: "#0a1a0a", fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
                     {scanning ? "…" : "+ Scan"}
