@@ -5,7 +5,7 @@ import ivyImg from "./assets/plants/ivy.jpg";
 import dracaenaImg from "./assets/plants/dracaena.jpg";
 import ficusImg from "./assets/plants/ficus.jpg";
 import zzImg from "./assets/plants/zz.jpg";
-import bgPhoto from "./assets/background.jpg";
+import bgPhoto from "./assets/background.webp";
 
 
 
