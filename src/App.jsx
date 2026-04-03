@@ -1537,7 +1537,14 @@ export default function App() {
         className="app"
         style={{}}
       >
+        {/* Background: photo + frosted glass overlay */}
         <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
+        <div style={{
+          position: "fixed", inset: 0, zIndex: -1,
+          backdropFilter: "blur(40px) saturate(140%) brightness(1.05)",
+          WebkitBackdropFilter: "blur(40px) saturate(140%) brightness(1.05)",
+          background: "rgba(255,255,255,0.18)",
+        }} />
 
 
         {dbLoading && (
