@@ -934,22 +934,22 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
 const GLASS_VARS = {
   regular: {
-    bg: "rgba(255,255,255,0.14)", bgHover: "rgba(255,255,255,0.20)",
-    border: "rgba(255,255,255,0.22)", borderTop: "rgba(255,255,255,0.50)",
-    shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.36) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
-    blur: "blur(22px) saturate(190%) brightness(1.14)",
+    bg: "rgba(255,255,255,0.22)", bgHover: "rgba(255,255,255,0.28)",
+    border: "rgba(255,255,255,0.32)", borderTop: "rgba(255,255,255,0.62)",
+    shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.48) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
+    blur: "blur(32px) saturate(210%) brightness(1.18)",
   },
   interactive: {
-    bg: "rgba(255,255,255,0.16)", bgHover: "rgba(255,255,255,0.24)",
-    border: "rgba(255,255,255,0.26)", borderTop: "rgba(255,255,255,0.58)",
-    shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.42) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
-    blur: "blur(24px) saturate(200%) brightness(1.16)",
+    bg: "rgba(255,255,255,0.24)", bgHover: "rgba(255,255,255,0.32)",
+    border: "rgba(255,255,255,0.36)", borderTop: "rgba(255,255,255,0.68)",
+    shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.52) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
+    blur: "blur(34px) saturate(220%) brightness(1.20)",
   },
   prominent: {
-    bg: "rgba(100,220,80,0.22)", bgHover: "rgba(100,220,80,0.32)",
-    border: "rgba(150,255,100,0.40)", borderTop: "rgba(200,255,160,0.70)",
-    shadow: "0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset",
-    blur: "blur(20px) saturate(200%) brightness(1.18)",
+    bg: "rgba(100,220,80,0.28)", bgHover: "rgba(100,220,80,0.38)",
+    border: "rgba(150,255,100,0.50)", borderTop: "rgba(200,255,160,0.78)",
+    shadow: "0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.55) inset",
+    blur: "blur(28px) saturate(220%) brightness(1.22)",
   },
 };
 
