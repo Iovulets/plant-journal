@@ -1017,9 +1017,19 @@ function ensureGlassLoop() {
 
 function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
   useEffect(() => { ensureGlassLoop(); }, []);
+  // The backdrop-filter div must be clipped to the container to prevent bleed.
+  // We use a 2-div approach: outer has overflow:visible (so hover lifts aren't clipped),
+  // inner backdrop is clipped by clip-path matching the border-radius.
   return (
     <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1fr 1fr", gap, ...style }} className={className}>
-      <div style={{ position: "absolute", inset: -1, backdropFilter: GLASS_VARS.regular.blur, WebkitBackdropFilter: GLASS_VARS.regular.blur, borderRadius: 22, zIndex: 0, pointerEvents: "none" }} />
+      <div style={{
+        position: "absolute", inset: 0,
+        backdropFilter: GLASS_VARS.regular.blur,
+        WebkitBackdropFilter: GLASS_VARS.regular.blur,
+        borderRadius: 22,
+        overflow: "hidden",
+        zIndex: 0, pointerEvents: "none",
+      }} />
       {children}
     </div>
   );
