@@ -4,7 +4,14 @@ import bgPhoto from "./assets/background.webp";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  {
+    auth: {
+      detectSessionInUrl: true,
+      persistSession: true,
+      autoRefreshToken: true,
+    }
+  }
 );
 
 function daysSince(iso) {
@@ -1597,23 +1604,38 @@ export default function App() {
 
   // ── Auth state ───────────────────────────────────────────────────────────
   useEffect(() => {
-    // Handle OAuth redirect — token comes back in the URL hash fragment
-    // exchangeCodeForSession picks it up and establishes the session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setAuthLoading(false);
-    });
-
+    // onAuthStateChange must be set up BEFORE getSession so it catches
+    // the SIGNED_IN event fired when Supabase parses the URL hash token
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      if (event === "SIGNED_IN") {
-        setAuthLoading(false);
-        // Clean the token hash from the URL without reloading
+      setAuthLoading(false);
+      if (event === "SIGNED_IN" && window.location.hash.includes("access_token")) {
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    });
+
+    // getSession after — handles already-logged-in case (no hash in URL)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        // If no session but hash has token, Supabase should parse it automatically
+        // via detectSessionInUrl — give it a moment then check again
         if (window.location.hash.includes("access_token")) {
-          window.history.replaceState(null, "", window.location.pathname);
+          setTimeout(() => {
+            supabase.auth.getSession().then(({ data: { session: s } }) => {
+              setUser(s?.user ?? null);
+              setAuthLoading(false);
+              if (s && window.location.hash) {
+                window.history.replaceState(null, "", window.location.pathname);
+              }
+            });
+          }, 500);
+        } else {
+          setUser(null);
+          setAuthLoading(false);
         }
       }
     });
+
     return () => subscription.unsubscribe();
   }, []);
 
