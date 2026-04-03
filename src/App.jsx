@@ -1451,12 +1451,22 @@ export default function App() {
 
   // ── Auth state ───────────────────────────────────────────────────────────
   useEffect(() => {
+    // Handle OAuth redirect — token comes back in the URL hash fragment
+    // exchangeCodeForSession picks it up and establishes the session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setAuthLoading(false);
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
+      if (event === "SIGNED_IN") {
+        setAuthLoading(false);
+        // Clean the token hash from the URL without reloading
+        if (window.location.hash.includes("access_token")) {
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      }
     });
     return () => subscription.unsubscribe();
   }, []);
