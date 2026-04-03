@@ -13,9 +13,6 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
-
-
-
 const TRACKING_SINCE = "27/03/2026";
 
 const PLANTS = [
@@ -132,14 +129,12 @@ const css = `
     --text-3: rgba(255,255,255,0.38);
     --warn: #f87171;
     --warn-bg: rgba(248,113,113,0.15);
-    /* Liquid glass token */
     --glass-bg: rgba(255,255,255,0.10);
     --glass-bg-hover: rgba(255,255,255,0.14);
     --glass-border: rgba(255,255,255,0.22);
     --glass-border-top: rgba(255,255,255,0.48);
     --glass-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 1.5px 0 rgba(255,255,255,0.35) inset, 0 -1px 0 rgba(0,0,0,0.12) inset;
     --glass-filter: blur(20px) saturate(180%) brightness(1.12);
-    /* legacy compat */
     --card: rgba(255,255,255,0.10);
     --card-border: rgba(255,255,255,0.22);
     --peach-dark: #4ade80;
@@ -172,15 +167,9 @@ const css = `
   }
   .fade-up { animation: fadeUp 0.3s ease both; }
 
-  /* ─── LIQUID GLASS mixin ─────────────────────────────────────── */
-  /* Outer wrapper: gets the SVG displacement filter for refraction */
-  .lg-wrap {
-    position: relative;
-    border-radius: 20px;
-  }
+  .lg-wrap { position: relative; border-radius: 20px; }
   .lg-wrap-sm { border-radius: 18px; }
 
-  /* Inner glass surface: backdrop-filter lives here (separate from filter) */
   .lg {
     background: var(--glass-bg);
     backdrop-filter: var(--glass-filter);
@@ -193,36 +182,25 @@ const css = `
     position: relative;
     overflow: hidden;
   }
-  /* Specular top-left highlight beam */
   .lg::before {
     content: '';
     position: absolute;
     inset: 0;
-    background:
-      linear-gradient(145deg,
-        rgba(255,255,255,0.22) 0%,
-        rgba(255,255,255,0.06) 30%,
-        transparent 55%);
+    background: linear-gradient(145deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 30%, transparent 55%);
     border-radius: inherit;
     pointer-events: none;
     z-index: 1;
   }
-  /* Edge rim from right light source */
   .lg::after {
     content: '';
     position: absolute;
     inset: 0;
-    background:
-      radial-gradient(ellipse 90% 60% at 90% -10%,
-        rgba(180,255,120,0.18) 0%,
-        rgba(120,220,60,0.06) 40%,
-        transparent 70%);
+    background: radial-gradient(ellipse 90% 60% at 90% -10%, rgba(180,255,120,0.18) 0%, rgba(120,220,60,0.06) 40%, transparent 70%);
     border-radius: inherit;
     pointer-events: none;
     z-index: 1;
   }
 
-  /* Full-screen glass layer */
   .glass-screen {
     position: fixed;
     top: 0; left: 50%; transform: translateX(-50%);
@@ -235,16 +213,12 @@ const css = `
   }
   .app > *:not(.glass-screen) { position: relative; z-index: 1; }
 
-  /* ─── OVERVIEW ──────────────────────────────────────────────── */
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
   .ov-heading { font-family: 'DM Sans', sans-serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: #ffffff; }
   .ov-heading em { font-style: normal; color: #c8f0a0; }
   .ov-since { margin-top: 8px; font-size: 12px; color: var(--text-2); font-weight: 300; }
 
-  /* ov-stats handled by GlassContainer */
-
-  /* .stat shell — fills parent GlassCard, content bottom-left */
   .stat { padding: 18px 16px 16px; position: relative; height: 100%; box-sizing: border-box; display: flex; flex-direction: column; justify-content: flex-end; align-items: flex-start; gap: 5px; }
   .stat > * { position: relative; z-index: 1; }
   .stat.span2 { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; }
@@ -256,7 +230,6 @@ const css = `
   .stat.span2 .stat-val { font-size: 14px; color: var(--text); }
   .action-tile { position: relative; }
 
-  /* Specular on stat cards */
   .stat::before {
     content: '';
     position: absolute; inset: 0;
@@ -277,9 +250,6 @@ const css = `
 
   .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
 
-  /* plant-list handled by GlassContainer */
-
-  /* .prow shell — GlassCard handles glass rendering */
   .prow { padding: 12px 14px; display: flex; align-items: center; gap: 12px; position: relative; }
   .prow > * { position: relative; z-index: 1; }
 
@@ -291,7 +261,6 @@ const css = `
   .slabel { font-size: 11px; }
   .parrow { font-size: 18px; color: var(--text-3); margin-left: 2px; }
 
-  /* ─── DETAIL ────────────────────────────────────────────────── */
   .detail-nav {
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 18px;
@@ -354,6 +323,17 @@ const css = `
   .d-key { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-2); }
   .d-val { font-size: 13px; color: var(--text); }
 
+  /* Tappable date rows */
+  .d-row-tap {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 12px; cursor: pointer; padding: 6px 10px; margin-left: -10px; margin-right: -10px;
+    border-radius: 10px; transition: background 0.15s;
+  }
+  .d-row-tap:hover { background: rgba(255,255,255,0.07); }
+  .d-row-tap:active { background: rgba(255,255,255,0.12); }
+  .d-val-tap { font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 6px; }
+  .d-val-tap-hint { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
+
   .progress-wrap { margin-bottom: 20px; }
   .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
   .progress-track { height: 4px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; }
@@ -382,8 +362,6 @@ const css = `
     border-radius: 16px; padding: 12px 16px; font-size: 12px; color: var(--warn); line-height: 1.65; margin-bottom: 16px;
   }
 
-  /* ─── LIQUID GLASS WATER BUTTON ─────────────────────────────── */
-  /* .btn-water — prominent glass button */
   .btn-water {
     width: 100%; padding: 12px 8px;
     background: rgba(100,220,80,0.22);
@@ -409,6 +387,37 @@ const css = `
   .btn-water:hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); box-shadow: 0 8px 28px rgba(60,180,30,0.30), 0 1.5px 0 rgba(200,255,160,0.55) inset; }
   .btn-water:active { transform: scale(0.98); }
 
+  .btn-fertilize {
+    width: 100%; padding: 12px 8px; margin-top: 8px;
+    background: rgba(212,147,90,0.18);
+    backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
+    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
+    border: 1px solid rgba(212,147,90,0.35);
+    border-top-color: rgba(240,190,140,0.60);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(180,120,40,0.15), 0 1.5px 0 rgba(240,190,140,0.35) inset;
+    color: #ffe0b0;
+    font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer; transition: all 0.22s ease;
+    position: relative; overflow: hidden;
+    text-align: center;
+  }
+  .btn-fertilize:hover { transform: translateY(-2px); background: rgba(212,147,90,0.28); }
+  .btn-fertilize:active { transform: scale(0.98); }
+
+  .btn-consult {
+    width: 100%; padding: 10px 8px; margin-top: 8px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.55);
+    font-size: 13px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    text-align: center;
+  }
+  .btn-consult:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
+
   .btn-reset {
     width: 100%; padding: 12px; background: rgba(255,255,255,0.06);
     color: var(--text-2); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px;
@@ -418,7 +427,6 @@ const css = `
 
   .swipe-hint { text-align: center; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-3); margin-top: 20px; }
 
-  /* ─── SHINE utility ─────────────────────────────────────────── */
   .shine { position: relative; overflow: hidden; }
   .shine::before {
     content: '';
@@ -435,79 +443,19 @@ const css = `
   }
 `;
 
-
-
-
-
-// ── Air Quality Slider ─────────────────────────────────────────────────────
-// Sources:
-//   CO2: peer-reviewed plant biology, ~g/year absorption rates
-//   VOC: NASA Clean Air Study (Wolverton 1989) μg/hr removal rates  
-//   Humidity: plant transpiration ~30-50ml/plant/day → RH contribution
-//   PM2.5: NASA + peer studies, leaf surface area trapping fine particulates
-//   Wellbeing: Journal of Physiological Anthropology (2015) cortisol studies
-//
-// Apartment context: 35m², 87.5m³, 2 adults, Chisinau MD (heating season = dry)
+// ── Air Quality ────────────────────────────────────────────────────────────
 
 const AIR_CARDS = [
-  {
-    id: "voc",
-    label: "VOC Removal",
-    subtitle: "toxin filtration",
-    unit: "μg/hr",
-    description: "WHO guideline: <300μg/m³ total VOC. Your plants remove toxins at roughly the rate of a mid-range air purifier running continuously. Tap a toxin to see which plants target it.",
-    color: "#94b88a",
-    colorLight: "rgba(148,184,138,0.15)",
-  },
-  {
-    id: "co2",
-    label: "CO₂ Offset",
-    subtitle: "carbon absorption",
-    unit: "g/day",
-    description: "Your 35m² apartment holds ~87.5m³ of air. Plants offset a small % of your CO₂, but ventilation matters more here. Where plants truly shine is VOC and particulate filtration.",
-    color: "#b8c894",
-    colorLight: "rgba(184,200,148,0.15)",
-  },
-  {
-    id: "humidity",
-    label: "Humidity",
-    subtitle: "transpiration boost",
-    unit: "ml/day",
-    description: "With no heating running, your indoor RH tracks outdoor levels (~68% in late March). You're already above the 40-60% optimal range — no humidity problem right now. This card becomes important when heating starts in autumn.",
-    color: "#8ab4c8",
-    colorLight: "rgba(138,180,200,0.15)",
-  },
-  {
-    id: "pm25",
-    label: "PM2.5 Filter",
-    subtitle: "fine dust trapping",
-    unit: "% reduction",
-    description: "Leaf surfaces trap fine airborne particles (PM2.5). NASA studies show 20-30% reduction in a closed room. Larger, textured leaves (Ficus, Dracaena) are most effective.",
-    color: "#c8a894",
-    colorLight: "rgba(200,168,148,0.15)",
-  },
-  {
-    id: "wellbeing",
-    label: "Wellbeing",
-    subtitle: "stress & cortisol",
-    unit: "score",
-    description: "Journal of Physiological Anthropology (2015): interacting with houseplants measurably reduces cortisol and systolic blood pressure. This is the most underrated benefit.",
-    color: "#b894c8",
-    colorLight: "rgba(184,148,200,0.15)",
-  },
+  { id: "voc", label: "VOC Removal", subtitle: "toxin filtration", unit: "μg/hr", description: "WHO guideline: <300μg/m³ total VOC. Your plants remove toxins at roughly the rate of a mid-range air purifier running continuously. Tap a toxin to see which plants target it.", color: "#94b88a", colorLight: "rgba(148,184,138,0.15)" },
+  { id: "co2", label: "CO₂ Offset", subtitle: "carbon absorption", unit: "g/day", description: "Your 35m² apartment holds ~87.5m³ of air. Plants offset a small % of your CO₂, but ventilation matters more here. Where plants truly shine is VOC and particulate filtration.", color: "#b8c894", colorLight: "rgba(184,200,148,0.15)" },
+  { id: "humidity", label: "Humidity", subtitle: "transpiration boost", unit: "ml/day", description: "With no heating running, your indoor RH tracks outdoor levels (~68% in late March). You're already above the 40-60% optimal range — no humidity problem right now. This card becomes important when heating starts in autumn.", color: "#8ab4c8", colorLight: "rgba(138,180,200,0.15)" },
+  { id: "pm25", label: "PM2.5 Filter", subtitle: "fine dust trapping", unit: "% reduction", description: "Leaf surfaces trap fine airborne particles (PM2.5). NASA studies show 20-30% reduction in a closed room. Larger, textured leaves (Ficus, Dracaena) are most effective.", color: "#c8a894", colorLight: "rgba(200,168,148,0.15)" },
+  { id: "wellbeing", label: "Wellbeing", subtitle: "stress & cortisol", unit: "score", description: "Journal of Physiological Anthropology (2015): interacting with houseplants measurably reduces cortisol and systolic blood pressure. This is the most underrated benefit.", color: "#b894c8", colorLight: "rgba(184,148,200,0.15)" },
 ];
 
-const VOC_COLORS = {
-  "Benzene":      "#e8a87a",
-  "Formaldehyde": "#94b88a",
-  "Ammonia":      "#a89ed4",
-  "Toluene":      "#d4b88a",
-  "Xylene":       "#b8d4c8",
-  "General VOCs": "#c4b4a4",
-};
+const VOC_COLORS = { "Benzene": "#e8a87a", "Formaldehyde": "#94b88a", "Ammonia": "#a89ed4", "Toluene": "#d4b88a", "Xylene": "#b8d4c8", "General VOCs": "#c4b4a4" };
 
 function getMetrics(plants) {
-  // VOC
   const totalVoc = plants.reduce((s, p) => s + (p.vocPerHour || 0), 0);
   const aptVocGen = 11000;
   const vocPct = Math.min((totalVoc / aptVocGen) * 100, 100);
@@ -517,32 +465,25 @@ function getMetrics(plants) {
     (p.vocStrengths || []).forEach(v => { vocMap[v] = (vocMap[v] || 0) + share; });
   });
 
-  // CO2
   const totalCo2Year = plants.reduce((s, p) => s + (p.co2PerYear || 0), 0);
   const offsetPerDay = totalCo2Year / 365;
   const humanPerDay = 400;
   const co2Pct = Math.min((offsetPerDay / humanPerDay) * 100, 100);
 
-  // Humidity: each plant ~35ml/day transpiration (medium size average)
   const humidityMlPerDay = plants.length * 35;
-  // 87.5m³ room: 1ml water → ~0.013% RH increase approx
   const rhBoost = humidityMlPerDay * 0.013;
-  const targetRH = 60; const currentRH = 68; // late March Chisinau, no heating, outdoor RH ~68%
-  // Show actual RH as % of optimal target (60% ceiling). 68% RH = 113% of target.
+  const targetRH = 60; const currentRH = 68;
   const humidityPct = Math.round((currentRH / targetRH) * 100);
 
-  // PM2.5: large-leaf plants more effective. Score per plant type
   const pm25Scores = { 1: 15, 2: 20, 3: 22, 4: 25, 5: 18, 6: 10 };
   const totalPm25 = plants.reduce((s, p) => s + (pm25Scores[p.id] || 10), 0);
   const maxPm25 = 25 * plants.length;
   const pm25Pct = Math.min((totalPm25 / maxPm25) * 100, 100);
-  const pm25Reduction = Math.round(totalPm25 / plants.length); // avg % reduction
+  const pm25Reduction = Math.round(totalPm25 / plants.length);
 
-  // Wellbeing: based on plant count, variety, and visible greenery
-  // 6 species = high variety, window placement = good light exposure
   const varietyScore = Math.min(plants.length / 6, 1) * 40;
-  const placementScore = 35; // window plants
-  const careScore = 25; // actively caring = engagement
+  const placementScore = 35;
+  const careScore = 25;
   const wellbeingTotal = varietyScore + placementScore + careScore;
   const wellbeingPct = Math.min(wellbeingTotal, 100);
 
@@ -557,7 +498,7 @@ function getMetrics(plants) {
 
 function VocDetail({ plants, metrics }) {
   const [activeVoc, setActiveVoc] = useState(null);
-  const { vocMap, totalVoc, aptVocGen } = metrics;
+  const { vocMap } = metrics;
   const vocEntries = Object.entries(vocMap).sort((a, b) => b[1] - a[1]);
   const maxVoc = vocEntries[0]?.[1] || 1;
   const sortedPlants = [...plants].sort((a, b) => (b.vocPerHour||0) - (a.vocPerHour||0));
@@ -599,7 +540,6 @@ function VocDetail({ plants, metrics }) {
 }
 
 function Co2Detail({ plants, metrics }) {
-  const { offsetPerDay, humanPerDay } = metrics;
   const sortedPlants = [...plants].sort((a,b) => (b.co2PerYear||0) - (a.co2PerYear||0));
   const maxCo2 = sortedPlants[0]?.co2PerYear || 1;
   return (
@@ -621,9 +561,9 @@ function Co2Detail({ plants, metrics }) {
 function HumidityDetail({ plants, metrics }) {
   const { rhBoost, currentRH } = metrics;
   const bars = [
-    { label: "Current RH (no heating)", value: currentRH, max: 100, color: "#4ade80" },
-    { label: "After plants", value: Math.min(parseFloat(currentRH) + parseFloat(rhBoost), 100), max: 100, color: "#86efac" },
-    { label: "Optimal target", value: 50, max: 100, color: "#94b88a" },
+    { label: "Current RH (no heating)", value: currentRH, color: "#4ade80" },
+    { label: "After plants", value: Math.min(parseFloat(currentRH) + parseFloat(rhBoost), 100), color: "#86efac" },
+    { label: "Optimal target", value: 50, color: "#94b88a" },
   ];
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
@@ -644,7 +584,7 @@ function HumidityDetail({ plants, metrics }) {
   );
 }
 
-function Pm25Detail({ plants, metrics }) {
+function Pm25Detail({ plants }) {
   const pm25Scores = { 1: 15, 2: 20, 3: 22, 4: 25, 5: 18, 6: 10 };
   const sortedPlants = [...plants].sort((a, b) => (pm25Scores[b.id]||10) - (pm25Scores[a.id]||10));
   const maxScore = 25;
@@ -702,74 +642,55 @@ function AirQualitySlider({ plants }) {
 
   return (
     <div style={{ margin: "16px 16px 0" }}>
-      {/* Tab pills */}
       <div style={{ display: "flex", gap: 6, marginBottom: 12, overflowX: "auto", paddingBottom: 2 }}>
         {AIR_CARDS.map(c => (
           <button key={c.id} onClick={() => setActiveCard(c.id)} style={{
             flexShrink: 0,
             background: activeCard === c.id ? c.color : "rgba(255,255,255,0.09)",
             border: `1px solid ${activeCard === c.id ? c.color : "rgba(255,255,255,0.22)"}`,
-            borderRadius: 20,
-            padding: "5px 13px",
-            fontSize: 11,
+            borderRadius: 20, padding: "5px 13px", fontSize: 11,
             color: activeCard === c.id ? "#0a1a0a" : "rgba(255,255,255,0.72)",
-            cursor: "pointer",
-            fontFamily: "'Jost', sans-serif",
-            fontWeight: 400,
-            letterSpacing: "0.3px",
-            transition: "all 0.2s",
+            cursor: "pointer", fontFamily: "'DM Sans', sans-serif", fontWeight: 400,
+            letterSpacing: "0.3px", transition: "all 0.2s",
           }}>
             {c.label}
           </button>
         ))}
       </div>
 
-      {/* Card */}
       <div style={{
         background: "rgba(255,255,255,0.09)",
         backdropFilter: "blur(20px) saturate(180%) brightness(1.12)",
         WebkitBackdropFilter: "blur(20px) saturate(180%) brightness(1.12)",
-        borderRadius: 20,
-        padding: "20px 18px 18px",
+        borderRadius: 20, padding: "20px 18px 18px",
         border: "1px solid rgba(255,255,255,0.22)",
         borderTop: `2px solid ${card.color}`,
         boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 1.5px 0 rgba(255,255,255,0.32) inset",
       }}>
-        {/* Card header */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "var(--muted)", marginBottom: 4 }}>Air quality</div>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 22, fontWeight: 300, color: "var(--text)", lineHeight: 1.1 }}>
+            <div style={{ fontSize: 22, fontWeight: 300, color: "var(--text)", lineHeight: 1.1 }}>
               {card.label}<br /><em style={{ fontStyle: "normal", fontWeight: 500, color: card.color }}>{card.subtitle}</em>
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 32, fontWeight: 300, color: card.color, lineHeight: 1 }}>
-              {m.value}
-            </div>
+            <div style={{ fontSize: 32, fontWeight: 300, color: card.color, lineHeight: 1 }}>{m.value}</div>
             <div style={{ fontSize: 10, color: "var(--muted)", letterSpacing: "0.5px" }}>{card.unit}</div>
           </div>
         </div>
 
-        {/* Main progress bar */}
         <div style={{ marginBottom: 18 }}>
           <div style={{ height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
-            <div style={{
-              height: "100%", borderRadius: 3,
-              width: `${Math.min(m.pct, 100)}%`,
-              background: `linear-gradient(90deg, ${card.color}, ${card.color}99)`,
-              transition: "width 0.8s ease",
-            }} />
+            <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(m.pct, 100)}%`, background: `linear-gradient(90deg, ${card.color}, ${card.color}99)`, transition: "width 0.8s ease" }} />
           </div>
           <div style={{ textAlign: "right", fontSize: 10, color: card.color, marginTop: 4, letterSpacing: "0.5px", fontWeight: 500 }}>
             {m.pct.toFixed(0)}% of target
           </div>
         </div>
 
-        {/* Detail section */}
         {detailMap[activeCard]}
 
-        {/* Context note */}
         <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: "10px 12px", fontSize: 11, color: "var(--text-2)", lineHeight: 1.6, fontWeight: 300 }}>
           {card.description}
         </div>
@@ -778,14 +699,44 @@ function AirQualitySlider({ plants }) {
   );
 }
 
+// ── Single declaration of resizeImageForAPI ────────────────────────────────
+async function resizeImageForAPI(file, maxWidth = 800) {
+  const originalDataUrl = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error("FileReader failed"));
+    reader.readAsDataURL(file);
+  });
+  const img = await new Promise((resolve, reject) => {
+    const i = new Image();
+    i.onload = () => resolve(i);
+    i.onerror = () => reject(new Error("Image decode failed"));
+    i.src = originalDataUrl;
+  });
+  const scale = Math.min(1, maxWidth / img.width);
+  const w = Math.round(img.width * scale);
+  const h = Math.round(img.height * scale);
+  const canvas = document.createElement("canvas");
+  canvas.width = w; canvas.height = h;
+  canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+  const dataUrl = canvas.toDataURL("image/jpeg", 0.60);
+  const base64 = dataUrl.split(",")[1];
+  return { base64, dataUrl, mediaType: "image/jpeg" };
+}
 
-
-// ── Plant Photo Analysis Feature ───────────────────────────────────────────
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 async function callClaude(base64Image, prompt, maxTokens = 256) {
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
-        headers: {
+    headers: {
       "Content-Type": "application/json",
       "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY || "",
       "anthropic-version": "2023-06-01",
@@ -812,13 +763,6 @@ async function callClaude(base64Image, prompt, maxTokens = 256) {
 }
 
 async function analyseWithClaude(base64Image, plant, careContext = {}) {
-  if (plant._identifyMode) {
-    return callClaude(base64Image,
-      `Identify this plant. Reply ONLY with JSON:
-{"commonName":"","scientificName":"","family":"","confidence":"high","origin":"","funFact":"","careLevel":"easy","edible":false,"toxic":false,"toxicTo":null}`,
-      200
-    );
-  }
   const { lastWateredDaysAgo, lastFertilizedDaysAgo } = careContext;
   const waterCtx = lastWateredDaysAgo != null
     ? `Last watered ${lastWateredDaysAgo} day(s) ago (schedule: every ${plant.waterEveryDays} days).`
@@ -833,42 +777,17 @@ Reply ONLY with JSON: {"status":"healthy","headline":"","recommendation":"","wai
   );
 }
 
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
 const URGENCY_COLOR = { low: "#94b88a", medium: "#d4935a", high: "#c46860" };
 const STATUS_ICON = { action: "✦", wait: "◷", healthy: "✓" };
 
 function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   const [current, setCurrent] = useState(startIndex);
   return (
-    <div
-      style={{
-        position: "fixed", inset: 0, background: "rgba(30,15,5,0.96)",
-        zIndex: 1000, display: "flex", flexDirection: "column",
-        alignItems: "center", justifyContent: "center",
-      }}
-      onClick={onClose}
-    >
-      {/* Close */}
-      <button onClick={onClose} style={{
-        position: "absolute", top: 20, right: 20,
-        background: "none", border: "none", color: "rgba(255,255,255,0.6)",
-        fontSize: 24, cursor: "pointer", lineHeight: 1,
-      }}>✕</button>
-
-      {/* Counter */}
+    <div style={{ position: "fixed", inset: 0, background: "rgba(30,15,5,0.96)", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
+      <button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: 24, cursor: "pointer", lineHeight: 1 }}>✕</button>
       <div style={{ position: "absolute", top: 24, left: 0, right: 0, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.4)", letterSpacing: 2 }}>
         {current + 1} / {photos.length}
       </div>
-
-      {/* Main photo */}
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
         <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}>
           <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
@@ -877,48 +796,17 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
           </div>
         </div>
       </div>
-
-      {/* Prev / Next */}
       <div style={{ display: "flex", gap: 16, marginTop: 24 }} onClick={e => e.stopPropagation()}>
-        <button onClick={() => setCurrent(i => Math.max(0, i - 1))} disabled={current === 0}
-          style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === 0 ? 0.3 : 1 }}>‹</button>
-        <button onClick={() => setCurrent(i => Math.min(photos.length - 1, i + 1))} disabled={current === photos.length - 1}
-          style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === photos.length - 1 ? 0.3 : 1 }}>›</button>
+        <button onClick={() => setCurrent(i => Math.max(0, i - 1))} disabled={current === 0} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === 0 ? 0.3 : 1 }}>‹</button>
+        <button onClick={() => setCurrent(i => Math.min(photos.length - 1, i + 1))} disabled={current === photos.length - 1} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === photos.length - 1 ? 0.3 : 1 }}>›</button>
       </div>
-
-      {/* Thumbnails */}
       <div style={{ display: "flex", gap: 8, marginTop: 16, overflowX: "auto", padding: "4px 20px", maxWidth: 380 }} onClick={e => e.stopPropagation()}>
         {photos.map((p, i) => (
-          <img key={i} src={p.dataUrl} onClick={() => setCurrent(i)}
-            style={{ width: 48, height: 48, objectFit: "cover", opacity: i === current ? 1 : 0.5, cursor: "pointer", border: i === current ? "2px solid #f2c4a0" : "2px solid transparent", flexShrink: 0 }} />
+          <img key={i} src={p.dataUrl} onClick={() => setCurrent(i)} style={{ width: 48, height: 48, objectFit: "cover", opacity: i === current ? 1 : 0.5, cursor: "pointer", border: i === current ? "2px solid #f2c4a0" : "2px solid transparent", flexShrink: 0 }} />
         ))}
       </div>
     </div>
   );
-}
-
-async function resizeImageForAPI(file, maxWidth = 800) {
-  const originalDataUrl = await new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = () => reject(new Error("FileReader failed"));
-    reader.readAsDataURL(file);
-  });
-  const img = await new Promise((resolve, reject) => {
-    const i = new Image();
-    i.onload = () => resolve(i);
-    i.onerror = () => reject(new Error("Image decode failed"));
-    i.src = originalDataUrl;
-  });
-  const scale = Math.min(1, maxWidth / img.width);
-  const w = Math.round(img.width * scale);
-  const h = Math.round(img.height * scale);
-  const canvas = document.createElement("canvas");
-  canvas.width = w; canvas.height = h;
-  canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-  const dataUrl = canvas.toDataURL("image/jpeg", 0.60);
-  const base64 = dataUrl.split(",")[1];
-  return { base64, dataUrl, mediaType: "image/jpeg" };
 }
 
 function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext, db }) {
@@ -927,11 +815,10 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
   const [galleryStart, setGalleryStart] = useState(0);
   const fileRef = useRef();
 
-  // All photos: user uploads + original, newest first
   const allPhotos = [...userPhotos].reverse();
-  // Top photo to show
   const topPhoto = allPhotos[0] || null;
   const latestAnalysis = topPhoto?.analysis || null;
+  const stackPhotos = allPhotos.slice(0, 4);
 
   async function handleFile(e) {
     const file = e.target.files?.[0];
@@ -963,14 +850,9 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
     e.target.value = "";
   }
 
-  // Stack: show up to 3 photos behind the top, offset
-  const stackPhotos = allPhotos.slice(0, 4);
-
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      {/* Photo stack */}
       <div style={{ position: "relative", width: 380, height: 490, marginBottom: 8 }}>
-        {/* Render stack back to front */}
         {stackPhotos.slice(1).reverse().map((photo, i) => {
           const stackIdx = stackPhotos.length - 1 - i;
           const offset = stackIdx * 4;
@@ -983,10 +865,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
             </div>
           );
         })}
-
-        {/* Top photo (or original plant photo) with pin */}
         <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-          {/* Pin */}
           <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", zIndex: 11, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
             <div style={{ width: 18, height: 18, borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${pinColor}dd, ${pinColor})`, boxShadow: "inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px rgba(255,255,255,0.35)", margin: "0 auto", position: "relative" }}>
               <div style={{ position: "absolute", top: 3, left: 3, width: 5, height: 5, borderRadius: "50%", background: "rgba(255,255,255,0.5)" }} />
@@ -995,22 +874,19 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           </div>
           <div style={{ transform: `rotate(${tilt}deg)` }}>
             <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)" }}>
-              <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name}
-                style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+              <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name} style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Controls row */}
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: userPhotos.length > 0 ? 16 : 8 }}>
         <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
         <button onClick={() => fileRef.current?.click()} disabled={analysing} style={{
           background: analysing ? "rgba(255,255,255,0.12)" : "var(--peach-dark)",
           border: "none", borderRadius: 20, padding: "7px 16px",
           fontSize: 12, color: "#fff", cursor: analysing ? "default" : "pointer",
-          fontFamily: "'Jost', sans-serif", letterSpacing: "0.5px",
-          transition: "all 0.2s",
+          fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.5px", transition: "all 0.2s",
         }}>
           {analysing ? "Analysing…" : "+ Add photo"}
         </button>
@@ -1018,14 +894,13 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           <button onClick={() => { setGalleryStart(0); setGallery(true); }} style={{
             background: "var(--white)", border: "1px solid rgba(255,255,255,0.12)",
             borderRadius: 20, padding: "7px 14px", fontSize: 12, color: "var(--muted)",
-            cursor: "pointer", fontFamily: "'Jost', sans-serif",
+            cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
           }}>
             Gallery ({userPhotos.length})
           </button>
         )}
       </div>
 
-      {/* Analysis result */}
       {analysing && (
         <div style={{ margin: "0 22px 16px", background: "var(--peach-light)", borderRadius: 14, padding: "14px 16px", fontSize: 13, color: "var(--muted)", fontStyle: "italic", textAlign: "center" }}>
           Examining your plant…
@@ -1043,11 +918,9 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
         }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
             <span style={{ fontSize: 14, color: URGENCY_COLOR[latestAnalysis.urgency] }}>{STATUS_ICON[latestAnalysis.status]}</span>
-            <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 16, fontWeight: 400, color: "var(--text)" }}>{latestAnalysis.headline}</div>
+            <div style={{ fontSize: 16, fontWeight: 400, color: "var(--text)" }}>{latestAnalysis.headline}</div>
             {latestAnalysis.waitDays && (
-              <div style={{ marginLeft: "auto", fontSize: 11, color: "var(--muted)", background: "var(--peach-light)", borderRadius: 10, padding: "2px 8px", flexShrink: 0 }}>
-                ~{latestAnalysis.waitDays}d
-              </div>
+              <div style={{ marginLeft: "auto", fontSize: 11, color: "var(--muted)", background: "var(--peach-light)", borderRadius: 10, padding: "2px 8px", flexShrink: 0 }}>~{latestAnalysis.waitDays}d</div>
             )}
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.65, fontWeight: 300 }}>{latestAnalysis.recommendation}</div>
@@ -1057,212 +930,37 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
         </div>
       )}
 
-      {/* Gallery lightbox */}
       {gallery && userPhotos.length > 0 && (
-        <GalleryLightbox
-          photos={[...userPhotos].reverse()}
-          startIndex={galleryStart}
-          onClose={() => setGallery(false)}
-        />
+        <GalleryLightbox photos={[...userPhotos].reverse()} startIndex={galleryStart} onClose={() => setGallery(false)} />
       )}
     </div>
   );
 }
 
-
-// ── Botanical Garden Screen ─────────────────────────────────────────────────
-
-const CARE_COLOR = { easy: "#94b88a", moderate: "#d4935a", demanding: "#c46860" };
-const CONFIDENCE_LABEL = { high: "Confident ID", medium: "Likely match", low: "Best guess" };
-
-function BotanicalGardenScreen({ gardenLog, onBack, onScan, scanning }) {
-  const [selected, setSelected] = useState(null);
-  const scanRef = useRef();
-
-  if (selected) {
-    const e = selected;
-    return (
-      <div className="fade-up">
-        <div className="detail-nav">
-          <button className="dnav-back" onClick={() => setSelected(null)}>← Garden</button>
-          <div className="dnav-counter" style={{ fontStyle: "italic", fontSize: 10 }}>{e.scientificName}</div>
-          <div style={{ width: 68 }} />
-        </div>
-
-        {/* Full photo */}
-        <div style={{ margin: "0 20px 20px", borderRadius: 20, overflow: "hidden", height: 260, background: "var(--peach-light)" }}>
-          <img src={e.dataUrl} alt={e.commonName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        </div>
-
-        <div style={{ padding: "0 22px 48px" }}>
-          {/* Confidence badge */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
-            <div style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", background: "var(--peach-light)", padding: "3px 10px", borderRadius: 20 }}>
-              {CONFIDENCE_LABEL[e.confidence]}
-            </div>
-            <div style={{ fontSize: 10, color: CARE_COLOR[e.careLevel], letterSpacing: 1.5, textTransform: "uppercase" }}>
-              {e.careLevel} care
-            </div>
-          </div>
-
-          <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 30, fontWeight: 300, color: "var(--text)", lineHeight: 1.1, marginBottom: 4 }}>{e.commonName}</div>
-          <div style={{ fontSize: 12, color: "var(--muted)", fontStyle: "italic", marginBottom: 20 }}>{e.scientificName} · {e.family}</div>
-
-          <div style={{ height: 1, background: "rgba(255,255,255,0.08)", marginBottom: 18 }} />
-
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 12 }}>
-            <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--muted)" }}>Origin</span>
-            <span style={{ fontSize: 13, color: "var(--text)" }}>{e.origin}</span>
-          </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 20 }}>
-            <span style={{ fontSize: 10, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--muted)" }}>Scanned</span>
-            <span style={{ fontSize: 13, color: "var(--text)" }}>{new Date(e.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
-          </div>
-
-          <div style={{ background: "var(--peach-light)", borderRadius: 14, padding: "14px 16px", fontSize: 13, lineHeight: 1.7, color: "rgba(255,255,255,0.65)", fontWeight: 300, marginBottom: 14 }}>
-            {e.description}
-          </div>
-
-          <div style={{ background: "var(--white)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 14, padding: "14px 16px", fontSize: 13, lineHeight: 1.65, color: "var(--text)", fontWeight: 300 }}>
-            <span style={{ fontSize: 10, letterSpacing: 2, textTransform: "uppercase", color: "var(--muted)", display: "block", marginBottom: 6 }}>Fun fact</span>
-            {e.funFact}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fade-up">
-      <div className="detail-nav">
-        <button className="dnav-back" onClick={onBack}>← Overview</button>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 16, fontWeight: 300, fontStyle: "italic", color: "var(--text)" }}>Botanical Garden</div>
-        <div style={{ width: 68 }} />
-      </div>
-
-      {/* Hero */}
-      <div style={{ padding: "8px 24px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-        <div style={{ fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "var(--muted)", marginBottom: 6 }}>Plant scanner</div>
-        <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 28, fontWeight: 300, color: "var(--text)", lineHeight: 1.15 }}>
-          {gardenLog.length === 0 ? <>Your garden<br /><em style={{ color: "var(--peach-dark)" }}>awaits discovery</em></> : <>{gardenLog.length} species<br /><em style={{ color: "var(--peach-dark)" }}>identified</em></>}
-        </div>
-      </div>
-
-      {/* Scan button */}
-      <div style={{ padding: "20px 20px 8px" }}>
-        <input ref={scanRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={onScan} />
-        <button onClick={() => scanRef.current?.click()} disabled={scanning} style={{
-          width: "100%", padding: "16px",
-          background: scanning
-            ? "rgba(255,255,255,0.08)"
-            : "linear-gradient(135deg, rgba(148,184,138,0.4), rgba(120,170,110,0.25))",
-          backdropFilter: "blur(16px)",
-          border: "1px solid rgba(148,184,138,0.45)",
-          borderTopColor: "rgba(200,240,190,0.7)",
-          borderRadius: 20,
-          boxShadow: "0 4px 20px rgba(100,160,90,0.15), 0 1px 0 rgba(255,255,255,0.5) inset",
-          color: scanning ? "var(--muted)" : "#3a6a30",
-          fontSize: 14, fontFamily: "'Jost', sans-serif",
-          letterSpacing: "1.5px", textTransform: "uppercase",
-          cursor: scanning ? "default" : "pointer",
-          textShadow: "0 1px 2px rgba(255,255,255,0.6)",
-          transition: "all 0.25s",
-          position: "relative", overflow: "hidden",
-        }}>
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: "50%", background: "linear-gradient(to bottom, rgba(255,255,255,0.28), rgba(255,255,255,0.03))", borderRadius: "20px 20px 0 0", pointerEvents: "none" }} />
-          {scanning ? "Identifying…" : "⟡ Scan a plant"}
-        </button>
-      </div>
-
-      {/* Log */}
-      {gardenLog.length === 0 ? (
-        <div style={{ padding: "48px 24px", textAlign: "center" }}>
-          <div style={{ fontSize: 40, marginBottom: 12, opacity: 0.35 }}>🌿</div>
-          <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.7, fontWeight: 300 }}>
-            Scan any plant to identify it.<br />Your discovered species will appear here.
-          </div>
-        </div>
-      ) : (
-        <div style={{ padding: "16px 16px 48px", display: "flex", flexDirection: "column", gap: 10 }}>
-          {gardenLog.map((e, i) => (
-            <div key={e.id} onClick={() => setSelected(e)} style={{
-              background: "var(--white)", borderRadius: 16, padding: "12px 14px",
-              display: "flex", alignItems: "center", gap: 12, cursor: "pointer",
-              border: "1px solid rgba(255,255,255,0.08)", transition: "background 0.15s",
-            }}>
-              {/* Thumb */}
-              <div style={{ width: 52, height: 52, borderRadius: 12, overflow: "hidden", flexShrink: 0, background: "var(--peach-light)" }}>
-                <img src={e.dataUrl} alt={e.commonName} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-              </div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: 16, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{e.commonName}</div>
-                <div style={{ fontSize: 11, color: "var(--muted)", fontStyle: "italic", marginTop: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{e.scientificName}</div>
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
-                <div style={{ fontSize: 10, color: CARE_COLOR[e.careLevel], letterSpacing: 1, textTransform: "uppercase" }}>{e.careLevel}</div>
-                <div style={{ fontSize: 10, color: "rgba(176,153,142,0.6)" }}>{new Date(e.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}</div>
-              </div>
-              <div style={{ fontSize: 16, color: "var(--peach-dark)", marginLeft: 2 }}>›</div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-
-
-// ── Liquid Glass — React translation of iOS 26 SwiftUI patterns ────────────
-//
-// SwiftUI concepts → Web equivalents:
-//   GlassEffectContainer  → GlassContainer (shared backdrop layer, merges children)
-//   .glassEffect()        → GlassCard (individual glass surface)
-//   .glassEffect.interactive() → GlassCard interactive=true (stronger hover response)
-//   .glassEffectUnion()   → GlassGroup (forced visual merging)
-//   Spacing controls merging → gap in GlassContainer controls blur overlap
-//
-// The key "liquid" behaviour: when glass elements are CLOSE, their backdrop-filter
-// regions overlap and blur the SAME background content → looks like one pooled surface.
-// We achieve this by hoisting the shared backdrop to the GlassContainer.
+// ── Liquid Glass components ────────────────────────────────────────────────
 
 const GLASS_VARS = {
-  // Regular surface  
   regular: {
-    bg: "rgba(255,255,255,0.11)",
-    bgHover: "rgba(255,255,255,0.17)",
-    border: "rgba(255,255,255,0.22)",
-    borderTop: "rgba(255,255,255,0.50)",
+    bg: "rgba(255,255,255,0.11)", bgHover: "rgba(255,255,255,0.17)",
+    border: "rgba(255,255,255,0.22)", borderTop: "rgba(255,255,255,0.50)",
     shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.36) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
     blur: "blur(22px) saturate(190%) brightness(1.14)",
   },
-  // Interactive surface — tappable elements (buttons, tiles, rows)
   interactive: {
-    bg: "rgba(255,255,255,0.13)",
-    bgHover: "rgba(255,255,255,0.20)",
-    border: "rgba(255,255,255,0.26)",
-    borderTop: "rgba(255,255,255,0.58)",
+    bg: "rgba(255,255,255,0.13)", bgHover: "rgba(255,255,255,0.20)",
+    border: "rgba(255,255,255,0.26)", borderTop: "rgba(255,255,255,0.58)",
     shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.42) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
     blur: "blur(24px) saturate(200%) brightness(1.16)",
   },
-  // Prominent — primary action buttons
   prominent: {
-    bg: "rgba(100,220,80,0.22)",
-    bgHover: "rgba(100,220,80,0.32)",
-    border: "rgba(150,255,100,0.40)",
-    borderTop: "rgba(200,255,160,0.70)",
+    bg: "rgba(100,220,80,0.22)", bgHover: "rgba(100,220,80,0.32)",
+    border: "rgba(150,255,100,0.40)", borderTop: "rgba(200,255,160,0.70)",
     shadow: "0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset",
     blur: "blur(20px) saturate(200%) brightness(1.18)",
   },
 };
 
-// Shared animated state — single RAF loop for all glass elements
-const _glass = {
-  mouseX: 0.5, mouseY: 0.5,
-  time: 0, rafId: null,
-  listeners: new Set(),
-  turbIds: ["liquid-refraction", "liquid-refraction-sm"],
-};
+const _glass = { mouseX: 0.5, mouseY: 0.5, time: 0, rafId: null, listeners: new Set(), turbIds: ["liquid-refraction", "liquid-refraction-sm"] };
 
 function ensureGlassLoop() {
   if (_glass.rafId) return;
@@ -1286,7 +984,6 @@ function ensureGlassLoop() {
       const fy = base[1] + Math.cos(t * 0.38 + i * 0.85) * 0.008;
       turb.setAttribute("baseFrequency", `${fx.toFixed(4)} ${fy.toFixed(4)}`);
 
-      // Mouse X → scale: moving right increases displacement
       const baseScale = i === 0 ? 18 : 11;
       const target = baseScale * (0.35 + _glass.mouseX * 1.3 + _glass.mouseY * 0.2);
       const cur = parseFloat(disp.getAttribute("scale") || baseScale);
@@ -1305,49 +1002,25 @@ function ensureGlassLoop() {
     _glass.mouseY = y / window.innerHeight;
   };
   window.addEventListener("mousemove", onMove, { passive: true });
-  window.addEventListener("touchmove",  onMove, { passive: true });
-  _glass._onMove = onMove;
+  window.addEventListener("touchmove", onMove, { passive: true });
 }
 
-// GlassContainer — equivalent of GlassEffectContainer
-// Hoists the backdrop-filter so child glass elements share one blur layer,
-// creating the "merged pool" effect when gap is small (≤12px).
 function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
   useEffect(() => { ensureGlassLoop(); }, []);
   return (
-    <div style={{
-      position: "relative",
-      display: "grid",
-      gridTemplateColumns: "1fr 1fr",
-      gap,
-      ...style,
-    }} className={className}>
-      {/* Shared glass layer behind all children — this is the key to merging */}
-      <div style={{
-        position: "absolute", inset: -1,
-        backdropFilter: GLASS_VARS.regular.blur,
-        WebkitBackdropFilter: GLASS_VARS.regular.blur,
-        borderRadius: 22,
-        zIndex: 0, pointerEvents: "none",
-      }} />
+    <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1fr 1fr", gap, ...style }} className={className}>
+      <div style={{ position: "absolute", inset: -1, backdropFilter: GLASS_VARS.regular.blur, WebkitBackdropFilter: GLASS_VARS.regular.blur, borderRadius: 22, zIndex: 0, pointerEvents: "none" }} />
       {children}
     </div>
   );
 }
 
-// Specular highlight overlay — the shiny top-left reflection
 function Specular({ borderRadius = 20 }) {
   return (
-    <div style={{
-      position: "absolute", inset: 0, borderRadius,
-      background: "linear-gradient(148deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 32%, transparent 55%)",
-      pointerEvents: "none", zIndex: 2,
-    }} />
+    <div style={{ position: "absolute", inset: 0, borderRadius, background: "linear-gradient(148deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 32%, transparent 55%)", pointerEvents: "none", zIndex: 2 }} />
   );
 }
 
-// GlassCard — individual glass surface  
-// variant: "regular" | "interactive" | "prominent"
 function GlassCard({ children, variant = "regular", borderRadius = 20, style = {}, className = "", onClick }) {
   const v = GLASS_VARS[variant] || GLASS_VARS.regular;
   const [hovered, setHovered] = useState(false);
@@ -1359,74 +1032,26 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
       onMouseEnter={() => isInteractive && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        position: "relative",
-        borderRadius,
+        position: "relative", borderRadius,
         background: hovered ? v.bgHover : v.bg,
         border: `1px solid ${v.border}`,
-        borderTopColor: v.borderTop,
-        borderBottomColor: "rgba(0,0,0,0.12)",
-        boxShadow: hovered
-          ? v.shadow.replace("rgba(0,0,0,0.18)", "rgba(0,0,0,0.26)").replace("rgba(0,0,0,0.20)", "rgba(0,0,0,0.28)")
-          : v.shadow,
+        borderTopColor: v.borderTop, borderBottomColor: "rgba(0,0,0,0.12)",
+        boxShadow: hovered ? v.shadow.replace("rgba(0,0,0,0.18)", "rgba(0,0,0,0.26)").replace("rgba(0,0,0,0.20)", "rgba(0,0,0,0.28)") : v.shadow,
         transform: hovered && isInteractive ? "translateY(-2px) scale(1.015)" : "none",
         transition: "background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease",
         cursor: isInteractive ? "pointer" : "default",
-        overflow: "hidden",
-        zIndex: 1,
-        ...style,
+        overflow: "hidden", zIndex: 1, ...style,
       }}
       className={className}
     >
       <Specular borderRadius={borderRadius} />
-      {/* Right-side light bloom */}
-      <div style={{
-        position: "absolute", top: "-30%", right: "-15%",
-        width: "75%", height: "130%",
-        background: "radial-gradient(ellipse at 75% 15%, rgba(170,255,100,0.10) 0%, transparent 60%)",
-        pointerEvents: "none", zIndex: 1,
-      }} />
-      <div style={{ position: "relative", zIndex: 3 }}>
-        {children}
-      </div>
+      <div style={{ position: "absolute", top: "-30%", right: "-15%", width: "75%", height: "130%", background: "radial-gradient(ellipse at 75% 15%, rgba(170,255,100,0.10) 0%, transparent 60%)", pointerEvents: "none", zIndex: 1 }} />
+      <div style={{ position: "relative", zIndex: 3 }}>{children}</div>
     </div>
   );
 }
 
-
-
-async function resizeImageForAPI(file, maxWidth = 800) {
-    // Step 1: read file as data URL via FileReader (works in sandboxed iframes)
-    const originalDataUrl = await new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result);
-      reader.onerror = () => reject(new Error("FileReader failed"));
-      reader.readAsDataURL(file);
-    });
-
-    // Step 2: load into Image using data URL (no createObjectURL needed)
-    const img = await new Promise((resolve, reject) => {
-      const i = new Image();
-      i.onload = () => resolve(i);
-      i.onerror = () => reject(new Error("Image decode failed"));
-      i.src = originalDataUrl;
-    });
-
-    // Step 3: resize on canvas
-    const scale = Math.min(1, maxWidth / img.width);
-    const w = Math.round(img.width * scale);
-    const h = Math.round(img.height * scale);
-    const canvas = document.createElement("canvas");
-    canvas.width = w; canvas.height = h;
-    canvas.getContext("2d").drawImage(img, 0, 0, w, h);
-
-    // Step 4: export as JPEG data URL
-    const dataUrl = canvas.toDataURL("image/jpeg", 0.60);
-    const base64 = dataUrl.split(",")[1];
-    return { base64, dataUrl, mediaType: "image/jpeg" };
-  }
-
-// ScanButton — self-contained component that lives inside the render tree
-// This ensures fetch works via the artifact proxy, same as PlantPhotoStack
+// ── ScanButton ─────────────────────────────────────────────────────────────
 function ScanButton({ onResult, onStart, renderTrigger }) {
   const fileRef = useRef();
   const [scanning, setScanning] = useState(false);
@@ -1447,18 +1072,17 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
 
     let dataUrl = null;
     try {
-      // Use fileToBase64 — same as PlantPhotoStack which works
       const base64 = await fileToBase64(file);
       dataUrl = `data:image/jpeg;base64,${base64}`;
 
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
-            headers: {
-      "Content-Type": "application/json",
-      "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY || "",
-      "anthropic-version": "2023-06-01",
-      "anthropic-dangerous-direct-browser-access": "true",
-    },
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY || "",
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
         body: JSON.stringify({
           model: "claude-sonnet-4-6",
           max_tokens: 200,
@@ -1502,14 +1126,12 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
 
   return (
     <>
-      <input ref={fileRef} type="file" accept="image/*" capture="environment"
-        style={{ display: "none" }} onChange={handleFile} />
+      <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{ display: "none" }} onChange={handleFile} />
       {renderTrigger ? renderTrigger(() => fileRef.current?.click(), scanning) : (
-        <div className="stat action-tile" style={{ cursor: "pointer" }}
-          onClick={() => fileRef.current?.click()}>
+        <div className="stat action-tile" style={{ cursor: "pointer" }} onClick={() => fileRef.current?.click()}>
           {scanning ? (
             <>
-              <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 28, fontWeight: 600, lineHeight: 1, color: "var(--green)" }}>{progress}%</div>
+              <div style={{ fontSize: 28, fontWeight: 600, lineHeight: 1, color: "var(--green)" }}>{progress}%</div>
               <div style={{ marginTop: 6, height: 2, background: "rgba(255,255,255,0.12)", borderRadius: 1, overflow: "hidden" }}>
                 <div style={{ height: "100%", width: `${progress}%`, background: "var(--green)", transition: "width 0.15s ease", borderRadius: 1 }} />
               </div>
@@ -1527,30 +1149,22 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
   );
 }
 
-// ── Edit Date Modal ────────────────────────────────────────────────────────
+// ── EditDateModal ──────────────────────────────────────────────────────────
 function EditDateModal({ type, currentDate, onConfirm, onClose }) {
   const toInputVal = (iso) => {
     if (!iso) return new Date().toISOString().slice(0, 10);
     return new Date(iso).toISOString().slice(0, 10);
   };
   const [dateVal, setDateVal] = useState(toInputVal(currentDate));
-  const isWater = type === 'water';
+  const isWater = type === "water";
   const accent = isWater ? "rgba(100,220,80,1)" : "rgba(212,147,90,1)";
   const accentBg = isWater ? "rgba(100,220,80,0.12)" : "rgba(212,147,90,0.10)";
   const accentBorder = isWater ? "rgba(100,220,80,0.3)" : "rgba(212,147,90,0.3)";
   const emoji = isWater ? "💧" : "🌿";
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 201,
-      display: "flex", flexDirection: "column", justifyContent: "flex-end",
-      background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
-    }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{
-        background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)",
-        borderRadius: "24px 24px 0 0", padding: "24px 24px 40px",
-        maxWidth: 430, width: "100%", margin: "0 auto",
-      }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: accent, marginBottom: 2 }}>Edit date</div>
@@ -1577,15 +1191,14 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
           border: `1px solid ${isWater ? "rgba(150,255,100,0.4)" : "rgba(212,147,90,0.4)"}`,
           borderTopColor: isWater ? "rgba(200,255,160,0.7)" : "rgba(240,190,140,0.7)",
           borderRadius: 20, color: isWater ? "#d4ffb0" : "#ffe0b0",
-          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-          cursor: "pointer", letterSpacing: "0.5px",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500, cursor: "pointer", letterSpacing: "0.5px",
         }}>Save date</button>
       </div>
     </div>
   );
 }
 
-// ── Fertilize Modal ────────────────────────────────────────────────────────
+// ── FertilizeModal ─────────────────────────────────────────────────────────
 function FertilizeModal({ onConfirm, onClose }) {
   const DOSES = [0, 0.5, 1];
   const DOSE_LABELS = { 0: "No dose", 0.5: "½ dose", 1: "Full dose" };
@@ -1593,16 +1206,8 @@ function FertilizeModal({ onConfirm, onClose }) {
   const [selected, setSelected] = useState(1);
 
   return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 200,
-      display: "flex", flexDirection: "column", justifyContent: "flex-end",
-      background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)",
-    }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{
-        background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)",
-        borderRadius: "24px 24px 0 0", padding: "24px 24px 40px",
-        maxWidth: 430, width: "100%", margin: "0 auto",
-      }}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(212,147,90,0.8)", marginBottom: 2 }}>Fertilize</div>
@@ -1651,7 +1256,7 @@ function FertilizeModal({ onConfirm, onClose }) {
   );
 }
 
-// ── Consult Gardener ────────────────────────────────────────────────────────
+// ── ConsultGardener ────────────────────────────────────────────────────────
 function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext, onClose }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -1733,7 +1338,7 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
               padding: "10px 14px", fontSize: 13, color: "var(--text)", lineHeight: 1.55,
             }}>{m.text}</div>
           ))}
-          {loading && <div style={{ alignSelf: "flex-start", background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", fontSize: 13, color: "var(--text-2)" }}><span style={{ opacity: 0.6 }}>Thinking…</span></div>}
+          {loading && <div style={{ alignSelf: "flex-start", background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", fontSize: 13, color: "var(--text-2)" }}>Thinking…</div>}
           <div ref={bottomRef} />
         </div>
         <div style={{ padding: "8px 12px 20px", display: "flex", gap: 8, alignItems: "center" }}>
@@ -1746,6 +1351,7 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
   );
 }
 
+// ── App ────────────────────────────────────────────────────────────────────
 export default function App() {
   const [screen, setScreen] = useState("overview");
   const [idx, setIdx] = useState(0);
@@ -1753,11 +1359,10 @@ export default function App() {
   const [nickInput, setNickInput] = useState("");
   const [gardenerOpen, setGardenerOpen] = useState(false);
   const [fertilizeModalOpen, setFertilizeModalOpen] = useState(false);
-  const [editDateModal, setEditDateModal] = useState(null);
+  const [editDateModal, setEditDateModal] = useState(null); // { type: "water"|"fertilize", plantId, currentDate }
   const [dbLoading, setDbLoading] = useState(true);
   const touchX = useRef(null);
 
-  // ── State ─────────────────────────────────────────────────────────────────
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
   const [dismissedWarnings, setDismissedWarnings] = useState({});
@@ -1765,7 +1370,7 @@ export default function App() {
   const [gardenLog, setGardenLog] = useState([]);
   const [plantPhotos, setPlantPhotos] = useState({});
 
-  // ── Load from Supabase on mount ───────────────────────────────────────────
+  // ── Load from Supabase ───────────────────────────────────────────────────
   useEffect(() => {
     async function loadAll() {
       try {
@@ -1808,27 +1413,21 @@ export default function App() {
     loadAll();
   }, []);
 
-  // ── Derived values ────────────────────────────────────────────────────────
+  // ── Derived values ───────────────────────────────────────────────────────
   const plant = PLANTS[idx];
   const lastWatered = waterLog[plant?.id] || null;
   const lastFertilized = fertilizeLog[plant?.id] || null;
-  const lastFertilizedDate = lastFertilized ? (typeof lastFertilized === 'string' ? lastFertilized : lastFertilized.date) : null;
-  const lastFertilizedDose = lastFertilized ? (typeof lastFertilized === 'string' ? 1 : lastFertilized.dose) : null;
+  const lastFertilizedDate = lastFertilized ? (typeof lastFertilized === "string" ? lastFertilized : lastFertilized.date) : null;
+  const lastFertilizedDose = lastFertilized ? (typeof lastFertilized === "string" ? 1 : lastFertilized.dose) : null;
   const status = plant ? getStatus(plant, lastWatered) : "unknown";
   const days = daysSince(lastWatered);
   const fertDays = daysSince(lastFertilizedDate);
   const pct = days !== null ? Math.min((days / plant.waterEveryDays) * 100, 100) : 0;
-  const fillColor = pct >= 100 ? "var(--red)" : pct >= 70 ? "var(--orange)" : "var(--green)";
-
-  const waterDaysLeft = days !== null ? plant.waterEveryDays - days : null;
-  const waterBtnLabel = days === null ? "Water now" : waterDaysLeft <= 0 ? "Overdue — water now" : `${waterDaysLeft}d until water`;
-  const waterBtnDone = days !== null && waterDaysLeft > 0;
+  const fillColor = pct >= 100 ? "#c46860" : pct >= 70 ? "#d4935a" : "#4ade80";
 
   const FERTILIZE_EVERY = 30;
   const fertDaysLeft = fertDays !== null ? FERTILIZE_EVERY - fertDays : null;
   const fertDoseLabel = lastFertilizedDose === 0.5 ? " · ½ dose" : lastFertilizedDose === 0 ? " · no dose" : "";
-  const fertBtnLabel = fertDays === null ? "Fertilize now" : fertDaysLeft <= 0 ? "Overdue — fertilize" : `${fertDaysLeft}d until fertilize${fertDoseLabel}`;
-  const fertBtnDone = fertDays !== null && fertDaysLeft > 0;
 
   const careContext = { lastWateredDaysAgo: days, lastFertilizedDaysAgo: fertDays };
 
@@ -1837,21 +1436,29 @@ export default function App() {
   const latestPhotoBase64 = latestPhoto?.base64 || null;
   const latestAnalysis = latestPhoto?.analysis || null;
 
-  // ── Actions ───────────────────────────────────────────────────────────────
+  // ── Actions ──────────────────────────────────────────────────────────────
   async function waterPlant(id) {
     const now = new Date().toISOString();
     setWaterLog(p => ({ ...p, [id]: now }));
     await supabase.from("water_log").insert({ plant_id: id, watered_at: now });
   }
+
   async function fertilizePlant(id, dose = 1) {
     const now = new Date().toISOString();
     setFertilizeLog(p => ({ ...p, [id]: { date: now, dose } }));
     await supabase.from("fertilize_log").insert({ plant_id: id, fertilized_at: now, dose });
   }
+
+  async function resetWaterLog(id) {
+    setWaterLog(p => { const n = { ...p }; delete n[id]; return n; });
+    await supabase.from("water_log").delete().eq("plant_id", id);
+  }
+
   async function dismissWarning(id) {
     setDismissedWarnings(p => ({ ...p, [id]: true }));
     await supabase.from("dismissed_warnings").upsert({ plant_id: id });
   }
+
   async function saveNick(id) {
     const nick = nickInput.trim();
     if (nick) {
@@ -1863,97 +1470,31 @@ export default function App() {
     }
     setEditingNick(null); setNickInput("");
   }
-  async function editDate(type, plantId, dateStr, dose) {
-    const newIso = new Date(dateStr + 'T12:00:00').toISOString();
-    const originalDate = type === 'water' ? lastWatered : lastFertilizedDate;
-    if (type === 'water') {
+
+  async function editDate(type, plantId, dateStr) {
+    const newIso = new Date(dateStr + "T12:00:00").toISOString();
+    if (type === "water") {
       setWaterLog(p => ({ ...p, [plantId]: newIso }));
       await supabase.from("water_log").insert({ plant_id: plantId, watered_at: newIso });
     } else {
-      const d = dose ?? lastFertilizedDose ?? 1;
+      const d = lastFertilizedDose ?? 1;
       setFertilizeLog(p => ({ ...p, [plantId]: { date: newIso, dose: d } }));
       await supabase.from("fertilize_log").insert({ plant_id: plantId, fertilized_at: newIso, dose: d });
     }
-    await supabase.from("care_edits").insert({
-      plant_id: plantId, type, original_date: originalDate, new_date: newIso,
-      dose: type === 'fertilize' ? (dose ?? lastFertilizedDose ?? 1) : null,
-    });
+    // Log the edit for audit trail
+    try {
+      await supabase.from("care_edits").insert({
+        plant_id: plantId, type,
+        original_date: type === "water" ? lastWatered : lastFertilizedDate,
+        new_date: newIso,
+        dose: type === "fertilize" ? (lastFertilizedDose ?? 1) : null,
+      });
+    } catch (_) { /* care_edits table may not exist yet */ }
     setEditDateModal(null);
   }
+
   function openDetail(i) { setIdx(i); setScreen("detail"); }
 
-  async function handleScan(e) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setScanning(true);
-    setScanProgress(0);
-
-    let prog = 0;
-    const progInterval = setInterval(() => {
-      prog += Math.random() * 3 + 1;
-      if (prog < 82) setScanProgress(Math.round(prog));
-    }, 150);
-
-    let dataUrl = null;
-
-    try {
-      const resized = await resizeImageForAPI(file, 300);
-      dataUrl = resized.dataUrl;
-      const base64 = resized.base64;
-
-      // Race against 35s hard timeout
-      const identifyPromise = callClaude(base64,
-        `Identify this plant. Reply ONLY with JSON:
-{"commonName":"","scientificName":"","family":"","confidence":"high","origin":"","funFact":"","careLevel":"easy","edible":false,"toxic":false,"toxicTo":null}`,
-        200
-      );
-      const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Timed out — please try again")), 35000)
-      );
-      const rawResult = await Promise.race([identifyPromise, timeoutPromise]);
-
-      const result = {
-        commonName: rawResult.commonName || "Unknown plant",
-        scientificName: rawResult.scientificName || "Could not identify",
-        family: rawResult.family || "—",
-        confidence: rawResult.confidence || "low",
-        origin: rawResult.origin || "—",
-        funFact: rawResult.funFact || "—",
-        careLevel: rawResult.careLevel || "—",
-        edible: rawResult.edible || false,
-        toxic: rawResult.toxic || false,
-        toxicTo: rawResult.toxicTo || null,
-      };
-
-      clearInterval(progInterval);
-      setScanProgress(100);
-      await new Promise(r => setTimeout(r, 350));
-      setGardenLog(prev => [{ ...result, dataUrl, date: new Date().toISOString(), id: Date.now() }, ...prev]);
-      setScreen("garden");
-
-    } catch(err) {
-      clearInterval(progInterval);
-      setScanProgress(100);
-      console.error("Scan error:", err?.message);
-      await new Promise(r => setTimeout(r, 300));
-      setGardenLog(prev => [{
-        commonName: "Scan failed",
-        scientificName: err?.message || "Unknown error",
-        family: "—", confidence: "low", origin: "—",
-        funFact: "Error: " + (err?.message || "unknown") + ". Try a clearer, well-lit photo.",
-        careLevel: "—", edible: false, toxic: false, toxicTo: null,
-        dataUrl: dataUrl || "",
-        date: new Date().toISOString(), id: Date.now()
-      }, ...prev]);
-      setScreen("garden");
-    }
-    setScanning(false);
-    setScanProgress(0);
-    e.target.value = "";
-  }
-
-  
   function onTouchStart(e) { touchX.current = e.touches[0].clientX; }
   function onTouchEnd(e) {
     if (touchX.current === null) return;
@@ -1965,69 +1506,53 @@ export default function App() {
     touchX.current = null;
   }
 
-
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
     <>
       <style>{css}</style>
-      {/* SVG Liquid Glass Refraction Engine */}
-        <svg style={{position:"absolute",width:0,height:0,overflow:"hidden"}} xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <filter id="liquid-refraction" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
-              <feTurbulence id="turbulence" type="fractalNoise" baseFrequency="0.012 0.008" numOctaves="3" seed="2" result="noise" />
-              <feGaussianBlur in="noise" stdDeviation="1.5" result="soft-noise" />
-              <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="18" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-              <feComposite in="displaced" in2="SourceGraphic" operator="in" />
-            </filter>
-            <filter id="liquid-refraction-strong" x="-20%" y="-20%" width="140%" height="140%" colorInterpolationFilters="sRGB">
-              <feTurbulence id="turbulence-strong" type="fractalNoise" baseFrequency="0.015 0.010" numOctaves="4" seed="5" result="noise" />
-              <feGaussianBlur in="noise" stdDeviation="2" result="soft-noise" />
-              <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="28" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-              <feComposite in="displaced" in2="SourceGraphic" operator="in" />
-            </filter>
-          </defs>
-        </svg>
-      <div className="app" style={{ backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top", backgroundAttachment: "fixed" }}>
+      <svg style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }} xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="liquid-refraction" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
+            <feTurbulence id="lg-turbulence" type="fractalNoise" baseFrequency="0.012 0.048" numOctaves="3" seed="2" result="noise" />
+            <feGaussianBlur in="noise" stdDeviation="1.8" result="soft-noise" />
+            <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="22" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+            <feComposite in="displaced" in2="SourceGraphic" operator="atop" />
+          </filter>
+          <filter id="liquid-refraction-sm" x="-5%" y="-5%" width="110%" height="110%" colorInterpolationFilters="sRGB">
+            <feTurbulence type="fractalNoise" baseFrequency="0.015 0.06" numOctaves="2" seed="5" result="noise" />
+            <feGaussianBlur in="noise" stdDeviation="1.2" result="soft-noise" />
+            <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="displaced" />
+            <feComposite in="displaced" in2="SourceGraphic" operator="atop" />
+          </filter>
+        </defs>
+      </svg>
+
+      <div
+        className="app"
+        style={{ backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top", backgroundAttachment: "fixed" }}
+      >
         <div className="glass-screen" />
+
         {dbLoading && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
             <div style={{ fontSize: 32 }}>🌿</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", letterSpacing: 1 }}>Loading your garden…</div>
           </div>
         )}
-        <svg style={{display:"none"}}>
-          <defs>
-            <filter id="liquid-refraction" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
-              <feTurbulence id="lg-turbulence" type="fractalNoise" baseFrequency="0.012 0.048" numOctaves="3" seed="2" result="noise" />
-              <feGaussianBlur in="noise" stdDeviation="1.8" result="soft-noise" />
-              <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="22" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-              <feComposite in="displaced" in2="SourceGraphic" operator="atop" />
-            </filter>
-            <filter id="liquid-refraction-sm" x="-5%" y="-5%" width="110%" height="110%" colorInterpolationFilters="sRGB">
-              <feTurbulence type="fractalNoise" baseFrequency="0.015 0.06" numOctaves="2" seed="5" result="noise" />
-              <feGaussianBlur in="noise" stdDeviation="1.2" result="soft-noise" />
-              <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-              <feComposite in="displaced" in2="SourceGraphic" operator="atop" />
-            </filter>
-          </defs>
-        </svg>
 
+        {/* ── OVERVIEW ── */}
         {screen === "overview" && (
           <div className="fade-up">
             <GlassContainer gap={10} style={{ padding: "16px 16px 0", gridAutoRows: "130px" }}>
-              <GlassCard borderRadius={20} style={{ height: 130 }}><div className="stat"><div className="stat-n">{PLANTS.length}</div><div className="stat-l">Total plants</div></div></GlassCard>
+              <GlassCard borderRadius={20} style={{ height: 130 }}>
+                <div className="stat"><div className="stat-n">{PLANTS.length}</div><div className="stat-l">Total plants</div></div>
+              </GlassCard>
               {(() => {
                 const warnPlants = PLANTS.filter(p => p.warning);
-                const handleWarnClick = () => {
-                  if (warnPlants.length === 0) return;
-                  if (warnPlants.length === 1) {
-                    setIdx(PLANTS.indexOf(warnPlants[0]));
-                    setScreen("detail");
-                  } else {
-                    setScreen("attention");
-                  }
-                };
                 return (
-                  <GlassCard borderRadius={20} variant={warnPlants.length > 0 ? "interactive" : "regular"} onClick={warnPlants.length > 0 ? handleWarnClick : undefined} style={{ height: 130 }}>
+                  <GlassCard borderRadius={20} variant={warnPlants.length > 0 ? "interactive" : "regular"}
+                    onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(PLANTS.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
+                    style={{ height: 130 }}>
                     <div className="stat warn" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default" }}>
                       <div className="stat-n">{warnPlants.length}</div>
                       <div className="stat-l">Need attention</div>
@@ -2037,25 +1562,24 @@ export default function App() {
                 );
               })()}
               <GlassCard borderRadius={20} style={{ height: 130 }}>
-              <ScanButton
-                onResult={async (entry) => {
-                  setGardenLog(prev => [entry, ...prev]);
-                  setScreen("garden");
-                  await supabase.from("garden_log").insert({
-                    common_name: entry.commonName, scientific_name: entry.scientificName,
-                    family: entry.family, confidence: entry.confidence, origin: entry.origin,
-                    fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
-                    toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl, scanned_at: entry.date,
-                  });
-                }}
-              />
+                <ScanButton
+                  onResult={async (entry) => {
+                    setGardenLog(prev => [entry, ...prev]);
+                    setScreen("garden");
+                    await supabase.from("garden_log").insert({
+                      common_name: entry.commonName, scientific_name: entry.scientificName,
+                      family: entry.family, confidence: entry.confidence, origin: entry.origin,
+                      fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
+                      toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl, scanned_at: entry.date,
+                    });
+                  }}
+                />
               </GlassCard>
               <GlassCard borderRadius={20} variant="interactive" onClick={() => setScreen("garden")} style={{ height: 130 }}>
-              <div className="stat action-tile" style={{ cursor: "pointer" }}>
-                <div className="stat-n">{gardenLog.length}</div>
-                <div className="stat-l">Botanical garden</div>
-              </div>
-
+                <div className="stat action-tile" style={{ cursor: "pointer" }}>
+                  <div className="stat-n">{gardenLog.length}</div>
+                  <div className="stat-l">Botanical garden</div>
+                </div>
               </GlassCard>
             </GlassContainer>
 
@@ -2066,27 +1590,27 @@ export default function App() {
                 const s = getStatus(p, waterLog[p.id] || null);
                 const nick = nicknames[p.id];
                 return (
-                  <GlassCard key={p.id} borderRadius={18} variant="interactive" style={{}} className="">
-                  <div className="prow" onClick={() => openDetail(i)}>
-                    <div style={{ position: "relative", flexShrink: 0 }}>
-                      <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-                        <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
-                        <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
+                  <GlassCard key={p.id} borderRadius={18} variant="interactive">
+                    <div className="prow" onClick={() => openDetail(i)}>
+                      <div style={{ position: "relative", flexShrink: 0 }}>
+                        <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
+                          <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
+                          <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
+                        </div>
+                        <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i]}deg)` }}>
+                          <img src={p.image} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
+                        </div>
                       </div>
-                      <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i]}deg)` }}>
-                        <img src={p.image} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
+                      <div className="prow-info">
+                        <div className="prow-name">{nick || p.name}</div>
+                        <div className="prow-sub">{nick ? p.name : p.species}</div>
                       </div>
+                      <div className="prow-right">
+                        <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
+                        <span className="slabel" style={{ color: STATUS_COLOR[s] }}>{STATUS_LABEL[s]}</span>
+                      </div>
+                      <div className="parrow">›</div>
                     </div>
-                    <div className="prow-info">
-                      <div className="prow-name">{nick || p.name}</div>
-                      <div className="prow-sub">{nick ? p.name : p.species}</div>
-                    </div>
-                    <div className="prow-right">
-                      <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
-                      <span className="slabel" style={{ color: STATUS_COLOR[s] }}>{STATUS_LABEL[s]}</span>
-                    </div>
-                    <div className="parrow">›</div>
-                  </div>
                   </GlassCard>
                 );
               })}
@@ -2095,6 +1619,7 @@ export default function App() {
           </div>
         )}
 
+        {/* ── DETAIL ── */}
         {screen === "detail" && (
           <div className="fade-up" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <div className="detail-nav">
@@ -2109,10 +1634,18 @@ export default function App() {
               {PLANTS.map((_, i) => <div key={i} className={`dot${i === idx ? " on" : ""}`} onClick={() => setIdx(i)} />)}
             </div>
 
-            <PlantPhotoStack plant={plant} tilt={TILTS[idx]} pinColor={PIN_COLORS[idx]} userPhotos={plantPhotos[plant.id] || []} setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === 'function' ? photos(prev[plant.id] || []) : photos }))} careContext={careContext} db={supabase} />
+            <PlantPhotoStack
+              plant={plant}
+              tilt={TILTS[idx]}
+              pinColor={PIN_COLORS[idx]}
+              userPhotos={plantPhotos[plant.id] || []}
+              setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === "function" ? photos(prev[plant.id] || []) : photos }))}
+              careContext={careContext}
+              db={supabase}
+            />
 
             {plant.warning && !dismissedWarnings[plant.id] && (
-              <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px 8px 14px", fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "flex-start", gap: 8 }}>
+              <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px", fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "flex-start", gap: 8 }}>
                 <span style={{ flex: 1 }}>⚠ {plant.warning}</span>
                 <button onClick={() => dismissWarning(plant.id)} style={{ background: "none", border: "none", color: "rgba(248,113,113,0.6)", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0, flexShrink: 0 }}>✕</button>
               </div>
@@ -2121,6 +1654,7 @@ export default function App() {
             <div className="detail-body">
               <div className="d-species">{plant.species}</div>
               <div className="d-name">{nicknames[plant.id] || plant.name}</div>
+
               <div className="nick-row">
                 {editingNick === plant.id ? (
                   <>
@@ -2136,10 +1670,52 @@ export default function App() {
                   </>
                 )}
               </div>
+
               <div className="rule" />
-              <div className="d-row"><span className="d-key">Light</span><span className="d-val">{plant.light}</span></div>
-              <div className="d-row"><span className="d-key">Water every</span><span className="d-val">{plant.waterEveryDays} days</span></div>
-              <div className="d-row"><span className="d-key">Status</span><span className="d-val" style={{ color: STATUS_COLOR[status] }}>{STATUS_LABEL[status]}</span></div>
+
+              <div className="d-row">
+                <span className="d-key">Light</span>
+                <span className="d-val">{plant.light}</span>
+              </div>
+              <div className="d-row">
+                <span className="d-key">Water every</span>
+                <span className="d-val">{plant.waterEveryDays} days</span>
+              </div>
+              <div className="d-row">
+                <span className="d-key">Status</span>
+                <span className="d-val" style={{ color: STATUS_COLOR[status] }}>{STATUS_LABEL[status]}</span>
+              </div>
+
+              {/* Tappable watered row */}
+              <div
+                className="d-row-tap"
+                onClick={() => setEditDateModal({ type: "water", plantId: plant.id, currentDate: lastWatered })}
+                title="Tap to edit watering date"
+              >
+                <span className="d-key">Last watered</span>
+                <span className="d-val-tap">
+                  {lastWatered
+                    ? (days === 0 ? "Today" : `${days}d ago · ${new Date(lastWatered).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}`)
+                    : "Not logged"}
+                  <span className="d-val-tap-hint">edit ✎</span>
+                </span>
+              </div>
+
+              {/* Tappable fertilized row */}
+              <div
+                className="d-row-tap"
+                onClick={() => setEditDateModal({ type: "fertilize", plantId: plant.id, currentDate: lastFertilizedDate })}
+                title="Tap to edit fertilize date"
+              >
+                <span className="d-key">Last fertilized</span>
+                <span className="d-val-tap">
+                  {lastFertilizedDate
+                    ? `${fertDays}d ago${fertDoseLabel} · ${new Date(lastFertilizedDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}`
+                    : "Not logged"}
+                  <span className="d-val-tap-hint">edit ✎</span>
+                </span>
+              </div>
+
               <div className="progress-wrap">
                 <div className="progress-labels">
                   <span>{lastWatered ? (days === 0 ? "Watered today" : `${days}d ago`) : "Never logged"}</span>
@@ -2149,28 +1725,40 @@ export default function App() {
                   <div className="progress-fill" style={{ width: `${pct}%`, background: fillColor }} />
                 </div>
               </div>
+
               <div className="care-box">{plant.care}</div>
               {plant.warning && <div className="warn-box">⚠ {plant.warning}</div>}
-              <button className="btn-water" onClick={() => waterPlant(plant.id)} style={lastWatered ? {
-                background: "linear-gradient(135deg, rgba(255,255,255,0.09) 0%, rgba(100,100,100,0.08) 100%)",
-                borderColor: "rgba(255,255,255,0.1)",
-                borderTopColor: "rgba(255,255,255,0.18)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
-                color: "rgba(255,255,255,0.38)",
-              } : {}}>
-                {lastWatered ? "Hydrated" : "Water now"}
+
+              {/* Water button */}
+              <button className="btn-water" onClick={() => waterPlant(plant.id)}>
+                💧 {days === 0 ? "Watered today" : days !== null && days < plant.waterEveryDays ? `Water in ${plant.waterEveryDays - days}d` : "Water now"}
               </button>
-              {lastWatered && <button className="btn-reset" onClick={() => resetWater(plant.id)}>Reset log</button>}
+
+              {/* Fertilize button */}
+              <button className="btn-fertilize" onClick={() => setFertilizeModalOpen(true)}>
+                🌿 {fertDays === null ? "Fertilize now" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fertilize in ${fertDaysLeft}d${fertDoseLabel}` : "Overdue — fertilize"}
+              </button>
+
+              {/* Consult gardener */}
+              <button className="btn-consult" onClick={() => setGardenerOpen(true)}>
+                🌱 Ask the gardener
+              </button>
+
+              {lastWatered && (
+                <button className="btn-reset" onClick={() => resetWaterLog(plant.id)}>Reset water log</button>
+              )}
+
               <div className="swipe-hint">swipe left or right to browse</div>
             </div>
           </div>
         )}
 
+        {/* ── MODALS ── */}
         {editDateModal && screen === "detail" && (
           <EditDateModal
             type={editDateModal.type}
             currentDate={editDateModal.currentDate}
-            onConfirm={(dateStr) => editDate(editDateModal.type, editDateModal.plantId, dateStr, editDateModal.dose)}
+            onConfirm={(dateStr) => editDate(editDateModal.type, editDateModal.plantId, dateStr)}
             onClose={() => setEditDateModal(null)}
           />
         )}
@@ -2192,6 +1780,7 @@ export default function App() {
           />
         )}
 
+        {/* ── GARDEN ── */}
         {screen === "garden" && (
           <div className="fade-up">
             <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -2252,7 +1841,7 @@ export default function App() {
                     </div>
                     <div style={{ padding: "14px 18px 18px" }}>
                       <div style={{ fontSize: 11, color: "var(--green)", fontStyle: "italic", marginBottom: 3 }}>{entry.scientificName}</div>
-                      <div style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>{entry.commonName}</div>
+                      <div style={{ fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>{entry.commonName}</div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
                         {[
                           { label: entry.family, color: "rgba(255,255,255,0.08)", text: "rgba(255,255,255,0.65)" },
@@ -2277,6 +1866,7 @@ export default function App() {
           </div>
         )}
 
+        {/* ── ATTENTION ── */}
         {screen === "attention" && (
           <div className="fade-up">
             <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
@@ -2290,10 +1880,10 @@ export default function App() {
               </div>
             </div>
             <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "16px 14px 40px" }}>
-              {PLANTS.filter(p => p.warning).map((plant) => {
-                const pIdx = PLANTS.indexOf(plant);
+              {PLANTS.filter(p => p.warning).map((p) => {
+                const pIdx = PLANTS.indexOf(p);
                 return (
-                  <GlassCard key={plant.id} borderRadius={18} variant="interactive" style={{}} onClick={() => { setIdx(pIdx); setScreen("detail"); }}>
+                  <GlassCard key={p.id} borderRadius={18} variant="interactive" onClick={() => { setIdx(pIdx); setScreen("detail"); }}>
                     <div className="prow" style={{ borderLeft: "3px solid var(--warn)", paddingLeft: 11 }}>
                       <div style={{ position: "relative", flexShrink: 0 }}>
                         <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
@@ -2301,13 +1891,13 @@ export default function App() {
                           <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
                         </div>
                         <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[pIdx]}deg)` }}>
-                          <img src={plant.image} alt={plant.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
+                          <img src={p.image} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
                         </div>
                       </div>
                       <div className="prow-info">
-                        <div className="prow-name">{nicknames[plant.id] || plant.name}</div>
-                        <div className="prow-sub">{plant.species}</div>
-                        <div style={{ fontSize: 11, color: "var(--warn)", marginTop: 4, lineHeight: 1.4 }}>⚠ {plant.warning}</div>
+                        <div className="prow-name">{nicknames[p.id] || p.name}</div>
+                        <div className="prow-sub">{p.species}</div>
+                        <div style={{ fontSize: 11, color: "var(--warn)", marginTop: 4, lineHeight: 1.4 }}>⚠ {p.warning}</div>
                       </div>
                       <div className="parrow" style={{ color: "var(--warn)" }}>›</div>
                     </div>
