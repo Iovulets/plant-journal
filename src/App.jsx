@@ -341,8 +341,8 @@ const css = `
   }
   .d-row-tap:hover { background: rgba(255,255,255,0.07); }
   .d-row-tap:active { background: rgba(255,255,255,0.12); }
-  .d-val-tap { font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 6px; }
-  .d-val-tap-hint { font-size: 10px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
+  .d-val-tap { font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 5px; }
+  .d-val-tap-hint { font-size: 10px; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.1); border-radius: 4px; padding: 1px 5px; letter-spacing: 0.5px; }
 
   .progress-wrap { margin-bottom: 20px; }
   .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
@@ -800,7 +800,7 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
       </div>
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
         <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}>
-          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 300, height: 260, objectFit: "cover" }} />
           <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "#aaa", fontStyle: "italic" }}>
             {new Date(photos[current].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
           </div>
@@ -862,7 +862,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ position: "relative", width: 380, height: 490, marginBottom: 8 }}>
+      <div style={{ position: "relative", width: 360, height: 328, marginBottom: 8 }}>
         {stackPhotos.slice(1).reverse().map((photo, i) => {
           const stackIdx = stackPhotos.length - 1 - i;
           const offset = stackIdx * 4;
@@ -870,7 +870,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           return (
             <div key={i} style={{ position: "absolute", top: offset, left: "50%", transform: `translateX(-50%) rotate(${rot}deg)`, zIndex: stackIdx }}>
               <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 4px 16px rgba(60,30,10,0.14)" }}>
-                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 300, height: 260, objectFit: "cover" }} />
               </div>
             </div>
           );
@@ -884,7 +884,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           </div>
           <div style={{ transform: `rotate(${tilt}deg)` }}>
             <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)" }}>
-              <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name} style={{ display: "block", width: 340, height: 200, objectFit: "cover" }} />
+              <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name} style={{ display: "block", width: 300, height: 260, objectFit: "cover" }} />
             </div>
           </div>
         </div>
@@ -1706,10 +1706,10 @@ export default function App() {
               >
                 <span className="d-key">Last watered</span>
                 <span className="d-val-tap">
+                  <span className="d-val-tap-hint">✎</span>
                   {lastWatered
                     ? (days === 0 ? "Today" : `${days}d ago · ${new Date(lastWatered).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}`)
                     : "Not logged"}
-                  <span className="d-val-tap-hint">edit ✎</span>
                 </span>
               </div>
 
@@ -1721,10 +1721,10 @@ export default function App() {
               >
                 <span className="d-key">Last fertilized</span>
                 <span className="d-val-tap">
+                  <span className="d-val-tap-hint">✎</span>
                   {lastFertilizedDate
                     ? `${fertDays}d ago${fertDoseLabel} · ${new Date(lastFertilizedDate).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}`
                     : "Not logged"}
-                  <span className="d-val-tap-hint">edit ✎</span>
                 </span>
               </div>
 
@@ -1756,9 +1756,7 @@ export default function App() {
                 🌱 Ask the gardener
               </button>
 
-              {lastWatered && (
-                <button className="btn-reset" onClick={() => resetWaterLog(plant.id)}>Reset water log</button>
-              )}
+
 
               <div className="swipe-hint">swipe left or right to browse</div>
             </div>
