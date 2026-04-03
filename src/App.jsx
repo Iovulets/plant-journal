@@ -1358,36 +1358,24 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
 // ── App ────────────────────────────────────────────────────────────────────
 
 // ── Auth Screen ────────────────────────────────────────────────────────────
-function AuthScreen({ onAuth }) {
-  const [mode, setMode] = useState("login"); // "login" | "signup"
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+function AuthScreen() {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  async function handleSubmit() {
+  async function signInWithGoogle() {
     setError("");
     setLoading(true);
-    try {
-      let result;
-      if (mode === "login") {
-        result = await supabase.auth.signInWithPassword({ email, password });
-      } else {
-        result = await supabase.auth.signUp({ email, password });
-      }
-      if (result.error) throw result.error;
-      if (mode === "signup" && !result.data.session) {
-        setError("Account created — check your email to confirm, then log in.");
-        setLoading(false);
-        return;
-      }
-      onAuth(result.data.session?.user);
-    } catch (err) {
-      const msg = err.message || "Something went wrong.";
-      // "Invalid API key" means VITE_SUPABASE_ANON_KEY is missing in Vercel env vars
-      setError(msg.includes("Invalid API key") ? "Configuration error — check Vercel environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY)." : msg);
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+    if (error) {
+      setError(error.message);
+      setLoading(false);
     }
-    setLoading(false);
+    // On success, browser redirects to Google — no need to setLoading(false)
   }
 
   return (
@@ -1396,7 +1384,6 @@ function AuthScreen({ onAuth }) {
       alignItems: "center", justifyContent: "center", padding: "32px 24px",
     }}>
       <div style={{ marginBottom: 48, textAlign: "center" }}>
-        
         <div style={{ fontSize: 22, fontWeight: 500, color: "#fff", letterSpacing: "4px", textTransform: "uppercase" }}>Plantj</div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 8, letterSpacing: "2px", textTransform: "uppercase" }}>Your garden journal</div>
       </div>
@@ -1408,76 +1395,46 @@ function AuthScreen({ onAuth }) {
         WebkitBackdropFilter: "blur(24px) saturate(180%)",
         border: "1px solid rgba(255,255,255,0.25)",
         borderTopColor: "rgba(255,255,255,0.50)",
-        borderRadius: 24, padding: "28px 24px",
+        borderRadius: 24, padding: "32px 24px",
         boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.35) inset",
       }}>
-        {/* Mode tabs */}
-        <div style={{ display: "flex", background: "rgba(255,255,255,0.08)", borderRadius: 12, padding: 3, marginBottom: 24 }}>
-          {["login", "signup"].map(m => (
-            <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
-              flex: 1, padding: "8px 0", borderRadius: 10, border: "none",
-              background: mode === m ? "rgba(255,255,255,0.18)" : "transparent",
-              color: mode === m ? "#fff" : "rgba(255,255,255,0.45)",
-              fontSize: 13, fontWeight: mode === m ? 500 : 400,
-              fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
-              transition: "all 0.15s",
-              boxShadow: mode === m ? "0 1px 4px rgba(0,0,0,0.12)" : "none",
-            }}>
-              {m === "login" ? "Log in" : "Sign up"}
-            </button>
-          ))}
-        </div>
-
-        {/* Fields */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
-          <input
-            type="email" placeholder="Email" value={email}
-            onChange={e => setEmail(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleSubmit()}
-            style={{
-              background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
-              borderRadius: 12, padding: "12px 16px", fontSize: 14,
-              color: "#fff", fontFamily: "'DM Sans', sans-serif", outline: "none",
-              width: "100%", boxSizing: "border-box",
-            }}
-          />
-          <input
-            type="password" placeholder="Password" value={password}
-            onChange={e => setPassword(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && handleSubmit()}
-            style={{
-              background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
-              borderRadius: 12, padding: "12px 16px", fontSize: 14,
-              color: "#fff", fontFamily: "'DM Sans', sans-serif", outline: "none",
-              width: "100%", boxSizing: "border-box",
-            }}
-          />
-        </div>
+        <button
+          onClick={signInWithGoogle}
+          disabled={loading}
+          style={{
+            width: "100%", padding: "14px 16px",
+            background: loading ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.92)",
+            border: "1px solid rgba(255,255,255,0.3)",
+            borderRadius: 16, cursor: loading ? "default" : "pointer",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
+            fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+            color: loading ? "rgba(255,255,255,0.4)" : "#1a1a1a",
+            transition: "all 0.18s",
+            boxShadow: loading ? "none" : "0 2px 8px rgba(0,0,0,0.12)",
+          }}
+        >
+          {!loading && (
+            <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.707c-.18-.54-.282-1.117-.282-1.707s.102-1.167.282-1.707V4.961H.957C.347 6.175 0 7.548 0 9s.348 2.825.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.961L3.964 7.293C4.672 5.166 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+          )}
+          {loading ? "Redirecting…" : "Continue with Google"}
+        </button>
 
         {error && (
-          <div style={{ fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.5, textAlign: "center" }}>
+          <div style={{ fontSize: 12, color: "#f87171", marginTop: 14, textAlign: "center", lineHeight: 1.5 }}>
             {error}
           </div>
         )}
-
-        <button onClick={handleSubmit} disabled={loading || !email || !password} style={{
-          width: "100%", padding: "13px",
-          background: "rgba(74,222,128,0.28)",
-          backdropFilter: "blur(12px)",
-          border: "1px solid rgba(150,255,100,0.40)",
-          borderTopColor: "rgba(200,255,160,0.65)",
-          borderRadius: 16, color: "#d4ffb0",
-          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-          cursor: loading || !email || !password ? "default" : "pointer",
-          opacity: loading || !email || !password ? 0.5 : 1,
-          transition: "all 0.15s", letterSpacing: "0.3px",
-        }}>
-          {loading ? "…" : mode === "login" ? "Log in" : "Create account"}
-        </button>
       </div>
     </div>
   );
 }
+
+
 
 export default function App() {
   const [user, setUser] = useState(null);
@@ -1700,7 +1657,7 @@ export default function App() {
         )}
 
         {/* Auth gate — show login, hide everything else */}
-        {!authLoading && !user && <AuthScreen onAuth={setUser} />}
+        {!authLoading && !user && <AuthScreen />}
         {!authLoading && !user && null /* stop rendering app content below */}
         {!authLoading && user && (
           <>
