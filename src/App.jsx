@@ -1533,18 +1533,12 @@ useEffect(() => {
     }
   });
 
-  const params = new URLSearchParams(window.location.search);
-  if (params.has("code")) {
-    // PKCE: Supabase auto-exchanges ?code= via detectSessionInUrl
-    // Wait for onAuthStateChange to fire, with a 2s fallback
-    const timer = setTimeout(() => {
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        setUser(session?.user ?? null);
-        setAuthLoading(false);
-        if (session) window.history.replaceState(null, "", window.location.pathname);
-      });
-    }, 2000);
-    return () => { subscription.unsubscribe(); clearTimeout(timer); };
+  const code = new URLSearchParams(window.location.search).get("code");
+  if (code) {
+    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
+      if (error) console.error("Code exchange failed:", error.message);
+      window.history.replaceState(null, "", window.location.pathname);
+    });
   } else {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
@@ -1554,7 +1548,6 @@ useEffect(() => {
 
   return () => subscription.unsubscribe();
 }, []);
-
 
 
   const [plants, setPlants] = useState([]);
