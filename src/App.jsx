@@ -528,8 +528,6 @@ function VocDetail({ plants, metrics }) {
             </div>
           );
         })}
-          </>
-        )}
       </div>
     </>
   );
@@ -2082,7 +2080,7 @@ export default function App() {
             </GlassContainer>
           </div>
         )}
-          </>
+        </>
         )}
       </div>
     </>
