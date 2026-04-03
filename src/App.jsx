@@ -207,9 +207,19 @@ const css = `
     width: 430px; height: 100vh;
     backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
     -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-    background: rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.10);
     pointer-events: none;
     z-index: 0;
+  }
+  @media (max-width: 430px) {
+    .glass-screen {
+      width: 100vw;
+      background: rgba(255,255,255,0.06);
+      backdrop-filter: blur(18px) saturate(140%) brightness(1.02);
+      -webkit-backdrop-filter: blur(18px) saturate(140%) brightness(1.02);
+    }
+    /* Boost card contrast on mobile where bg is darker */
+    .prow { background: rgba(255,255,255,0.04); }
   }
   .app > *:not(.glass-screen) { position: relative; z-index: 1; }
 
@@ -1529,8 +1539,10 @@ export default function App() {
 
       <div
         className="app"
-        style={{ backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top", backgroundAttachment: "fixed" }}
+        style={{}}
       >
+        {/* Fixed bg div avoids iOS backgroundAttachment:fixed bug */}
+        <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
         <div className="glass-screen" />
 
         {dbLoading && (
