@@ -1017,19 +1017,10 @@ function ensureGlassLoop() {
 
 function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
   useEffect(() => { ensureGlassLoop(); }, []);
-  // The backdrop-filter div must be clipped to the container to prevent bleed.
-  // We use a 2-div approach: outer has overflow:visible (so hover lifts aren't clipped),
-  // inner backdrop is clipped by clip-path matching the border-radius.
+  // No shared backdrop div — WebKit/iOS ignores overflow:hidden on backdrop-filter elements,
+  // causing blur to bleed outside bounds. Each GlassCard carries its own backdrop-filter instead.
   return (
     <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1fr 1fr", gap, ...style }} className={className}>
-      <div style={{
-        position: "absolute", inset: 0,
-        backdropFilter: GLASS_VARS.regular.blur,
-        WebkitBackdropFilter: GLASS_VARS.regular.blur,
-        borderRadius: 22,
-        overflow: "hidden",
-        zIndex: 0, pointerEvents: "none",
-      }} />
       {children}
     </div>
   );
@@ -1054,6 +1045,8 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
       style={{
         position: "relative", borderRadius,
         background: hovered ? v.bgHover : v.bg,
+        backdropFilter: v.blur,
+        WebkitBackdropFilter: v.blur,
         border: `1px solid ${v.border}`,
         borderTopColor: v.borderTop, borderBottomColor: "rgba(0,0,0,0.12)",
         boxShadow: hovered ? v.shadow.replace("rgba(0,0,0,0.18)", "rgba(0,0,0,0.26)").replace("rgba(0,0,0,0.20)", "rgba(0,0,0,0.28)") : v.shadow,
