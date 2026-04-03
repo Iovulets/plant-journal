@@ -1523,42 +1523,37 @@ export default function App() {
   const [dbLoading, setDbLoading] = useState(true);
   const touchX = useRef(null);
 
-  // ── Auth state ───────────────────────────────────────────────────────────
-  useEffect(() => {
-    // onAuthStateChange must be set up BEFORE getSession so it catches
-    // the SIGNED_IN event fired when Supabase parses the URL hash token
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+// ── Auth state ───────────────────────────────────────────────────────────
+useEffect(() => {
+  const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    setUser(session?.user ?? null);
+    setAuthLoading(false);
+    if (event === "SIGNED_IN") {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("code")) {
+    // PKCE: Supabase auto-exchanges ?code= via detectSessionInUrl
+    // Wait for onAuthStateChange to fire, with a 2s fallback
+    const timer = setTimeout(() => {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setUser(session?.user ?? null);
+        setAuthLoading(false);
+        if (session) window.history.replaceState(null, "", window.location.pathname);
+      });
+    }, 2000);
+    return () => { subscription.unsubscribe(); clearTimeout(timer); };
+  } else {
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setAuthLoading(false);
-      if (event === "SIGNED_IN" && window.location.hash.includes("access_token")) {
-        window.history.replaceState(null, "", window.location.pathname);
-      }
     });
+  }
 
-    // getSession after — handles already-logged-in case (no hash in URL)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        // If no session but hash has token, Supabase should parse it automatically
-        // via detectSessionInUrl — give it a moment then check again
-        if (window.location.hash.includes("access_token")) {
-          setTimeout(() => {
-            supabase.auth.getSession().then(({ data: { session: s } }) => {
-              setUser(s?.user ?? null);
-              setAuthLoading(false);
-              if (s && window.location.hash) {
-                window.history.replaceState(null, "", window.location.pathname);
-              }
-            });
-          }, 500);
-        } else {
-          setUser(null);
-          setAuthLoading(false);
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  return () => subscription.unsubscribe();
+}, []);
 
 
 
