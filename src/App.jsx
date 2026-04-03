@@ -1,58 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
-import anthuriumImg from "./assets/plants/anthurium.jpg";
-import chrysanthemumImg from "./assets/plants/chrysanthemum.jpg";
-import ivyImg from "./assets/plants/ivy.jpg";
-import dracaenaImg from "./assets/plants/dracaena.jpg";
-import ficusImg from "./assets/plants/ficus.jpg";
-import zzImg from "./assets/plants/zz.jpg";
 import bgPhoto from "./assets/background.webp";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
   import.meta.env.VITE_SUPABASE_ANON_KEY
 );
-
-const TRACKING_SINCE = "27/03/2026";
-
-const PLANTS = [
-  {
-    id: 1, name: "White Anthurium", species: "Anthurium andraeanum", emoji: "",
-    image: anthuriumImg, waterEveryDays: 7, light: "Bright indirect",
-    care: "Keep soil moist but never soggy. Loves humidity — mist the leaves weekly. Wipe dust off leaves with a damp cloth occasionally.",
-    warning: null, co2PerYear: 50, vocPerHour: 1000, vocStrengths: ["Ammonia", "Formaldehyde"],
-  },
-  {
-    id: 2, name: "Chrysanthemum", species: "Chrysanthemum morifolium", emoji: "",
-    image: chrysanthemumImg, waterEveryDays: 3, light: "Bright direct",
-    care: "Keep soil consistently moist. Buds are forming — do not let it dry out now. Remove spent flowers to encourage blooming.",
-    warning: null, co2PerYear: 120, vocPerHour: 3500, vocStrengths: ["Benzene", "Formaldehyde", "Ammonia"],
-  },
-  {
-    id: 3, name: "English Ivy", species: "Hedera helix", emoji: "",
-    image: ivyImg, waterEveryDays: 5, light: "Medium indirect",
-    care: "Allow top inch of soil to dry between waterings. Prefers cooler temps. Mist occasionally to maintain humidity.",
-    warning: null, co2PerYear: 90, vocPerHour: 2900, vocStrengths: ["Benzene", "Formaldehyde"],
-  },
-  {
-    id: 4, name: "Dracaena", species: "Dracaena marginata", emoji: "",
-    image: dracaenaImg, waterEveryDays: 10, light: "Medium indirect",
-    care: "Let soil dry out between waterings. Sensitive to fluoride — use filtered water if possible. Avoid cold drafts.",
-    warning: null, co2PerYear: 100, vocPerHour: 2400, vocStrengths: ["Formaldehyde", "Toluene", "Xylene"],
-  },
-  {
-    id: 5, name: "Weeping Fig", species: "Ficus benjamina", emoji: "",
-    image: ficusImg, waterEveryDays: 7, light: "Bright indirect",
-    care: "Do NOT move it — Ficus drops leaves when relocated. Keep away from cold drafts and window glass at night. Water consistently. Scratch bare branches: green inside means alive.",
-    warning: "Stressed from 1yr neglect + cat attack. Bare branches visible. Stable spot is critical.", co2PerYear: 90, vocPerHour: 1540, vocStrengths: ["Formaldehyde", "Xylene"],
-  },
-  {
-    id: 6, name: "ZZ Plant", species: "Zamioculcas zamiifolia", emoji: "",
-    image: zzImg, waterEveryDays: 21, light: "Low to medium indirect",
-    care: "Extremely drought tolerant. Overwatering is the main killer. Water once every 3 weeks maximum. Thrives on neglect.",
-    warning: null, co2PerYear: 30, vocPerHour: 400, vocStrengths: ["General VOCs"],
-  },
-];
 
 function daysSince(iso) {
   if (!iso) return null;
@@ -1357,6 +1310,199 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
 
 // ── App ────────────────────────────────────────────────────────────────────
 
+
+// ── Add Plant Modal ────────────────────────────────────────────────────────
+function AddPlantModal({ onSave, onClose }) {
+  const [name, setName] = useState("");
+  const [species, setSpecies] = useState("");
+  const [waterDays, setWaterDays] = useState("7");
+  const [light, setLight] = useState("Bright indirect");
+  const [care, setCare] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const LIGHT_OPTIONS = ["Low indirect", "Medium indirect", "Bright indirect", "Bright direct"];
+
+  async function handleSave() {
+    if (!name.trim()) return;
+    setSaving(true);
+    await onSave({
+      name: name.trim(),
+      species: species.trim() || null,
+      water_every_days: parseInt(waterDays) || 7,
+      light,
+      care: care.trim() || null,
+      warning: null,
+      co2_per_year: 80,
+      voc_per_hour: 1500,
+      voc_strengths: ["General VOCs"],
+    });
+    setSaving(false);
+    onClose();
+  }
+
+  const inputStyle = {
+    background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
+    borderRadius: 12, padding: "11px 14px", fontSize: 13,
+    color: "#fff", fontFamily: "'DM Sans', sans-serif", outline: "none",
+    width: "100%", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "85vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>New plant</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>Add to your garden</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>x</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+          <input style={inputStyle} placeholder="Plant name *" value={name} onChange={e => setName(e.target.value)} />
+          <input style={inputStyle} placeholder="Species (optional)" value={species} onChange={e => setSpecies(e.target.value)} />
+          
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Water every</div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {["3", "5", "7", "10", "14", "21"].map(d => (
+                <button key={d} onClick={() => setWaterDays(d)} style={{
+                  flex: 1, padding: "8px 0", borderRadius: 10, border: "1px solid",
+                  borderColor: waterDays === d ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
+                  background: waterDays === d ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
+                  color: waterDays === d ? "var(--green)" : "var(--text-2)",
+                  fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                }}>
+                  {d}d
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Light</div>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {LIGHT_OPTIONS.map(l => (
+                <button key={l} onClick={() => setLight(l)} style={{
+                  padding: "7px 12px", borderRadius: 10, border: "1px solid",
+                  borderColor: light === l ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
+                  background: light === l ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
+                  color: light === l ? "var(--green)" : "var(--text-2)",
+                  fontSize: 11, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                }}>
+                  {l}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <textarea style={{ ...inputStyle, minHeight: 80, resize: "none", lineHeight: 1.5 }}
+            placeholder="Care notes (optional)"
+            value={care} onChange={e => setCare(e.target.value)}
+          />
+        </div>
+
+        <button onClick={handleSave} disabled={!name.trim() || saving} style={{
+          width: "100%", padding: "13px",
+          background: "rgba(74,222,128,0.22)", backdropFilter: "blur(20px)",
+          border: "1px solid rgba(150,255,100,0.4)", borderTopColor: "rgba(200,255,160,0.7)",
+          borderRadius: 20, color: "#d4ffb0",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: !name.trim() || saving ? "default" : "pointer",
+          opacity: !name.trim() || saving ? 0.5 : 1, letterSpacing: "0.3px",
+        }}>
+          {saving ? "Saving…" : "Add plant"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+
+// ── Add Plant Modal ────────────────────────────────────────────────────────
+function AddPlantModal({ onSave, onClose }) {
+  const [name, setName] = useState("");
+  const [species, setSpecies] = useState("");
+  const [waterDays, setWaterDays] = useState(7);
+  const [light, setLight] = useState("Medium indirect");
+  const [care, setCare] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const LIGHT_OPTIONS = ["Low indirect", "Medium indirect", "Bright indirect", "Bright direct"];
+
+  async function handleSave() {
+    if (!name.trim()) return;
+    setSaving(true);
+    await onSave({ name: name.trim(), species: species.trim(), waterEveryDays: waterDays, light, care: care.trim() });
+    setSaving(false);
+  }
+
+  const inputStyle = {
+    background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
+    borderRadius: 12, padding: "11px 14px", fontSize: 13,
+    color: "var(--text)", fontFamily: "'DM Sans', sans-serif", outline: "none",
+    width: "100%", boxSizing: "border-box",
+  };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 20px 40px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "85vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>New plant</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>Add to your garden</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>x</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
+          <input style={inputStyle} placeholder="Plant name *" value={name} onChange={e => setName(e.target.value)} />
+          <input style={inputStyle} placeholder="Species (optional)" value={species} onChange={e => setSpecies(e.target.value)} />
+
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Water every</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <button onClick={() => setWaterDays(d => Math.max(1, d - 1))} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 10, width: 36, height: 36, color: "var(--text)", fontSize: 18, cursor: "pointer" }}>-</button>
+              <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)", minWidth: 80, textAlign: "center" }}>{waterDays} {waterDays === 1 ? "day" : "days"}</div>
+              <button onClick={() => setWaterDays(d => d + 1)} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 10, width: 36, height: 36, color: "var(--text)", fontSize: 18, cursor: "pointer" }}>+</button>
+            </div>
+          </div>
+
+          <div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Light</div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {LIGHT_OPTIONS.map(opt => (
+                <button key={opt} onClick={() => setLight(opt)} style={{
+                  padding: "6px 12px", borderRadius: 20, fontSize: 11, cursor: "pointer",
+                  fontFamily: "'DM Sans', sans-serif",
+                  background: light === opt ? "var(--green)" : "rgba(255,255,255,0.08)",
+                  border: `1px solid ${light === opt ? "var(--green)" : "rgba(255,255,255,0.18)"}`,
+                  color: light === opt ? "#0a1a0a" : "var(--text-2)",
+                }}>{opt}</button>
+              ))}
+            </div>
+          </div>
+
+          <textarea style={{ ...inputStyle, resize: "none", height: 80, lineHeight: 1.5 }}
+            placeholder="Care notes (optional)" value={care} onChange={e => setCare(e.target.value)} />
+        </div>
+
+        <button onClick={handleSave} disabled={!name.trim() || saving} style={{
+          width: "100%", padding: "14px",
+          background: !name.trim() ? "rgba(255,255,255,0.06)" : "rgba(74,222,128,0.22)",
+          border: `1px solid ${!name.trim() ? "rgba(255,255,255,0.12)" : "rgba(150,255,100,0.40)"}`,
+          borderTopColor: !name.trim() ? "rgba(255,255,255,0.18)" : "rgba(200,255,160,0.70)",
+          borderRadius: 20, color: !name.trim() ? "rgba(255,255,255,0.25)" : "#d4ffb0",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: !name.trim() ? "default" : "pointer", letterSpacing: "0.3px",
+        }}>
+          {saving ? "Saving…" : "Add plant"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── Auth Screen ────────────────────────────────────────────────────────────
 function AuthScreen() {
   const [loading, setLoading] = useState(false);
@@ -1473,6 +1619,9 @@ export default function App() {
 
 
 
+  const [plants, setPlants] = useState([]);
+  const [addPlantOpen, setAddPlantOpen] = useState(false);
+  const [plants, setPlants] = useState([]);
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
   const [dismissedWarnings, setDismissedWarnings] = useState({});
@@ -1486,7 +1635,8 @@ export default function App() {
     async function loadAll() {
       try {
         const uid = user.id;
-        const [wRes, fRes, dRes, nRes, gRes, pRes] = await Promise.all([
+        const [plRes, wRes, fRes, dRes, nRes, gRes, pRes] = await Promise.all([
+          supabase.from("plants").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
           supabase.from("water_log").select("*").eq("user_id", uid).order("watered_at", { ascending: false }),
           supabase.from("fertilize_log").select("*").eq("user_id", uid).order("fertilized_at", { ascending: false }),
           supabase.from("dismissed_warnings").select("*").eq("user_id", uid),
@@ -1494,6 +1644,23 @@ export default function App() {
           supabase.from("garden_log").select("*").eq("user_id", uid).order("scanned_at", { ascending: false }),
           supabase.from("plant_photos").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
         ]);
+        setPlants((plRes.data || []).map(r => ({
+          id: r.id, name: r.name, species: r.species,
+          waterEveryDays: r.water_every_days, light: r.light,
+          care: r.care, warning: r.warning,
+          co2PerYear: r.co2_per_year || 80,
+          vocPerHour: r.voc_per_hour || 1500,
+          vocStrengths: r.voc_strengths || ["General VOCs"],
+          image: null,
+        })));
+        setPlants((plRes.data || []).map(r => ({
+          id: r.id, name: r.name, species: r.species,
+          waterEveryDays: r.water_every_days, light: r.light,
+          care: r.care, warning: r.warning,
+          co2PerYear: r.co2_per_year || 0,
+          vocPerHour: r.voc_per_hour || 0,
+          vocStrengths: r.voc_strengths || [],
+        })));
         const wl = {};
         (wRes.data || []).forEach(r => { if (!wl[r.plant_id]) wl[r.plant_id] = r.watered_at; });
         setWaterLog(wl);
@@ -1526,15 +1693,15 @@ export default function App() {
   }, [user]);
 
   // ── Derived values ───────────────────────────────────────────────────────
-  const plant = PLANTS[idx];
-  const lastWatered = waterLog[plant?.id] || null;
+  const plant = plants[idx] || null;
+  const lastWatered = plant ? (waterLog[plant.id] || null) : null;
   const lastFertilized = fertilizeLog[plant?.id] || null;
   const lastFertilizedDate = lastFertilized ? (typeof lastFertilized === "string" ? lastFertilized : lastFertilized.date) : null;
   const lastFertilizedDose = lastFertilized ? (typeof lastFertilized === "string" ? 1 : lastFertilized.dose) : null;
   const status = plant ? getStatus(plant, lastWatered) : "unknown";
   const days = daysSince(lastWatered);
   const fertDays = daysSince(lastFertilizedDate);
-  const pct = days !== null ? Math.min((days / plant.waterEveryDays) * 100, 100) : 0;
+  const pct = (days !== null && plant) ? Math.min((days / plant.waterEveryDays) * 100, 100) : 0;
   const fillColor = pct >= 100 ? "#c46860" : pct >= 70 ? "#d4935a" : "#4ade80";
 
   const FERTILIZE_EVERY = 30;
@@ -1607,10 +1774,42 @@ export default function App() {
 
   function openDetail(i) { setIdx(i); setScreen("detail"); }
 
+  async function addPlant({ name, species, waterEveryDays, light, care }) {
+    const { data, error } = await supabase.from("plants").insert({
+      user_id: user.id, name, species, water_every_days: waterEveryDays,
+      light, care, sort_order: plants.length + 1,
+    }).select().single();
+    if (error) { console.error(error); return; }
+    setPlants(prev => [...prev, {
+      id: data.id, name: data.name, species: data.species,
+      waterEveryDays: data.water_every_days, light: data.light,
+      care: data.care, warning: data.warning,
+      co2PerYear: 0, vocPerHour: 0, vocStrengths: [],
+    }]);
+    setAddPlantOpen(false);
+  }
+
+  async function addPlant(plantData) {
+    const { data, error } = await supabase.from("plants").insert({
+      ...plantData, user_id: user.id,
+    }).select().single();
+    if (!error && data) {
+      setPlants(prev => [...prev, {
+        id: data.id, name: data.name, species: data.species,
+        waterEveryDays: data.water_every_days, light: data.light,
+        care: data.care, warning: data.warning,
+        co2PerYear: data.co2_per_year || 80,
+        vocPerHour: data.voc_per_hour || 1500,
+        vocStrengths: data.voc_strengths || ["General VOCs"],
+        image: null,
+      }]);
+    }
+  }
+
   async function signOut() {
     await supabase.auth.signOut();
     setWaterLog({}); setFertilizeLog({}); setDismissedWarnings({});
-    setNicknames({}); setGardenLog([]); setPlantPhotos({});
+    setNicknames({}); setGardenLog([]); setPlantPhotos({}); setPlants([]); setPlants([]);
     setScreen("overview");
   }
 
@@ -1619,7 +1818,7 @@ export default function App() {
     if (touchX.current === null) return;
     const diff = touchX.current - e.changedTouches[0].clientX;
     if (Math.abs(diff) > 50) {
-      if (diff > 0 && idx < PLANTS.length - 1) setIdx(i => i + 1);
+      if (diff > 0 && idx < plants.length - 1) setIdx(i => i + 1);
       if (diff < 0 && idx > 0) setIdx(i => i - 1);
     }
     touchX.current = null;
@@ -1685,13 +1884,13 @@ export default function App() {
           <div className="fade-up">
             <GlassContainer gap={10} style={{ padding: "16px 16px 0", gridAutoRows: "130px" }}>
               <GlassCard borderRadius={20} style={{ height: 130 }}>
-                <div className="stat"><div className="stat-n">{PLANTS.length}</div><div className="stat-l">Total plants</div></div>
+                <div className="stat"><div className="stat-n">{plants.length}</div><div className="stat-l">Total plants</div></div>
               </GlassCard>
               {(() => {
-                const warnPlants = PLANTS.filter(p => p.warning);
+                const warnPlants = plants.filter(p => p.warning);
                 return (
                   <GlassCard borderRadius={20} variant={warnPlants.length > 0 ? "interactive" : "regular"}
-                    onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(PLANTS.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
+                    onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
                     style={{ height: 130 }}>
                     <div className="stat warn" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default" }}>
                       <div className="stat-n">{warnPlants.length}</div>
@@ -1727,54 +1926,77 @@ export default function App() {
               <div className="ov-heading">My little <em>garden</em></div>
               <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.35)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.5px", paddingBottom: 4, textTransform: "uppercase" }}>Sign out</button>
             </div>
-            <div className="list-head">Your plants</div>
-            <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "0 14px 32px" }}>
-              {PLANTS.map((p, i) => {
-                const s = getStatus(p, waterLog[p.id] || null);
-                const nick = nicknames[p.id];
-                return (
-                  <GlassCard key={p.id} borderRadius={18} variant="interactive">
-                    <div className="prow" onClick={() => openDetail(i)}>
-                      <div style={{ position: "relative", flexShrink: 0 }}>
-                        <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-                          <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
-                          <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
+
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 22px 10px" }}>
+              <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>Your plants</div>
+              <button onClick={() => setAddPlantOpen(true)} style={{
+                background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)",
+                borderRadius: 20, padding: "5px 14px", fontSize: 11,
+                color: "var(--green)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif",
+                letterSpacing: "0.5px",
+              }}>+ Add plant</button>
+            </div>
+
+            {plants.length === 0 ? (
+              <div style={{ padding: "40px 24px", textAlign: "center" }}>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.7, fontWeight: 300 }}>
+                  No plants yet.<br />Tap + Add plant to start your garden.
+                </div>
+              </div>
+            ) : (
+              <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "0 14px 32px" }}>
+                {plants.map((p, i) => {
+                  const s = getStatus(p, waterLog[p.id] || null);
+                  const nick = nicknames[p.id];
+                  const photos = plantPhotos[p.id] || [];
+                  const topPhoto = photos.length > 0 ? photos[photos.length - 1] : null;
+                  return (
+                    <GlassCard key={p.id} borderRadius={18} variant="interactive">
+                      <div className="prow" onClick={() => openDetail(i)}>
+                        <div style={{ position: "relative", flexShrink: 0 }}>
+                          <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
+                            <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i % PIN_COLORS.length], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
+                            <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
+                          </div>
+                          <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i % TILTS.length]}deg)` }}>
+                            {topPhoto
+                              ? <img src={topPhoto.dataUrl} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
+                              : <div style={{ width: 44, height: 40, background: "rgba(74,222,128,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>+</div>
+                            }
+                          </div>
                         </div>
-                        <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i]}deg)` }}>
-                          <img src={p.image} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
+                        <div className="prow-info">
+                          <div className="prow-name">{nick || p.name}</div>
+                          <div className="prow-sub">{nick ? p.name : p.species}</div>
                         </div>
+                        <div className="prow-right">
+                          <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
+                          <span className="slabel" style={{ color: STATUS_COLOR[s] }}>{STATUS_LABEL[s]}</span>
+                        </div>
+                        <div className="parrow">›</div>
                       </div>
-                      <div className="prow-info">
-                        <div className="prow-name">{nick || p.name}</div>
-                        <div className="prow-sub">{nick ? p.name : p.species}</div>
-                      </div>
-                      <div className="prow-right">
-                        <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
-                        <span className="slabel" style={{ color: STATUS_COLOR[s] }}>{STATUS_LABEL[s]}</span>
-                      </div>
-                      <div className="parrow">›</div>
-                    </div>
-                  </GlassCard>
-                );
-              })}
-            </GlassContainer>
-            <AirQualitySlider plants={PLANTS} />
+                    </GlassCard>
+                  );
+                })}
+              </GlassContainer>
+            )}
+            {plants.length > 0 && <AirQualitySlider plants={plants} />}
           </div>
         )}
 
         {/* ── DETAIL ── */}
-        {screen === "detail" && (
+        {screen === "detail" && plant && (
           <div className="fade-up" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <div className="detail-nav">
               <button className="dnav-back" onClick={() => setScreen("overview")}>← Overview</button>
-              <div className="dnav-counter">{idx + 1} / {PLANTS.length}</div>
+              <div className="dnav-counter">{idx + 1} / {plants.length}</div>
               <div className="dnav-arrows">
                 <button className="darrow" disabled={idx === 0} onClick={() => setIdx(i => i - 1)}>‹</button>
-                <button className="darrow" disabled={idx === PLANTS.length - 1} onClick={() => setIdx(i => i + 1)}>›</button>
+                <button className="darrow" disabled={idx === plants.length - 1} onClick={() => setIdx(i => i + 1)}>›</button>
               </div>
             </div>
             <div className="dots">
-              {PLANTS.map((_, i) => <div key={i} className={`dot${i === idx ? " on" : ""}`} onClick={() => setIdx(i)} />)}
+              {plants.map((_, i) => <div key={i} className={`dot${i === idx ? " on" : ""}`} onClick={() => setIdx(i)} />)}
             </div>
 
             <PlantPhotoStack
@@ -1895,6 +2117,10 @@ export default function App() {
         )}
 
         {/* ── MODALS ── */}
+        {addPlantOpen && (
+          <AddPlantModal onSave={addPlant} onClose={() => setAddPlantOpen(false)} />
+        )}
+
         {editDateModal && screen === "detail" && (
           <EditDateModal
             type={editDateModal.type}
@@ -2017,13 +2243,13 @@ export default function App() {
             <div style={{ padding: "24px 24px 8px" }}>
               <div style={{ fontSize: 10, letterSpacing: "3px", textTransform: "uppercase", color: "var(--warn)", marginBottom: 6 }}>Needs attention</div>
               <div style={{ fontSize: 32, fontWeight: 600, color: "var(--text)", lineHeight: 1.1 }}>
-                {PLANTS.filter(p => p.warning).length} plant{PLANTS.filter(p => p.warning).length !== 1 ? "s" : ""}<br />
+                {plants.filter(p => p.warning).length} plant{plants.filter(p => p.warning).length !== 1 ? "s" : ""}<br />
                 <span style={{ color: "var(--warn)" }}>need care</span>
               </div>
             </div>
             <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "16px 14px 40px" }}>
-              {PLANTS.filter(p => p.warning).map((p) => {
-                const pIdx = PLANTS.indexOf(p);
+              {plants.filter(p => p.warning).map((p) => {
+                const pIdx = plants.indexOf(p);
                 return (
                   <GlassCard key={p.id} borderRadius={18} variant="interactive" onClick={() => { setIdx(pIdx); setScreen("detail"); }}>
                     <div className="prow" style={{ borderLeft: "3px solid var(--warn)", paddingLeft: 11 }}>
