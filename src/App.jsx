@@ -17,37 +17,37 @@ const TRACKING_SINCE = "27/03/2026";
 
 const PLANTS = [
   {
-    id: 1, name: "White Anthurium", species: "Anthurium andraeanum", emoji: "🌸",
+    id: 1, name: "White Anthurium", species: "Anthurium andraeanum", emoji: "",
     image: anthuriumImg, waterEveryDays: 7, light: "Bright indirect",
     care: "Keep soil moist but never soggy. Loves humidity — mist the leaves weekly. Wipe dust off leaves with a damp cloth occasionally.",
     warning: null, co2PerYear: 50, vocPerHour: 1000, vocStrengths: ["Ammonia", "Formaldehyde"],
   },
   {
-    id: 2, name: "Chrysanthemum", species: "Chrysanthemum morifolium", emoji: "🌼",
+    id: 2, name: "Chrysanthemum", species: "Chrysanthemum morifolium", emoji: "",
     image: chrysanthemumImg, waterEveryDays: 3, light: "Bright direct",
     care: "Keep soil consistently moist. Buds are forming — do not let it dry out now. Remove spent flowers to encourage blooming.",
     warning: null, co2PerYear: 120, vocPerHour: 3500, vocStrengths: ["Benzene", "Formaldehyde", "Ammonia"],
   },
   {
-    id: 3, name: "English Ivy", species: "Hedera helix", emoji: "🍃",
+    id: 3, name: "English Ivy", species: "Hedera helix", emoji: "",
     image: ivyImg, waterEveryDays: 5, light: "Medium indirect",
     care: "Allow top inch of soil to dry between waterings. Prefers cooler temps. Mist occasionally to maintain humidity.",
     warning: null, co2PerYear: 90, vocPerHour: 2900, vocStrengths: ["Benzene", "Formaldehyde"],
   },
   {
-    id: 4, name: "Dracaena", species: "Dracaena marginata", emoji: "🌿",
+    id: 4, name: "Dracaena", species: "Dracaena marginata", emoji: "",
     image: dracaenaImg, waterEveryDays: 10, light: "Medium indirect",
     care: "Let soil dry out between waterings. Sensitive to fluoride — use filtered water if possible. Avoid cold drafts.",
     warning: null, co2PerYear: 100, vocPerHour: 2400, vocStrengths: ["Formaldehyde", "Toluene", "Xylene"],
   },
   {
-    id: 5, name: "Weeping Fig", species: "Ficus benjamina", emoji: "🌳",
+    id: 5, name: "Weeping Fig", species: "Ficus benjamina", emoji: "",
     image: ficusImg, waterEveryDays: 7, light: "Bright indirect",
     care: "Do NOT move it — Ficus drops leaves when relocated. Keep away from cold drafts and window glass at night. Water consistently. Scratch bare branches: green inside means alive.",
     warning: "Stressed from 1yr neglect + cat attack. Bare branches visible. Stable spot is critical.", co2PerYear: 90, vocPerHour: 1540, vocStrengths: ["Formaldehyde", "Xylene"],
   },
   {
-    id: 6, name: "ZZ Plant", species: "Zamioculcas zamiifolia", emoji: "✨",
+    id: 6, name: "ZZ Plant", species: "Zamioculcas zamiifolia", emoji: "",
     image: zzImg, waterEveryDays: 21, light: "Low to medium indirect",
     care: "Extremely drought tolerant. Overwatering is the main killer. Water once every 3 weeks maximum. Thrives on neglect.",
     warning: null, co2PerYear: 30, vocPerHour: 400, vocStrengths: ["General VOCs"],
@@ -1143,7 +1143,7 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
             </>
           ) : (
             <>
-              <div className="stat-n" style={{ fontSize: 36, fontWeight: 600, lineHeight: 1 }}>⟡</div>
+              <div className="stat-n" style={{ fontSize: 28, fontWeight: 300, lineHeight: 1, letterSpacing: "3px" }}>scan</div>
               <div className="stat-l">Scan plant</div>
             </>
           )}
@@ -1164,7 +1164,7 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
   const accent = isWater ? "rgba(100,220,80,1)" : "rgba(212,147,90,1)";
   const accentBg = isWater ? "rgba(100,220,80,0.12)" : "rgba(212,147,90,0.10)";
   const accentBorder = isWater ? "rgba(100,220,80,0.3)" : "rgba(212,147,90,0.3)";
-  const emoji = isWater ? "💧" : "🌿";
+  const emoji = isWater ? "" : "";
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
@@ -1377,13 +1377,15 @@ function AuthScreen({ onAuth }) {
       }
       if (result.error) throw result.error;
       if (mode === "signup" && !result.data.session) {
-        setError("Check your email to confirm your account.");
+        setError("Account created — check your email to confirm, then log in.");
         setLoading(false);
         return;
       }
       onAuth(result.data.session?.user);
     } catch (err) {
-      setError(err.message || "Something went wrong.");
+      const msg = err.message || "Something went wrong.";
+      // "Invalid API key" means VITE_SUPABASE_ANON_KEY is missing in Vercel env vars
+      setError(msg.includes("Invalid API key") ? "Configuration error — check Vercel environment variables (VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY)." : msg);
     }
     setLoading(false);
   }
@@ -1394,9 +1396,9 @@ function AuthScreen({ onAuth }) {
       alignItems: "center", justifyContent: "center", padding: "32px 24px",
     }}>
       <div style={{ marginBottom: 48, textAlign: "center" }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
-        <div style={{ fontSize: 28, fontWeight: 600, color: "#fff", letterSpacing: "-0.5px" }}>Plant Journal</div>
-        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>Your garden, always with you</div>
+        
+        <div style={{ fontSize: 22, fontWeight: 500, color: "#fff", letterSpacing: "4px", textTransform: "uppercase" }}>Plantj</div>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 8, letterSpacing: "2px", textTransform: "uppercase" }}>Your garden journal</div>
       </div>
 
       <div style={{
@@ -1693,7 +1695,7 @@ export default function App() {
         {/* Auth loading splash */}
         {authLoading && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 40 }}>🌿</div>
+            <div style={{ fontSize: 13, letterSpacing: "3px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>Loading</div>
           </div>
         )}
 
@@ -1706,7 +1708,7 @@ export default function App() {
 
         {dbLoading && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontSize: 32 }}>🌿</div>
+            <div style={{ fontSize: 13, letterSpacing: "3px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>Loading</div>
             <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", letterSpacing: 1 }}>Loading your garden…</div>
           </div>
         )}
@@ -1820,7 +1822,7 @@ export default function App() {
 
             {plant.warning && !dismissedWarnings[plant.id] && (
               <div style={{ margin: "0 22px 4px", background: "rgba(248,113,113,0.1)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 10, padding: "8px 14px", fontSize: 12, color: "var(--warn)", display: "flex", alignItems: "flex-start", gap: 8 }}>
-                <span style={{ flex: 1 }}>⚠ {plant.warning}</span>
+                <span style={{ flex: 1 }}>! {plant.warning}</span>
                 <button onClick={() => dismissWarning(plant.id)} style={{ background: "none", border: "none", color: "rgba(248,113,113,0.6)", cursor: "pointer", fontSize: 14, lineHeight: 1, padding: 0, flexShrink: 0 }}>✕</button>
               </div>
             )}
@@ -1901,21 +1903,21 @@ export default function App() {
               </div>
 
               <div className="care-box">{plant.care}</div>
-              {plant.warning && <div className="warn-box">⚠ {plant.warning}</div>}
+              {plant.warning && <div className="warn-box">! {plant.warning}</div>}
 
               {/* Water button */}
               <button className="btn-water" onClick={() => waterPlant(plant.id)}>
-                💧 {days === 0 ? "Watered today" : days !== null && days < plant.waterEveryDays ? `Water in ${plant.waterEveryDays - days}d` : "Water now"}
+                {days === 0 ? "Watered today" : days !== null && days < plant.waterEveryDays ? `Water in ${plant.waterEveryDays - days}d` : "Water now"}
               </button>
 
               {/* Fertilize button */}
               <button className="btn-fertilize" onClick={() => setFertilizeModalOpen(true)}>
-                🌿 {fertDays === null ? "Fertilize now" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fertilize in ${fertDaysLeft}d${fertDoseLabel}` : "Overdue — fertilize"}
+                {fertDays === null ? "Fertilize now" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fertilize in ${fertDaysLeft}d${fertDoseLabel}` : "Overdue — fertilize"}
               </button>
 
               {/* Consult gardener */}
               <button className="btn-consult" onClick={() => setGardenerOpen(true)}>
-                🌱 Ask the gardener
+                Ask the gardener
               </button>
 
 
@@ -1984,7 +1986,7 @@ export default function App() {
 
             {gardenLog.length === 0 ? (
               <div style={{ padding: "60px 32px", textAlign: "center" }}>
-                <div style={{ fontSize: 40, marginBottom: 16 }}>🌿</div>
+                
                 <div style={{ fontSize: 20, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>No plants scanned yet</div>
                 <div style={{ fontSize: 13, color: "var(--muted)", lineHeight: 1.6, fontWeight: 300 }}>Tap Scan on the overview or use the button above to identify a plant.</div>
               </div>
@@ -2007,7 +2009,7 @@ export default function App() {
                       </div>
                       {entry.toxic && (
                         <div style={{ position: "absolute", top: 12, left: 12, background: "rgba(196,104,96,0.9)", color: "#fff", fontSize: 10, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(4px)" }}>
-                          ⚠ Toxic{entry.toxicTo ? ` to ${entry.toxicTo}` : ""}
+                          ! Toxic{entry.toxicTo ? ` to ${entry.toxicTo}` : ""}
                         </div>
                       )}
                       <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, height: 60, background: "linear-gradient(to top, rgba(15,26,15,0.95), transparent)" }} />
@@ -2070,7 +2072,7 @@ export default function App() {
                       <div className="prow-info">
                         <div className="prow-name">{nicknames[p.id] || p.name}</div>
                         <div className="prow-sub">{p.species}</div>
-                        <div style={{ fontSize: 11, color: "var(--warn)", marginTop: 4, lineHeight: 1.4 }}>⚠ {p.warning}</div>
+                        <div style={{ fontSize: 11, color: "var(--warn)", marginTop: 4, lineHeight: 1.4 }}>! {p.warning}</div>
                       </div>
                       <div className="parrow" style={{ color: "var(--warn)" }}>›</div>
                     </div>
