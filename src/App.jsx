@@ -149,23 +149,20 @@ const css = `
     --soft-brown: rgba(255,255,255,0.5);
   }
 
-  body {
-    margin: 0;
-    background-color: #d4b896;
-    background-size: cover;
-    background-position: center top;
-    background-attachment: fixed;
-    min-height: 100vh;
-  }
+  body { margin: 0; background: #0f1a0f; }
 
   .app {
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
-    background: transparent;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
     user-select: none;
+    /* Background lives here — same stacking context as children, so backdrop-filter works */
+    background-size: cover;
+    background-position: center top;
+    background-attachment: scroll; /* scroll works on iOS unlike fixed */
+    isolation: auto; /* do NOT create a new stacking context */
   }
 
   @keyframes fadeUp {
@@ -211,7 +208,7 @@ const css = `
   @media (max-width: 430px) {
     .prow { background: rgba(255,255,255,0.04); }
   }
-  .app > * { position: relative; z-index: 1; }
+  .app > * { position: relative; }
 
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
@@ -1043,7 +1040,7 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
         transform: hovered && isInteractive ? "translateY(-2px) scale(1.015)" : "none",
         transition: "background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease",
         cursor: isInteractive ? "pointer" : "default",
-        overflow: "hidden", zIndex: 1, ...style,
+        zIndex: 1, ...style,
       }}
       className={className}
     >
@@ -1366,11 +1363,7 @@ export default function App() {
   const [dbLoading, setDbLoading] = useState(true);
   const touchX = useRef(null);
 
-  // Set background image on body so backdrop-filter on cards can reach it
-  useEffect(() => {
-    document.body.style.backgroundImage = `url(${bgPhoto})`;
-    return () => { document.body.style.backgroundImage = ''; };
-  }, []);
+
 
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
@@ -1538,7 +1531,7 @@ export default function App() {
 
       <div
         className="app"
-        style={{}}
+        style={{ backgroundImage: `url(${bgPhoto})` }}
       >
 
 
