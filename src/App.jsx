@@ -1356,7 +1356,130 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
 }
 
 // ── App ────────────────────────────────────────────────────────────────────
+
+// ── Auth Screen ────────────────────────────────────────────────────────────
+function AuthScreen({ onAuth }) {
+  const [mode, setMode] = useState("login"); // "login" | "signup"
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleSubmit() {
+    setError("");
+    setLoading(true);
+    try {
+      let result;
+      if (mode === "login") {
+        result = await supabase.auth.signInWithPassword({ email, password });
+      } else {
+        result = await supabase.auth.signUp({ email, password });
+      }
+      if (result.error) throw result.error;
+      if (mode === "signup" && !result.data.session) {
+        setError("Check your email to confirm your account.");
+        setLoading(false);
+        return;
+      }
+      onAuth(result.data.session?.user);
+    } catch (err) {
+      setError(err.message || "Something went wrong.");
+    }
+    setLoading(false);
+  }
+
+  return (
+    <div style={{
+      position: "fixed", inset: 0, display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center", padding: "32px 24px",
+    }}>
+      <div style={{ marginBottom: 48, textAlign: "center" }}>
+        <div style={{ fontSize: 40, marginBottom: 12 }}>🌿</div>
+        <div style={{ fontSize: 28, fontWeight: 600, color: "#fff", letterSpacing: "-0.5px" }}>Plant Journal</div>
+        <div style={{ fontSize: 13, color: "rgba(255,255,255,0.5)", marginTop: 6 }}>Your garden, always with you</div>
+      </div>
+
+      <div style={{
+        width: "100%", maxWidth: 360,
+        background: "rgba(255,255,255,0.12)",
+        backdropFilter: "blur(24px) saturate(180%)",
+        WebkitBackdropFilter: "blur(24px) saturate(180%)",
+        border: "1px solid rgba(255,255,255,0.25)",
+        borderTopColor: "rgba(255,255,255,0.50)",
+        borderRadius: 24, padding: "28px 24px",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.35) inset",
+      }}>
+        {/* Mode tabs */}
+        <div style={{ display: "flex", background: "rgba(255,255,255,0.08)", borderRadius: 12, padding: 3, marginBottom: 24 }}>
+          {["login", "signup"].map(m => (
+            <button key={m} onClick={() => { setMode(m); setError(""); }} style={{
+              flex: 1, padding: "8px 0", borderRadius: 10, border: "none",
+              background: mode === m ? "rgba(255,255,255,0.18)" : "transparent",
+              color: mode === m ? "#fff" : "rgba(255,255,255,0.45)",
+              fontSize: 13, fontWeight: mode === m ? 500 : 400,
+              fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+              transition: "all 0.15s",
+              boxShadow: mode === m ? "0 1px 4px rgba(0,0,0,0.12)" : "none",
+            }}>
+              {m === "login" ? "Log in" : "Sign up"}
+            </button>
+          ))}
+        </div>
+
+        {/* Fields */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 16 }}>
+          <input
+            type="email" placeholder="Email" value={email}
+            onChange={e => setEmail(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleSubmit()}
+            style={{
+              background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
+              borderRadius: 12, padding: "12px 16px", fontSize: 14,
+              color: "#fff", fontFamily: "'DM Sans', sans-serif", outline: "none",
+              width: "100%", boxSizing: "border-box",
+            }}
+          />
+          <input
+            type="password" placeholder="Password" value={password}
+            onChange={e => setPassword(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleSubmit()}
+            style={{
+              background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
+              borderRadius: 12, padding: "12px 16px", fontSize: 14,
+              color: "#fff", fontFamily: "'DM Sans', sans-serif", outline: "none",
+              width: "100%", boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {error && (
+          <div style={{ fontSize: 12, color: "#f87171", marginBottom: 12, lineHeight: 1.5, textAlign: "center" }}>
+            {error}
+          </div>
+        )}
+
+        <button onClick={handleSubmit} disabled={loading || !email || !password} style={{
+          width: "100%", padding: "13px",
+          background: "rgba(74,222,128,0.28)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(150,255,100,0.40)",
+          borderTopColor: "rgba(200,255,160,0.65)",
+          borderRadius: 16, color: "#d4ffb0",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: loading || !email || !password ? "default" : "pointer",
+          opacity: loading || !email || !password ? 0.5 : 1,
+          transition: "all 0.15s", letterSpacing: "0.3px",
+        }}>
+          {loading ? "…" : mode === "login" ? "Log in" : "Create account"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function App() {
+  const [user, setUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
   const [screen, setScreen] = useState("overview");
   const [idx, setIdx] = useState(0);
   const [editingNick, setEditingNick] = useState(null);
@@ -1366,6 +1489,18 @@ export default function App() {
   const [editDateModal, setEditDateModal] = useState(null); // { type: "water"|"fertilize", plantId, currentDate }
   const [dbLoading, setDbLoading] = useState(true);
   const touchX = useRef(null);
+
+  // ── Auth state ───────────────────────────────────────────────────────────
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setAuthLoading(false);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
 
 
@@ -1378,15 +1513,17 @@ export default function App() {
 
   // ── Load from Supabase ───────────────────────────────────────────────────
   useEffect(() => {
+    if (!user) return;
     async function loadAll() {
       try {
+        const uid = user.id;
         const [wRes, fRes, dRes, nRes, gRes, pRes] = await Promise.all([
-          supabase.from("water_log").select("*").order("watered_at", { ascending: false }),
-          supabase.from("fertilize_log").select("*").order("fertilized_at", { ascending: false }),
-          supabase.from("dismissed_warnings").select("*"),
-          supabase.from("nicknames").select("*"),
-          supabase.from("garden_log").select("*").order("scanned_at", { ascending: false }),
-          supabase.from("plant_photos").select("*").order("created_at", { ascending: true }),
+          supabase.from("water_log").select("*").eq("user_id", uid).order("watered_at", { ascending: false }),
+          supabase.from("fertilize_log").select("*").eq("user_id", uid).order("fertilized_at", { ascending: false }),
+          supabase.from("dismissed_warnings").select("*").eq("user_id", uid),
+          supabase.from("nicknames").select("*").eq("user_id", uid),
+          supabase.from("garden_log").select("*").eq("user_id", uid).order("scanned_at", { ascending: false }),
+          supabase.from("plant_photos").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
         ]);
         const wl = {};
         (wRes.data || []).forEach(r => { if (!wl[r.plant_id]) wl[r.plant_id] = r.watered_at; });
@@ -1417,7 +1554,7 @@ export default function App() {
       setDbLoading(false);
     }
     loadAll();
-  }, []);
+  }, [user]);
 
   // ── Derived values ───────────────────────────────────────────────────────
   const plant = PLANTS[idx];
@@ -1446,33 +1583,33 @@ export default function App() {
   async function waterPlant(id) {
     const now = new Date().toISOString();
     setWaterLog(p => ({ ...p, [id]: now }));
-    await supabase.from("water_log").insert({ plant_id: id, watered_at: now });
+    await supabase.from("water_log").insert({ plant_id: id, watered_at: now, user_id: user.id });
   }
 
   async function fertilizePlant(id, dose = 1) {
     const now = new Date().toISOString();
     setFertilizeLog(p => ({ ...p, [id]: { date: now, dose } }));
-    await supabase.from("fertilize_log").insert({ plant_id: id, fertilized_at: now, dose });
+    await supabase.from("fertilize_log").insert({ plant_id: id, fertilized_at: now, dose, user_id: user.id });
   }
 
   async function resetWaterLog(id) {
     setWaterLog(p => { const n = { ...p }; delete n[id]; return n; });
-    await supabase.from("water_log").delete().eq("plant_id", id);
+    await supabase.from("water_log").delete().eq("plant_id", id).eq("user_id", user.id);
   }
 
   async function dismissWarning(id) {
     setDismissedWarnings(p => ({ ...p, [id]: true }));
-    await supabase.from("dismissed_warnings").upsert({ plant_id: id });
+    await supabase.from("dismissed_warnings").upsert({ plant_id: id, user_id: user.id });
   }
 
   async function saveNick(id) {
     const nick = nickInput.trim();
     if (nick) {
       setNicknames(p => ({ ...p, [id]: nick }));
-      await supabase.from("nicknames").upsert({ plant_id: id, nickname: nick });
+      await supabase.from("nicknames").upsert({ plant_id: id, nickname: nick, user_id: user.id });
     } else {
       setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
-      await supabase.from("nicknames").delete().eq("plant_id", id);
+      await supabase.from("nicknames").delete().eq("plant_id", id).eq("user_id", user.id);
     }
     setEditingNick(null); setNickInput("");
   }
@@ -1481,11 +1618,11 @@ export default function App() {
     const newIso = new Date(dateStr + "T12:00:00").toISOString();
     if (type === "water") {
       setWaterLog(p => ({ ...p, [plantId]: newIso }));
-      await supabase.from("water_log").insert({ plant_id: plantId, watered_at: newIso });
+      await supabase.from("water_log").insert({ plant_id: plantId, watered_at: newIso, user_id: user.id });
     } else {
       const d = lastFertilizedDose ?? 1;
       setFertilizeLog(p => ({ ...p, [plantId]: { date: newIso, dose: d } }));
-      await supabase.from("fertilize_log").insert({ plant_id: plantId, fertilized_at: newIso, dose: d });
+      await supabase.from("fertilize_log").insert({ plant_id: plantId, fertilized_at: newIso, dose: d, user_id: user.id });
     }
     // Log the edit for audit trail
     try {
@@ -1500,6 +1637,13 @@ export default function App() {
   }
 
   function openDetail(i) { setIdx(i); setScreen("detail"); }
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    setWaterLog({}); setFertilizeLog({}); setDismissedWarnings({});
+    setNicknames({}); setGardenLog([]); setPlantPhotos({});
+    setScreen("overview");
+  }
 
   function onTouchStart(e) { touchX.current = e.touches[0].clientX; }
   function onTouchEnd(e) {
@@ -1537,6 +1681,14 @@ export default function App() {
         className="app"
         style={{}}
       >
+        {/* Auth loading */}
+        {authLoading && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ fontSize: 32 }}>🌿</div>
+          </div>
+        )}
+        {/* Auth gate */}
+        {!authLoading && !user && <AuthScreen onAuth={setUser} />}
         {/* Background: photo + frosted glass overlay */}
         <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
         <div style={{
@@ -1597,7 +1749,10 @@ export default function App() {
               </GlassCard>
             </GlassContainer>
 
-            <div style={{ padding: "20px 24px 0" }}><div className="ov-heading">My little <em>garden</em></div></div>
+            <div style={{ padding: "20px 24px 0", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
+              <div className="ov-heading">My little <em>garden</em></div>
+              <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.35)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.5px", paddingBottom: 4, textTransform: "uppercase" }}>Sign out</button>
+            </div>
             <div className="list-head">Your plants</div>
             <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "0 14px 32px" }}>
               {PLANTS.map((p, i) => {
@@ -1806,6 +1961,7 @@ export default function App() {
                     family: entry.family, confidence: entry.confidence, origin: entry.origin,
                     fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
                     toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl, scanned_at: entry.date,
+                    user_id: user.id,
                   });
                 }}
                 renderTrigger={(onClick, scanning) => (
