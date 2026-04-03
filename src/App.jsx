@@ -201,27 +201,10 @@ const css = `
     z-index: 1;
   }
 
-  .glass-screen {
-    position: fixed;
-    top: 0; left: 50%; transform: translateX(-50%);
-    width: 430px; height: 100vh;
-    backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-    -webkit-backdrop-filter: blur(28px) saturate(160%) brightness(1.05);
-    background: rgba(255,255,255,0.10);
-    pointer-events: none;
-    z-index: 0;
-  }
   @media (max-width: 430px) {
-    .glass-screen {
-      width: 100vw;
-      background: rgba(255,255,255,0.06);
-      backdrop-filter: blur(18px) saturate(140%) brightness(1.02);
-      -webkit-backdrop-filter: blur(18px) saturate(140%) brightness(1.02);
-    }
-    /* Boost card contrast on mobile where bg is darker */
     .prow { background: rgba(255,255,255,0.04); }
   }
-  .app > *:not(.glass-screen) { position: relative; z-index: 1; }
+  .app > * { position: relative; z-index: 1; }
 
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
@@ -951,13 +934,13 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
 const GLASS_VARS = {
   regular: {
-    bg: "rgba(255,255,255,0.11)", bgHover: "rgba(255,255,255,0.17)",
+    bg: "rgba(255,255,255,0.14)", bgHover: "rgba(255,255,255,0.20)",
     border: "rgba(255,255,255,0.22)", borderTop: "rgba(255,255,255,0.50)",
     shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.36) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
     blur: "blur(22px) saturate(190%) brightness(1.14)",
   },
   interactive: {
-    bg: "rgba(255,255,255,0.13)", bgHover: "rgba(255,255,255,0.20)",
+    bg: "rgba(255,255,255,0.16)", bgHover: "rgba(255,255,255,0.24)",
     border: "rgba(255,255,255,0.26)", borderTop: "rgba(255,255,255,0.58)",
     shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.42) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
     blur: "blur(24px) saturate(200%) brightness(1.16)",
@@ -1546,7 +1529,6 @@ export default function App() {
       >
         {/* Fixed bg div avoids iOS backgroundAttachment:fixed bug */}
         <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
-        <div className="glass-screen" />
 
         {dbLoading && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
