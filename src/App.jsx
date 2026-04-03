@@ -155,14 +155,10 @@ const css = `
     max-width: 430px;
     margin: 0 auto;
     min-height: 100vh;
+    background: transparent;
     font-family: 'DM Sans', sans-serif;
     color: var(--text);
     user-select: none;
-    /* Background lives here — same stacking context as children, so backdrop-filter works */
-    background-size: cover;
-    background-position: center top;
-    background-attachment: scroll; /* scroll works on iOS unlike fixed */
-    isolation: auto; /* do NOT create a new stacking context */
   }
 
   @keyframes fadeUp {
@@ -208,7 +204,7 @@ const css = `
   @media (max-width: 430px) {
     .prow { background: rgba(255,255,255,0.04); }
   }
-  .app > * { position: relative; }
+  .app > * { position: relative; z-index: 1; }
 
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
@@ -938,22 +934,22 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
 const GLASS_VARS = {
   regular: {
-    bg: "rgba(255,255,255,0.15)", bgHover: "rgba(255,255,255,0.22)",
-    border: "rgba(255,255,255,0.30)", borderTop: "rgba(255,255,255,0.60)",
-    shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.50) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
-    blur: "blur(24px) saturate(180%) brightness(1.12)",
+    bg: "rgba(255,255,255,0.11)", bgHover: "rgba(255,255,255,0.17)",
+    border: "rgba(255,255,255,0.22)", borderTop: "rgba(255,255,255,0.50)",
+    shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.36) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
+    blur: "blur(22px) saturate(190%) brightness(1.14)",
   },
   interactive: {
-    bg: "rgba(255,255,255,0.18)", bgHover: "rgba(255,255,255,0.26)",
-    border: "rgba(255,255,255,0.35)", borderTop: "rgba(255,255,255,0.65)",
-    shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.55) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
-    blur: "blur(28px) saturate(190%) brightness(1.14)",
+    bg: "rgba(255,255,255,0.13)", bgHover: "rgba(255,255,255,0.20)",
+    border: "rgba(255,255,255,0.26)", borderTop: "rgba(255,255,255,0.58)",
+    shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.42) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
+    blur: "blur(24px) saturate(200%) brightness(1.16)",
   },
   prominent: {
     bg: "rgba(100,220,80,0.22)", bgHover: "rgba(100,220,80,0.32)",
     border: "rgba(150,255,100,0.40)", borderTop: "rgba(200,255,160,0.70)",
     shadow: "0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset",
-    blur: "blur(22px) saturate(180%) brightness(1.18)",
+    blur: "blur(20px) saturate(200%) brightness(1.18)",
   },
 };
 
@@ -1004,10 +1000,14 @@ function ensureGlassLoop() {
 
 function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
   useEffect(() => { ensureGlassLoop(); }, []);
-  // No shared backdrop div — WebKit/iOS ignores overflow:hidden on backdrop-filter elements,
-  // causing blur to bleed outside bounds. Each GlassCard carries its own backdrop-filter instead.
   return (
     <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1fr 1fr", gap, ...style }} className={className}>
+      <div style={{
+        position: "absolute", inset: 0,
+        backdropFilter: GLASS_VARS.regular.blur,
+        WebkitBackdropFilter: GLASS_VARS.regular.blur,
+        borderRadius: 22, zIndex: 0, pointerEvents: "none",
+      }} />
       {children}
     </div>
   );
@@ -1032,15 +1032,13 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
       style={{
         position: "relative", borderRadius,
         background: hovered ? v.bgHover : v.bg,
-        backdropFilter: v.blur,
-        WebkitBackdropFilter: v.blur,
         border: `1px solid ${v.border}`,
         borderTopColor: v.borderTop, borderBottomColor: "rgba(0,0,0,0.12)",
         boxShadow: hovered ? v.shadow.replace("rgba(0,0,0,0.18)", "rgba(0,0,0,0.26)").replace("rgba(0,0,0,0.20)", "rgba(0,0,0,0.28)") : v.shadow,
         transform: hovered && isInteractive ? "translateY(-2px) scale(1.015)" : "none",
         transition: "background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease",
         cursor: isInteractive ? "pointer" : "default",
-        zIndex: 1, ...style,
+        overflow: "hidden", zIndex: 1, ...style,
       }}
       className={className}
     >
@@ -1531,8 +1529,9 @@ export default function App() {
 
       <div
         className="app"
-        style={{ backgroundImage: `url(${bgPhoto})` }}
+        style={{}}
       >
+        <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
 
 
         {dbLoading && (
