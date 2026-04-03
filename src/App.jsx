@@ -7,6 +7,7 @@ const supabase = createClient(
   import.meta.env.VITE_SUPABASE_ANON_KEY,
   {
     auth: {
+      flowType: "pkce",
       detectSessionInUrl: true,
       persistSession: true,
       autoRefreshToken: true,
@@ -1437,7 +1438,11 @@ function AuthScreen() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: window.location.origin + "/",
+        queryParams: {
+          access_type: "offline",
+          prompt: "consent",
+        },
       },
     });
     if (error) {
