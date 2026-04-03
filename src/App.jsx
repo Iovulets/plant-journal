@@ -528,6 +528,8 @@ function VocDetail({ plants, metrics }) {
             </div>
           );
         })}
+          </>
+        )}
       </div>
     </>
   );
@@ -1681,15 +1683,7 @@ export default function App() {
         className="app"
         style={{}}
       >
-        {/* Auth loading */}
-        {authLoading && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 32 }}>🌿</div>
-          </div>
-        )}
-        {/* Auth gate */}
-        {!authLoading && !user && <AuthScreen onAuth={setUser} />}
-        {/* Background: photo + frosted glass overlay */}
+        {/* Background always visible */}
         <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
         <div style={{
           position: "fixed", inset: 0, zIndex: -1,
@@ -1697,6 +1691,19 @@ export default function App() {
           WebkitBackdropFilter: "blur(40px) saturate(140%) brightness(1.05)",
           background: "rgba(255,255,255,0.18)",
         }} />
+
+        {/* Auth loading splash */}
+        {authLoading && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ fontSize: 40 }}>🌿</div>
+          </div>
+        )}
+
+        {/* Auth gate — show login, hide everything else */}
+        {!authLoading && !user && <AuthScreen onAuth={setUser} />}
+        {!authLoading && !user && null /* stop rendering app content below */}
+        {!authLoading && user && (
+          <>
 
 
         {dbLoading && (
@@ -2074,6 +2081,8 @@ export default function App() {
               })}
             </GlassContainer>
           </div>
+        )}
+          </>
         )}
       </div>
     </>
