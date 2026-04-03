@@ -149,7 +149,14 @@ const css = `
     --soft-brown: rgba(255,255,255,0.5);
   }
 
-  body { background: #d4b896; }
+  body {
+    margin: 0;
+    background-color: #d4b896;
+    background-size: cover;
+    background-position: center top;
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
 
   .app {
     max-width: 430px;
@@ -934,22 +941,22 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
 const GLASS_VARS = {
   regular: {
-    bg: "rgba(255,255,255,0.12)", bgHover: "rgba(255,255,255,0.18)",
-    border: "rgba(255,255,255,0.35)", borderTop: "rgba(255,255,255,0.65)",
-    shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.55) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
-    blur: "blur(48px) saturate(280%) brightness(1.08)",
+    bg: "rgba(255,255,255,0.15)", bgHover: "rgba(255,255,255,0.22)",
+    border: "rgba(255,255,255,0.30)", borderTop: "rgba(255,255,255,0.60)",
+    shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.50) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
+    blur: "blur(24px) saturate(180%) brightness(1.12)",
   },
   interactive: {
-    bg: "rgba(255,255,255,0.14)", bgHover: "rgba(255,255,255,0.22)",
-    border: "rgba(255,255,255,0.40)", borderTop: "rgba(255,255,255,0.72)",
-    shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.60) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
-    blur: "blur(52px) saturate(300%) brightness(1.10)",
+    bg: "rgba(255,255,255,0.18)", bgHover: "rgba(255,255,255,0.26)",
+    border: "rgba(255,255,255,0.35)", borderTop: "rgba(255,255,255,0.65)",
+    shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.55) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
+    blur: "blur(28px) saturate(190%) brightness(1.14)",
   },
   prominent: {
-    bg: "rgba(100,220,80,0.18)", bgHover: "rgba(100,220,80,0.28)",
-    border: "rgba(150,255,100,0.45)", borderTop: "rgba(200,255,160,0.75)",
-    shadow: "0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.55) inset",
-    blur: "blur(44px) saturate(280%) brightness(1.14)",
+    bg: "rgba(100,220,80,0.22)", bgHover: "rgba(100,220,80,0.32)",
+    border: "rgba(150,255,100,0.40)", borderTop: "rgba(200,255,160,0.70)",
+    shadow: "0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset",
+    blur: "blur(22px) saturate(180%) brightness(1.18)",
   },
 };
 
@@ -1359,6 +1366,12 @@ export default function App() {
   const [dbLoading, setDbLoading] = useState(true);
   const touchX = useRef(null);
 
+  // Set background image on body so backdrop-filter on cards can reach it
+  useEffect(() => {
+    document.body.style.backgroundImage = `url(${bgPhoto})`;
+    return () => { document.body.style.backgroundImage = ''; };
+  }, []);
+
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
   const [dismissedWarnings, setDismissedWarnings] = useState({});
@@ -1527,8 +1540,7 @@ export default function App() {
         className="app"
         style={{}}
       >
-        {/* Fixed bg div avoids iOS backgroundAttachment:fixed bug */}
-        <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
+
 
         {dbLoading && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
