@@ -1426,90 +1426,6 @@ function AddPlantModal({ onSave, onClose }) {
 }
 
 
-// ── Add Plant Modal ────────────────────────────────────────────────────────
-function AddPlantModal({ onSave, onClose }) {
-  const [name, setName] = useState("");
-  const [species, setSpecies] = useState("");
-  const [waterDays, setWaterDays] = useState(7);
-  const [light, setLight] = useState("Medium indirect");
-  const [care, setCare] = useState("");
-  const [saving, setSaving] = useState(false);
-
-  const LIGHT_OPTIONS = ["Low indirect", "Medium indirect", "Bright indirect", "Bright direct"];
-
-  async function handleSave() {
-    if (!name.trim()) return;
-    setSaving(true);
-    await onSave({ name: name.trim(), species: species.trim(), waterEveryDays: waterDays, light, care: care.trim() });
-    setSaving(false);
-  }
-
-  const inputStyle = {
-    background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
-    borderRadius: 12, padding: "11px 14px", fontSize: 13,
-    color: "var(--text)", fontFamily: "'DM Sans', sans-serif", outline: "none",
-    width: "100%", boxSizing: "border-box",
-  };
-
-  return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 300, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 20px 40px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "85vh", overflowY: "auto" }}>
-        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>New plant</div>
-            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>Add to your garden</div>
-          </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>x</button>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-          <input style={inputStyle} placeholder="Plant name *" value={name} onChange={e => setName(e.target.value)} />
-          <input style={inputStyle} placeholder="Species (optional)" value={species} onChange={e => setSpecies(e.target.value)} />
-
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Water every</div>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <button onClick={() => setWaterDays(d => Math.max(1, d - 1))} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 10, width: 36, height: 36, color: "var(--text)", fontSize: 18, cursor: "pointer" }}>-</button>
-              <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)", minWidth: 80, textAlign: "center" }}>{waterDays} {waterDays === 1 ? "day" : "days"}</div>
-              <button onClick={() => setWaterDays(d => d + 1)} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 10, width: 36, height: 36, color: "var(--text)", fontSize: 18, cursor: "pointer" }}>+</button>
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Light</div>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-              {LIGHT_OPTIONS.map(opt => (
-                <button key={opt} onClick={() => setLight(opt)} style={{
-                  padding: "6px 12px", borderRadius: 20, fontSize: 11, cursor: "pointer",
-                  fontFamily: "'DM Sans', sans-serif",
-                  background: light === opt ? "var(--green)" : "rgba(255,255,255,0.08)",
-                  border: `1px solid ${light === opt ? "var(--green)" : "rgba(255,255,255,0.18)"}`,
-                  color: light === opt ? "#0a1a0a" : "var(--text-2)",
-                }}>{opt}</button>
-              ))}
-            </div>
-          </div>
-
-          <textarea style={{ ...inputStyle, resize: "none", height: 80, lineHeight: 1.5 }}
-            placeholder="Care notes (optional)" value={care} onChange={e => setCare(e.target.value)} />
-        </div>
-
-        <button onClick={handleSave} disabled={!name.trim() || saving} style={{
-          width: "100%", padding: "14px",
-          background: !name.trim() ? "rgba(255,255,255,0.06)" : "rgba(74,222,128,0.22)",
-          border: `1px solid ${!name.trim() ? "rgba(255,255,255,0.12)" : "rgba(150,255,100,0.40)"}`,
-          borderTopColor: !name.trim() ? "rgba(255,255,255,0.18)" : "rgba(200,255,160,0.70)",
-          borderRadius: 20, color: !name.trim() ? "rgba(255,255,255,0.25)" : "#d4ffb0",
-          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-          cursor: !name.trim() ? "default" : "pointer", letterSpacing: "0.3px",
-        }}>
-          {saving ? "Saving…" : "Add plant"}
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // ── Auth Screen ────────────────────────────────────────────────────────────
 function AuthScreen() {
   const [loading, setLoading] = useState(false);
@@ -1643,7 +1559,6 @@ export default function App() {
 
   const [plants, setPlants] = useState([]);
   const [addPlantOpen, setAddPlantOpen] = useState(false);
-  const [plants, setPlants] = useState([]);
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
   const [dismissedWarnings, setDismissedWarnings] = useState({});
