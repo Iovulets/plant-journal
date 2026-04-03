@@ -203,6 +203,7 @@ const css = `
 
   @media (max-width: 430px) {
     .prow { background: rgba(255,255,255,0.04); }
+
   }
   .app > * { position: relative; z-index: 1; }
 
@@ -1000,14 +1001,19 @@ function ensureGlassLoop() {
 
 function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
   useEffect(() => { ensureGlassLoop(); }, []);
+  // On mobile (<=430px) WebKit bleeds backdrop-filter outside its bounds regardless of clipping.
+  // We skip the shared blur div there and let card bg opacity handle the frosted look.
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 430;
   return (
     <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1fr 1fr", gap, ...style }} className={className}>
-      <div style={{
-        position: "absolute", inset: 0,
-        backdropFilter: GLASS_VARS.regular.blur,
-        WebkitBackdropFilter: GLASS_VARS.regular.blur,
-        borderRadius: 22, zIndex: 0, pointerEvents: "none",
-      }} />
+      {!isMobile && (
+        <div style={{
+          position: "absolute", inset: 0,
+          backdropFilter: GLASS_VARS.regular.blur,
+          WebkitBackdropFilter: GLASS_VARS.regular.blur,
+          borderRadius: 22, zIndex: 0, pointerEvents: "none",
+        }} />
+      )}
       {children}
     </div>
   );
@@ -1031,7 +1037,7 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
       onMouseLeave={() => setHovered(false)}
       style={{
         position: "relative", borderRadius,
-        background: hovered ? v.bgHover : v.bg,
+        background: hovered ? v.bgHover : (window.innerWidth <= 430 ? v.bgHover : v.bg),
         border: `1px solid ${v.border}`,
         borderTopColor: v.borderTop, borderBottomColor: "rgba(0,0,0,0.12)",
         boxShadow: hovered ? v.shadow.replace("rgba(0,0,0,0.18)", "rgba(0,0,0,0.26)").replace("rgba(0,0,0,0.20)", "rgba(0,0,0,0.28)") : v.shadow,
