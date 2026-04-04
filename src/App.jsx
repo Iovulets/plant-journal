@@ -1533,12 +1533,21 @@ useEffect(() => {
     }
   });
 
-  const code = new URLSearchParams(window.location.search).get("code");
-  if (code) {
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) console.error("Code exchange failed:", error.message);
-      window.history.replaceState(null, "", window.location.pathname);
-    });
+  const hash = window.location.hash;
+  if (hash && hash.includes("access_token")) {
+    const params = new URLSearchParams(hash.replace("#", ""));
+    const access_token = params.get("access_token");
+    const refresh_token = params.get("refresh_token");
+    if (access_token && refresh_token) {
+      supabase.auth.setSession({ access_token, refresh_token }).then(({ data, error }) => {
+        if (error) console.error("setSession error:", error.message);
+        else {
+          setUser(data.session?.user ?? null);
+          setAuthLoading(false);
+          window.history.replaceState(null, "", window.location.pathname);
+        }
+      });
+    }
   } else {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
