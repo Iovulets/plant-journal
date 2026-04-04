@@ -4,15 +4,7 @@ import bgPhoto from "./assets/background.webp";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY,
-  {
-    auth: {
-      flowType: "pkce",
-      detectSessionInUrl: true,
-      persistSession: true,
-      autoRefreshToken: true,
-    }
-  }
+  import.meta.env.VITE_SUPABASE_ANON_KEY
 );
 
 function daysSince(iso) {
@@ -1439,17 +1431,12 @@ function AuthScreen() {
       provider: "google",
       options: {
         redirectTo: window.location.origin + "/",
-        queryParams: {
-          access_type: "offline",
-          prompt: "consent",
-        },
       },
     });
     if (error) {
       setError(error.message);
       setLoading(false);
     }
-    // On success, browser redirects to Google — no need to setLoading(false)
   }
 
   return (
@@ -1528,23 +1515,12 @@ useEffect(() => {
   const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
     setUser(session?.user ?? null);
     setAuthLoading(false);
-    if (event === "SIGNED_IN") {
-      window.history.replaceState(null, "", window.location.pathname);
-    }
   });
 
-  const code = new URLSearchParams(window.location.search).get("code");
-  if (code) {
-    supabase.auth.exchangeCodeForSession(code).then(({ error }) => {
-      if (error) console.error("Code exchange failed:", error.message);
-      window.history.replaceState(null, "", window.location.pathname);
-    });
-  } else {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setAuthLoading(false);
-    });
-  }
+  supabase.auth.getSession().then(({ data: { session } }) => {
+    setUser(session?.user ?? null);
+    setAuthLoading(false);
+  });
 
   return () => subscription.unsubscribe();
 }, []);
