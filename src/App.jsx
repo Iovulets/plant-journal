@@ -4,7 +4,8 @@ import bgPhoto from "./assets/background.webp";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
-  import.meta.env.VITE_SUPABASE_ANON_KEY
+  import.meta.env.VITE_SUPABASE_ANON_KEY,
+  { auth: { detectSessionInUrl: true } }
 );
 
 function daysSince(iso) {
