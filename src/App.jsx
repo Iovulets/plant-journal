@@ -2013,33 +2013,23 @@ useEffect(() => {
                 </span>
               </div>
 
-              <div className="progress-wrap">
-                <div className="progress-labels">
-                  <span>{lastWatered ? (days === 0 ? "Watered today" : `${days}d ago`) : "Never logged"}</span>
-                  <span>{lastWatered ? `next in ${Math.max(0, plant.waterEveryDays - (days || 0))}d` : "—"}</span>
-                </div>
-                <div className="progress-track">
-                  <div className="progress-fill" style={{ width: `${pct}%`, background: fillColor }} />
-                </div>
-              </div>
+
 
               <div className="care-box">{plant.care}</div>
               {plant.warning && <div className="warn-box">! {plant.warning}</div>}
 
-              {/* Water button */}
-              <button className="btn-water" onClick={() => waterPlant(plant.id)}>
-                {days === 0 ? "Watered today" : days !== null && days < plant.waterEveryDays ? `Water in ${plant.waterEveryDays - days}d` : "Water now"}
-              </button>
-
-              {/* Fertilize button */}
-              <button className="btn-fertilize" onClick={() => setFertilizeModalOpen(true)}>
-                {fertDays === null ? "Fertilize now" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fertilize in ${fertDaysLeft}d${fertDoseLabel}` : "Overdue — fertilize"}
-              </button>
-
-              {/* Consult gardener */}
-              <button className="btn-consult" onClick={() => setGardenerOpen(true)}>
-                Ask the gardener
-              </button>
+              {/* Action buttons row */}
+              <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
+                <button className="btn-water" style={{ flex: 1, padding: "12px 4px", fontSize: 12 }} onClick={() => waterPlant(plant.id)}>
+                  {days === 0 ? "💧 Today" : days !== null && days < plant.waterEveryDays ? `💧 ${plant.waterEveryDays - days}d` : "💧 Water"}
+                </button>
+                <button className="btn-fertilize" style={{ flex: 1, padding: "12px 4px", fontSize: 12, marginTop: 0 }} onClick={() => setFertilizeModalOpen(true)}>
+                  {fertDays === null ? "🌿 Fertilize" : fertDaysLeft !== null && fertDaysLeft > 0 ? `🌿 ${fertDaysLeft}d` : "🌿 Overdue"}
+                </button>
+                <button className="btn-consult" style={{ flex: 1, padding: "12px 4px", fontSize: 12, marginTop: 0 }} onClick={() => setGardenerOpen(true)}>
+                  🤖 Gardener
+                </button>
+              </div>
 
 
 
