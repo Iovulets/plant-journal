@@ -156,7 +156,7 @@ const css = `
     content: '';
     position: absolute;
     inset: 0;
-    background: none;
+    background: radial-gradient(ellipse 90% 60% at 90% -10%, rgba(180,255,120,0.18) 0%, rgba(120,220,60,0.06) 40%, transparent 70%);
     border-radius: inherit;
     pointer-events: none;
     z-index: 1;
@@ -199,7 +199,7 @@ const css = `
     position: absolute;
     top: -30%; right: -15%;
     width: 75%; height: 130%;
-    background: none;
+    background: radial-gradient(ellipse at 75% 15%, rgba(170,255,100,0.14) 0%, transparent 60%);
     pointer-events: none;
   }
 
@@ -1010,6 +1010,7 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
       className={className}
     >
       <Specular borderRadius={borderRadius} />
+      <div style={{ position: "absolute", top: "-30%", right: "-15%", width: "75%", height: "130%", background: "radial-gradient(ellipse at 75% 15%, rgba(170,255,100,0.10) 0%, transparent 60%)", pointerEvents: "none", zIndex: 1 }} />
       <div style={{ position: "relative", zIndex: 3 }}>{children}</div>
     </div>
   );
