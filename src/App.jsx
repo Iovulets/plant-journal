@@ -1825,9 +1825,9 @@ useEffect(() => {
                 return (
                   <GlassCard borderRadius={20} variant={warnPlants.length > 0 ? "interactive" : "regular"}
                     onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
-                    style={{ height: 130 }}>
-                    <div className="stat warn" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default" }}>
-                      <div className="stat-n">{warnPlants.length}</div>
+                    style={{ height: 130, ...(warnPlants.length > 0 ? { background: "rgba(248,113,113,0.15)", borderColor: "rgba(248,113,113,0.35)", borderTopColor: "rgba(255,180,180,0.5)" } : {}) }}>
+                    <div className="stat" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default" }}>
+                      <div className="stat-n" style={{ color: warnPlants.length > 0 ? "var(--warn)" : "var(--text)" }}>{warnPlants.length}</div>
                       <div className="stat-l">Need attention</div>
                       {warnPlants.length > 0 && <div style={{ fontSize: 10, color: "rgba(248,113,113,0.7)", marginTop: 6, letterSpacing: 1 }}>tap to view →</div>}
                     </div>
