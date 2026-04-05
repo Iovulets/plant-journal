@@ -1810,7 +1810,7 @@ useEffect(() => {
         {screen === "overview" && (
           <div className="fade-up">
             <GlassContainer gap={10} style={{ padding: "16px 16px 0", gridAutoRows: "130px" }}>
-              <GlassCard borderRadius={20} style={{ height: 130 }}>
+              <GlassCard borderRadius={20} variant="interactive" style={{ height: 130 }}>
                 <div className="stat"><div className="stat-n">{plants.length}</div><div className="stat-l">Total plants</div></div>
               </GlassCard>
               {(() => {
@@ -1834,8 +1834,7 @@ useEffect(() => {
                   </GlassCard>
                 );
               })()}
-              <GlassCard borderRadius={20} style={{ height: 130 }}>
-                <ScanButton
+              <GlassCard borderRadius={20} variant="interactive" style={{ height: 130 }}>
                   onResult={async (entry) => {
                     setGardenLog(prev => [entry, ...prev]);
                     setScreen("garden");
