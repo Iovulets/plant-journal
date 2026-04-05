@@ -1785,7 +1785,7 @@ useEffect(() => {
           position: "fixed", inset: 0, zIndex: -1,
           backdropFilter: "blur(16px) saturate(120%) brightness(1.02)",
           WebkitBackdropFilter: "blur(16px) saturate(120%) brightness(1.02)",
-          background: "rgba(255,255,255,0.07)",
+          background: "rgba(0,0,0,0.35)",
         }} />
 
         {/* Auth loading splash */}
