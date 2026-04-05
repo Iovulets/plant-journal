@@ -613,15 +613,7 @@ function AirQualitySlider({ plants }) {
         ))}
       </div>
 
-      <div style={{
-        background: "rgba(255,255,255,0.09)",
-        backdropFilter: "blur(20px) saturate(180%) brightness(1.12)",
-        WebkitBackdropFilter: "blur(20px) saturate(180%) brightness(1.12)",
-        borderRadius: 20, padding: "20px 18px 18px",
-        border: "1px solid rgba(255,255,255,0.22)",
-        borderTop: `2px solid ${card.color}`,
-        boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 1.5px 0 rgba(255,255,255,0.32) inset",
-      }}>
+      <GlassCard borderRadius={20} style={{ padding: "20px 18px 18px", borderTop: `2px solid ${card.color}` }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
           <div>
             <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "var(--muted)", marginBottom: 4 }}>Air quality</div>
@@ -649,7 +641,7 @@ function AirQualitySlider({ plants }) {
         <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: "10px 12px", fontSize: 11, color: "var(--text-2)", lineHeight: 1.6, fontWeight: 300 }}>
           {card.description}
         </div>
-      </div>
+      </GlassCard>
     </div>
   );
 }
