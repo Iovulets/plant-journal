@@ -1823,7 +1823,7 @@ useEffect(() => {
                   return false;
                 });
                 return (
-                  <GlassCard borderRadius={20} variant={warnPlants.length > 0 ? "interactive" : "regular"}
+                  <GlassCard borderRadius={20} variant="interactive"
                     onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
                     style={{ height: 130, ...(warnPlants.length > 0 ? { background: "rgba(248,113,113,0.15)", borderColor: "rgba(248,113,113,0.35)", borderTopColor: "rgba(255,180,180,0.5)" } : {}) }}>
                     <div className="stat" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default" }}>
@@ -1835,6 +1835,7 @@ useEffect(() => {
                 );
               })()}
               <GlassCard borderRadius={20} variant="interactive" style={{ height: 130 }}>
+                <ScanButton
                   onResult={async (entry) => {
                     setGardenLog(prev => [entry, ...prev]);
                     setScreen("garden");
