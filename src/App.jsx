@@ -764,7 +764,7 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   );
 }
 
-function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext, db }) {
+function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, careContext, db, userId }) {
   const [analysing, setAnalysing] = useState(false);
   const [gallery, setGallery] = useState(false);
   const [galleryStart, setGalleryStart] = useState(0);
@@ -790,7 +790,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
       const { data: urlData } = db.storage.from("plant-photos").getPublicUrl(path);
       const publicUrl = urlData?.publicUrl || dataUrl;
       const { data: dbRow } = await db.from("plant_photos").insert({
-        plant_id: plant.id, storage_path: path, data_url: publicUrl, analysis: result,
+        plant_id: plant.id, storage_path: path, data_url: publicUrl, analysis: result, user_id: userId,
       }).select().single();
       setUserPhotos(prev => prev.map((p, i) =>
         i === prev.length - 1 ? { ...p, dataUrl: publicUrl, analysis: result, id: dbRow?.id } : p
@@ -1792,9 +1792,9 @@ useEffect(() => {
         <div style={{ position: "fixed", inset: 0, zIndex: -1, backgroundImage: `url(${bgPhoto})`, backgroundSize: "cover", backgroundPosition: "center top" }} />
         <div style={{
           position: "fixed", inset: 0, zIndex: -1,
-          backdropFilter: "blur(40px) saturate(140%) brightness(1.05)",
-          WebkitBackdropFilter: "blur(40px) saturate(140%) brightness(1.05)",
-          background: "rgba(255,255,255,0.18)",
+          backdropFilter: "blur(16px) saturate(120%) brightness(1.02)",
+          WebkitBackdropFilter: "blur(16px) saturate(120%) brightness(1.02)",
+          background: "rgba(255,255,255,0.07)",
         }} />
 
         {/* Auth loading splash */}
@@ -1946,6 +1946,7 @@ useEffect(() => {
               setUserPhotos={(photos) => setPlantPhotos(prev => ({ ...prev, [plant.id]: typeof photos === "function" ? photos(prev[plant.id] || []) : photos }))}
               careContext={careContext}
               db={supabase}
+              userId={user.id}
             />
 
             {plant.warning && !dismissedWarnings[plant.id] && (
