@@ -2021,13 +2021,13 @@ useEffect(() => {
               {/* Action buttons row */}
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                 <button className="btn-water" style={{ flex: 1, padding: "12px 4px", fontSize: 12 }} onClick={() => waterPlant(plant.id)}>
-                  {days === 0 ? "💧 Today" : days !== null && days < plant.waterEveryDays ? `💧 ${plant.waterEveryDays - days}d` : "💧 Water"}
+                  {days === 0 ? "Watered" : days !== null && days < plant.waterEveryDays ? `Water ${plant.waterEveryDays - days}d` : "Water"}
                 </button>
                 <button className="btn-fertilize" style={{ flex: 1, padding: "12px 4px", fontSize: 12, marginTop: 0 }} onClick={() => setFertilizeModalOpen(true)}>
-                  {fertDays === null ? "🌿 Fertilize" : fertDaysLeft !== null && fertDaysLeft > 0 ? `🌿 ${fertDaysLeft}d` : "🌿 Overdue"}
+                  {fertDays === null ? "Fertilize" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fert. ${fertDaysLeft}d` : "Fertilize"}
                 </button>
                 <button className="btn-consult" style={{ flex: 1, padding: "12px 4px", fontSize: 12, marginTop: 0 }} onClick={() => setGardenerOpen(true)}>
-                  🤖 Gardener
+                  Gardener
                 </button>
               </div>
 
