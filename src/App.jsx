@@ -1095,7 +1095,7 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
             </>
           ) : (
             <>
-              <div className="stat-n" style={{ fontSize: 28, fontWeight: 300, lineHeight: 1, letterSpacing: "3px" }}>scan</div>
+              <div className="stat-n" style={{ fontSize: 36, fontWeight: 300, lineHeight: 1 }}>⟡</div>
               <div className="stat-l">Scan plant</div>
             </>
           )}
@@ -1855,7 +1855,6 @@ useEffect(() => {
 
             <div style={{ padding: "20px 24px 0", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <div className="ov-heading">My little <em>garden</em></div>
-              <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.35)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "0.5px", paddingBottom: 4, textTransform: "uppercase" }}>Sign out</button>
             </div>
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 22px 10px" }}>
@@ -1902,7 +1901,7 @@ useEffect(() => {
                         </div>
                         <div className="prow-right">
                           <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
-                          <span className="slabel" style={{ color: STATUS_COLOR[s] }}>{STATUS_LABEL[s]}</span>
+                          <span className="slabel" style={{ color: "#ffffff" }}>{STATUS_LABEL[s]}</span>
                         </div>
                         <div className="parrow">›</div>
                       </div>
@@ -1912,6 +1911,9 @@ useEffect(() => {
               </GlassContainer>
             )}
             {plants.length > 0 && <AirQualitySlider plants={plants} />}
+            <div style={{ padding: "24px 24px 40px", textAlign: "center" }}>
+              <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>Sign out</button>
+            </div>
           </div>
         )}
 
