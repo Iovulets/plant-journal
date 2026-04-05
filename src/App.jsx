@@ -1817,7 +1817,14 @@ useEffect(() => {
                 <div className="stat"><div className="stat-n">{plants.length}</div><div className="stat-l">Total plants</div></div>
               </GlassCard>
               {(() => {
-                const warnPlants = plants.filter(p => p.warning);
+                const warnPlants = plants.filter(p => {
+                  const d = daysSince(waterLog[p.id] || null);
+                  if (d !== null && d >= p.waterEveryDays) return true;
+                  const fDate = fertilizeLog[p.id] ? (typeof fertilizeLog[p.id] === "string" ? fertilizeLog[p.id] : fertilizeLog[p.id].date) : null;
+                  const fd = daysSince(fDate);
+                  if (fd !== null && fd >= 30) return true;
+                  return false;
+                });
                 return (
                   <GlassCard borderRadius={20} variant={warnPlants.length > 0 ? "interactive" : "regular"}
                     onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
@@ -1835,13 +1842,16 @@ useEffect(() => {
                   onResult={async (entry) => {
                     setGardenLog(prev => [entry, ...prev]);
                     setScreen("garden");
-                    await supabase.from("garden_log").insert({
-                      common_name: entry.commonName, scientific_name: entry.scientificName,
-                      family: entry.family, confidence: entry.confidence, origin: entry.origin,
-                      fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
-                      toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl, scanned_at: entry.date,
-                      user_id: user.id,
-                    });
+                    const alreadySaved = gardenLog.some(e => e.scientificName === entry.scientificName);
+                    if (!alreadySaved) {
+                      await supabase.from("garden_log").insert({
+                        common_name: entry.commonName, scientific_name: entry.scientificName,
+                        family: entry.family, confidence: entry.confidence, origin: entry.origin,
+                        fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
+                        toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl, scanned_at: entry.date,
+                        user_id: user.id,
+                      });
+                    }
                   }}
                 />
               </GlassCard>
@@ -2080,13 +2090,16 @@ useEffect(() => {
               <ScanButton
                 onResult={async (entry) => {
                   setGardenLog(prev => [entry, ...prev]);
-                  await supabase.from("garden_log").insert({
-                    common_name: entry.commonName, scientific_name: entry.scientificName,
-                    family: entry.family, confidence: entry.confidence, origin: entry.origin,
-                    fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
-                    toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl, scanned_at: entry.date,
-                    user_id: user.id,
-                  });
+                  const alreadySaved = gardenLog.some(e => e.scientificName === entry.scientificName);
+                  if (!alreadySaved) {
+                    await supabase.from("garden_log").insert({
+                      common_name: entry.commonName, scientific_name: entry.scientificName,
+                      family: entry.family, confidence: entry.confidence, origin: entry.origin,
+                      fun_fact: entry.funFact, care_level: entry.careLevel, edible: entry.edible,
+                      toxic: entry.toxic, toxic_to: entry.toxicTo, data_url: entry.dataUrl, scanned_at: entry.date,
+                      user_id: user.id,
+                    });
+                  }
                 }}
                 renderTrigger={(onClick, scanning) => (
                   <button onClick={onClick} style={{ background: "var(--green)", border: "none", borderRadius: 20, padding: "7px 16px", fontSize: 12, color: "#0a1a0a", fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>
