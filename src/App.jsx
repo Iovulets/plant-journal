@@ -1028,8 +1028,9 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
 
     let dataUrl = null;
     try {
-      const base64 = await fileToBase64(file);
-      dataUrl = `data:image/jpeg;base64,${base64}`;
+      const resized = await resizeImageForAPI(file, 800);
+      const base64 = resized.base64;
+      dataUrl = resized.dataUrl;
 
       const response = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -1842,8 +1843,9 @@ useEffect(() => {
                   onResult={async (entry) => {
                     setGardenLog(prev => [entry, ...prev]);
                     setScreen("garden");
-                    const alreadySaved = gardenLog.some(e => e.scientificName === entry.scientificName);
-                    if (!alreadySaved) {
+                    const { data: existing } = await supabase.from("garden_log")
+                      .select("id").eq("scientific_name", entry.scientificName).eq("user_id", user.id).limit(1);
+                    if (!existing || existing.length === 0) {
                       await supabase.from("garden_log").insert({
                         common_name: entry.commonName, scientific_name: entry.scientificName,
                         family: entry.family, confidence: entry.confidence, origin: entry.origin,
@@ -2090,8 +2092,9 @@ useEffect(() => {
               <ScanButton
                 onResult={async (entry) => {
                   setGardenLog(prev => [entry, ...prev]);
-                  const alreadySaved = gardenLog.some(e => e.scientificName === entry.scientificName);
-                  if (!alreadySaved) {
+                  const { data: existing } = await supabase.from("garden_log")
+                    .select("id").eq("scientific_name", entry.scientificName).eq("user_id", user.id).limit(1);
+                  if (!existing || existing.length === 0) {
                     await supabase.from("garden_log").insert({
                       common_name: entry.commonName, scientific_name: entry.scientificName,
                       family: entry.family, confidence: entry.confidence, origin: entry.origin,
