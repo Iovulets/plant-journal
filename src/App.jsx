@@ -1602,6 +1602,7 @@ useEffect(() => {
           funFact: r.fun_fact, careLevel: r.care_level, edible: r.edible,
           toxic: r.toxic, toxicTo: r.toxic_to, dataUrl: r.data_url, date: r.scanned_at,
         })));
+        console.log("[garden_log] loaded:", gRes.data?.length, "error:", gRes.error?.message);
         const pp = {};
         for (const r of (pRes.data || [])) {
           if (!pp[r.plant_id]) pp[r.plant_id] = [];
