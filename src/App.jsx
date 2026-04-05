@@ -1566,13 +1566,14 @@ useEffect(() => {
     async function loadAll() {
       try {
         const uid = user.id;
-        const [plRes, wRes, fRes, dRes, nRes, gRes] = await Promise.all([
+        const [plRes, wRes, fRes, dRes, nRes, gRes, pRes] = await Promise.all([
           supabase.from("plants").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
           supabase.from("water_log").select("*").eq("user_id", uid).order("watered_at", { ascending: false }),
           supabase.from("fertilize_log").select("*").eq("user_id", uid).order("fertilized_at", { ascending: false }),
           supabase.from("dismissed_warnings").select("*").eq("user_id", uid),
           supabase.from("nicknames").select("*").eq("user_id", uid),
           supabase.from("garden_log").select("*").eq("user_id", uid).order("scanned_at", { ascending: false }),
+          supabase.from("plant_photos").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
         ]);
         setPlants((plRes.data || []).map(r => ({
           id: r.id, name: r.name, species: r.species,
@@ -1601,20 +1602,15 @@ useEffect(() => {
           funFact: r.fun_fact, careLevel: r.care_level, edible: r.edible,
           toxic: r.toxic, toxicTo: r.toxic_to, dataUrl: r.data_url, date: r.scanned_at,
         })));
-      } catch (err) { console.error("Supabase load error:", err); }
-      setDbLoading(false);
-
-      // Load photos separately so they don't block the main render
-      try {
-        const { data: photoRows } = await supabase.from("plant_photos").select("*").eq("user_id", uid).order("created_at", { ascending: true });
         const pp = {};
-        for (const r of (photoRows || [])) {
+        for (const r of (pRes.data || [])) {
           if (!pp[r.plant_id]) pp[r.plant_id] = [];
           const { data: urlData } = supabase.storage.from("plant-photos").getPublicUrl(r.storage_path);
           pp[r.plant_id].push({ id: r.id, dataUrl: urlData?.publicUrl || r.data_url, base64: null, analysis: r.analysis, date: r.created_at });
         }
         setPlantPhotos(pp);
-      } catch (err) { console.error("Photo load error:", err); }
+      } catch (err) { console.error("Supabase load error:", err); }
+      setDbLoading(false);
     }
     loadAll();
   }, [user]);
