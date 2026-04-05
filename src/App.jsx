@@ -1795,12 +1795,13 @@ useEffect(() => {
           <>
 
 
-        {dbLoading && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
-            <div style={{ fontSize: 13, letterSpacing: "3px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>Loading</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.6)", letterSpacing: 1 }}>Loading your garden…</div>
+        {dbLoading ? (
+          <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
+            <div style={{ fontSize: 32, marginBottom: 4 }}>🌿</div>
+            <div style={{ fontSize: 11, letterSpacing: "3px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>Loading</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", letterSpacing: 0.5 }}>Loading your garden…</div>
           </div>
-        )}
+        ) : (<>
 
         {/* ── OVERVIEW ── */}
         {screen === "overview" && (
