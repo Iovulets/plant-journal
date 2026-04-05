@@ -86,8 +86,8 @@ const css = `
     --green-dim: #86efac;
     --green-mid: rgba(74,222,128,0.18);
     --text: #ffffff;
-    --text-2: rgba(255,255,255,0.72);
-    --text-3: rgba(255,255,255,0.38);
+    --text-2: rgba(255,255,255,0.90);
+    --text-3: rgba(255,255,255,0.60);
     --warn: #f87171;
     --warn-bg: rgba(248,113,113,0.15);
     --glass-bg: rgba(255,255,255,0.10);
@@ -101,13 +101,13 @@ const css = `
     --peach-dark: #4ade80;
     --peach-light: rgba(74,222,128,0.12);
     --peach-mid: rgba(74,222,128,0.28);
-    --warm: rgba(255,255,255,0.72);
-    --muted: rgba(255,255,255,0.48);
-    --text-muted: rgba(255,255,255,0.48);
+    --warm: rgba(255,255,255,0.90);
+    --muted: rgba(255,255,255,0.80);
+    --text-muted: rgba(255,255,255,0.80);
     --white: rgba(255,255,255,0.10);
     --cream: #1a3a1a;
     --peach: rgba(74,222,128,0.18);
-    --soft-brown: rgba(255,255,255,0.5);
+    --soft-brown: rgba(255,255,255,0.8);
   }
 
   body { margin: 0; background: #0f1a0f; }
@@ -156,7 +156,7 @@ const css = `
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse 90% 60% at 90% -10%, rgba(180,255,120,0.18) 0%, rgba(120,220,60,0.06) 40%, transparent 70%);
+    background: none;
     border-radius: inherit;
     pointer-events: none;
     z-index: 1;
@@ -199,7 +199,7 @@ const css = `
     position: absolute;
     top: -30%; right: -15%;
     width: 75%; height: 130%;
-    background: radial-gradient(ellipse at 75% 15%, rgba(170,255,100,0.14) 0%, transparent 60%);
+    background: none;
     pointer-events: none;
   }
 
@@ -1010,7 +1010,6 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
       className={className}
     >
       <Specular borderRadius={borderRadius} />
-      <div style={{ position: "absolute", top: "-30%", right: "-15%", width: "75%", height: "130%", background: "radial-gradient(ellipse at 75% 15%, rgba(170,255,100,0.10) 0%, transparent 60%)", pointerEvents: "none", zIndex: 1 }} />
       <div style={{ position: "relative", zIndex: 3 }}>{children}</div>
     </div>
   );
