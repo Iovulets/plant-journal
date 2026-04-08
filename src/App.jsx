@@ -718,15 +718,22 @@ async function callClaude(base64Image, prompt, maxTokens = 256) {
 }
 
 async function analyseWithClaude(base64Image, plant, careContext = {}) {
-  const { lastWateredDaysAgo, lastFertilizedDaysAgo } = careContext;
+  const { lastWateredDaysAgo, lastFertilizedDaysAgo, settings } = careContext;
   const waterCtx = lastWateredDaysAgo != null
     ? `Last watered ${lastWateredDaysAgo} day(s) ago (schedule: every ${plant.waterEveryDays} days).`
     : `Not yet watered (schedule: every ${plant.waterEveryDays} days).`;
   const fertCtx = lastFertilizedDaysAgo != null
     ? `Last fertilized ${lastFertilizedDaysAgo} day(s) ago (schedule: every 30 days).`
     : `Never fertilized.`;
+  const settingsCtx = settings ? [
+    settings.potType ? `Pot: ${settings.potType}${settings.potSize ? `, ${settings.potSize}L` : ""}.` : "",
+    settings.soilType ? `Soil: ${settings.soilType}.` : "",
+    settings.lightDistance ? `Distance from light: ${settings.lightDistance}.` : "",
+    settings.room ? `Room: ${settings.room}.` : "",
+    settings.plantedDate ? `Owned since: ${settings.plantedDate}.` : "",
+  ].filter(Boolean).join(" ") : "";
   return callClaude(base64Image,
-    `You are a botanist. Photo shows ${plant.name} (${plant.species}). Light: ${plant.light}. ${waterCtx} ${fertCtx}
+    `You are a botanist. Photo shows ${plant.name}${plant.species ? ` (${plant.species})` : ""}. Light: ${plant.light}. ${waterCtx} ${fertCtx}${settingsCtx ? " " + settingsCtx : ""}
 Reply ONLY with JSON: {"status":"healthy","headline":"","recommendation":"","waitDays":null,"urgency":"low"}`,
     256
   );
@@ -1225,7 +1232,7 @@ function FertilizeModal({ onConfirm, onClose }) {
 const POT_TYPES = ["Terracotta", "Ceramic", "Plastic", "Fabric", "Self-watering", "Other"];
 const LIGHT_DISTANCES = ["Near window", "1m", "2m", "3m", "4m", "5m", "No light"];
 
-function PlantSettingsModal({ plant, settings, nicknames, onSave, onClose }) {
+function PlantSettingsModal({ plant, settings, nicknames, onSave, onDelete, onClose }) {
   const [nickname, setNickname] = useState(nicknames[plant.id] || "");
   const [plantedDate, setPlantedDate] = useState(settings.plantedDate || "");
   const [potType, setPotType] = useState(settings.potType || "");
@@ -1233,6 +1240,8 @@ function PlantSettingsModal({ plant, settings, nicknames, onSave, onClose }) {
   const [soilType, setSoilType] = useState(settings.soilType || "");
   const [room, setRoom] = useState(settings.room || "Living room");
   const [lightDistance, setLightDistance] = useState(settings.lightDistance || "");
+  const [deleteMode, setDeleteMode] = useState(false);
+  const [deleteInput, setDeleteInput] = useState("");
 
   const inputStyle = {
     background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
@@ -1330,6 +1339,55 @@ function PlantSettingsModal({ plant, settings, nicknames, onSave, onClose }) {
           fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
           cursor: "pointer", letterSpacing: "0.3px",
         }}>Save settings</button>
+
+        <button onClick={() => setDeleteMode(true)} style={{
+          width: "100%", padding: "12px", marginTop: 10,
+          background: "transparent", border: "1px solid rgba(248,113,113,0.25)",
+          borderRadius: 20, color: "rgba(248,113,113,0.6)",
+          fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+          cursor: "pointer", letterSpacing: "0.3px",
+        }}>Delete plant</button>
+
+        {/* Delete confirmation overlay */}
+        {deleteMode && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 220, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }} onClick={() => { setDeleteMode(false); setDeleteInput(""); }}>
+            <div onClick={e => e.stopPropagation()} style={{ background: "#1a0a0a", borderTop: "1px solid rgba(248,113,113,0.25)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(248,113,113,0.8)", marginBottom: 6 }}>Permanent action</div>
+                <div style={{ fontSize: 18, fontWeight: 500, color: "#fff", marginBottom: 8 }}>Delete {plant.name}?</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
+                  This will remove all care logs, photos, and settings for this plant. Type <span style={{ color: "#f87171", fontWeight: 500 }}>delete plant</span> to confirm.
+                </div>
+              </div>
+              <input
+                value={deleteInput}
+                onChange={e => setDeleteInput(e.target.value)}
+                placeholder="delete plant"
+                autoFocus
+                style={{
+                  width: "100%", boxSizing: "border-box", background: "rgba(248,113,113,0.08)",
+                  border: "1px solid rgba(248,113,113,0.30)", borderRadius: 12,
+                  padding: "12px 14px", fontSize: 14, color: "#fff",
+                  fontFamily: "'DM Sans', sans-serif", outline: "none", marginBottom: 12,
+                }}
+              />
+              <button
+                onClick={() => deleteInput === "delete plant" && onDelete()}
+                disabled={deleteInput !== "delete plant"}
+                style={{
+                  width: "100%", padding: "14px",
+                  background: deleteInput === "delete plant" ? "rgba(248,113,113,0.25)" : "rgba(255,255,255,0.05)",
+                  border: `1px solid ${deleteInput === "delete plant" ? "rgba(248,113,113,0.5)" : "rgba(255,255,255,0.1)"}`,
+                  borderRadius: 20, color: deleteInput === "delete plant" ? "#f87171" : "rgba(255,255,255,0.2)",
+                  fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                  cursor: deleteInput === "delete plant" ? "pointer" : "default",
+                  transition: "all 0.15s",
+                }}
+              >Delete plant</button>
+              <button onClick={() => { setDeleteMode(false); setDeleteInput(""); }} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Cancel</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2001,7 +2059,7 @@ useEffect(() => {
   const fertDaysLeft = fertDays !== null ? FERTILIZE_EVERY - fertDays : null;
   const fertDoseLabel = lastFertilizedDose === 0.5 ? " · ½ dose" : lastFertilizedDose === 0 ? " · no dose" : "";
 
-  const careContext = { lastWateredDaysAgo: days, lastFertilizedDaysAgo: fertDays };
+  const careContext = { lastWateredDaysAgo: days, lastFertilizedDaysAgo: fertDays, settings: plantSettings[plant?.id] || {} };
 
   const currentPhotos = plantPhotos[plant?.id] || [];
   const latestPhoto = currentPhotos.length > 0 ? currentPhotos[currentPhotos.length - 1] : null;
@@ -2050,7 +2108,6 @@ useEffect(() => {
   }
 
   async function saveSettings(id, s) {
-    // Nickname
     if (s.nickname.trim()) {
       setNicknames(p => ({ ...p, [id]: s.nickname.trim() }));
       await supabase.from("nicknames").upsert({ plant_id: id, nickname: s.nickname.trim(), user_id: user.id });
@@ -2058,7 +2115,6 @@ useEffect(() => {
       setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
       await supabase.from("nicknames").delete().eq("plant_id", id).eq("user_id", user.id);
     }
-    // Persist settings columns to plants table
     await supabase.from("plants").update({
       planted_date: s.plantedDate || null,
       pot_type: s.potType || null,
@@ -2067,9 +2123,31 @@ useEffect(() => {
       room: s.room || null,
       light_distance: s.lightDistance || null,
     }).eq("id", id).eq("user_id", user.id);
-    // Update local state
     setPlantSettings(p => ({ ...p, [id]: { plantedDate: s.plantedDate, potType: s.potType, potSize: s.potSize, soilType: s.soilType, room: s.room, lightDistance: s.lightDistance } }));
     setPlantSettingsOpen(false);
+  }
+
+  async function deletePlant(id) {
+    // Delete all related records then the plant itself
+    await Promise.all([
+      supabase.from("water_log").delete().eq("plant_id", id).eq("user_id", user.id),
+      supabase.from("fertilize_log").delete().eq("plant_id", id).eq("user_id", user.id),
+      supabase.from("dismissed_warnings").delete().eq("plant_id", id).eq("user_id", user.id),
+      supabase.from("nicknames").delete().eq("plant_id", id).eq("user_id", user.id),
+      supabase.from("plant_photos").delete().eq("plant_id", id).eq("user_id", user.id),
+    ]);
+    await supabase.from("plants").delete().eq("id", id).eq("user_id", user.id);
+    // Update local state
+    setPlants(p => p.filter(pl => pl.id !== id));
+    setWaterLog(p => { const n = { ...p }; delete n[id]; return n; });
+    setFertilizeLog(p => { const n = { ...p }; delete n[id]; return n; });
+    setDismissedWarnings(p => { const n = { ...p }; delete n[id]; return n; });
+    setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
+    setPlantPhotos(p => { const n = { ...p }; delete n[id]; return n; });
+    setPlantSettings(p => { const n = { ...p }; delete n[id]; return n; });
+    setPlantSettingsOpen(false);
+    setIdx(i => Math.max(0, i - 1));
+    setScreen("overview");
   }
 
   async function editDate(type, plantId, dateStr) {
@@ -2501,6 +2579,7 @@ useEffect(() => {
             settings={plantSettings[plant.id] || {}}
             nicknames={nicknames}
             onSave={(s) => saveSettings(plant.id, s)}
+            onDelete={() => deletePlant(plant.id)}
             onClose={() => setPlantSettingsOpen(false)}
           />
         )}
