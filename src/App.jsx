@@ -345,34 +345,41 @@ const css = `
 
   .btn-fertilize {
     width: 100%; padding: 12px 8px; margin-top: 8px;
-    background: rgba(212,147,90,0.18);
+    background: rgba(100,220,80,0.22);
     backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
     -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    border: 1px solid rgba(212,147,90,0.35);
-    border-top-color: rgba(240,190,140,0.60);
+    border: 1px solid rgba(150,255,100,0.40);
+    border-top-color: rgba(200,255,160,0.70);
+    border-bottom-color: rgba(40,120,20,0.20);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(180,120,40,0.15), 0 1.5px 0 rgba(240,190,140,0.35) inset;
-    color: #ffe0b0;
+    box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
+    color: #d4ffb0;
     font-size: 14px; font-family: 'DM Sans', sans-serif; font-weight: 500;
     letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.22s ease;
     position: relative; overflow: hidden;
     text-align: center;
   }
-  .btn-fertilize:hover { transform: translateY(-2px); background: rgba(212,147,90,0.28); }
+  .btn-fertilize:hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); box-shadow: 0 8px 28px rgba(60,180,30,0.30), 0 1.5px 0 rgba(200,255,160,0.55) inset; }
   .btn-fertilize:active { transform: scale(0.98); }
 
   .btn-consult {
     width: 100%; padding: 10px 8px; margin-top: 8px;
-    background: rgba(255,255,255,0.07);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: rgba(100,220,80,0.22);
+    backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
+    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
+    border: 1px solid rgba(150,255,100,0.40);
+    border-top-color: rgba(200,255,160,0.70);
+    border-bottom-color: rgba(40,120,20,0.20);
     border-radius: 20px;
-    color: rgba(255,255,255,0.55);
-    font-size: 13px; font-family: 'DM Sans', sans-serif;
-    cursor: pointer; transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
+    color: #d4ffb0;
+    font-size: 13px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+    cursor: pointer; transition: all 0.22s ease;
     text-align: center;
   }
-  .btn-consult:hover { background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); }
+  .btn-consult:hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); }
+  .btn-consult:active { transform: scale(0.98); }
 
   .btn-reset {
     width: 100%; padding: 12px; background: rgba(255,255,255,0.06);
@@ -1454,29 +1461,98 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
 
 
 // ── Add Plant Modal ────────────────────────────────────────────────────────
-function AddPlantModal({ onSave, onClose }) {
-  const [name, setName] = useState("");
-  const [species, setSpecies] = useState("");
-  const [waterDays, setWaterDays] = useState("7");
-  const [light, setLight] = useState("Bright indirect");
-  const [care, setCare] = useState("");
-  const [saving, setSaving] = useState(false);
+// ── AddPlantModal — choice screen ─────────────────────────────────────────
+function AddPlantModal({ onSave, onClose, scanButton }) {
+  const [mode, setMode] = useState(null); // null | "manual"
 
-  const LIGHT_OPTIONS = ["Low indirect", "Medium indirect", "Bright indirect", "Bright direct"];
+  if (mode === "manual") {
+    return <AddPlantManualModal onSave={onSave} onClose={onClose} onBack={() => setMode(null)} />;
+  }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 28 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 4 }}>New plant</div>
+            <div style={{ fontSize: 20, fontWeight: 500, color: "var(--text)" }}>How do you want to add it?</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {scanButton}
+          <button onClick={() => setMode("manual")} style={{
+            width: "100%", padding: "16px",
+            background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
+            border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
+            borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
+            color: "#d4ffb0", fontSize: 15, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+            cursor: "pointer", letterSpacing: "0.3px",
+          }}>Add manually</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── AddPlantManualModal — name → AI fills details ──────────────────────────
+function AddPlantManualModal({ onSave, onClose, onBack }) {
+  const [name, setName] = useState("");
+  const [analysing, setAnalysing] = useState(false);
+  const [details, setDetails] = useState(null); // filled by AI
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  async function lookupPlant() {
+    const q = name.trim();
+    if (!q) return;
+    setAnalysing(true);
+    setError("");
+    setDetails(null);
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": import.meta.env.VITE_ANTHROPIC_API_KEY || "",
+          "anthropic-version": "2023-06-01",
+          "anthropic-dangerous-direct-browser-access": "true",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 300,
+          messages: [{
+            role: "user",
+            content: `You are a botanist. Given the plant name "${q}", return care details. Reply ONLY with JSON, no markdown:
+{"species":"","light":"Bright indirect","waterEveryDays":7,"care":"","co2PerYear":80,"vocPerHour":1500,"vocStrengths":["General VOCs"]}`
+          }]
+        })
+      });
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+      const text = data.content?.find(b => b.type === "text")?.text || "";
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) throw new Error("No data returned");
+      setDetails(JSON.parse(match[0]));
+    } catch (err) {
+      setError(err.message || "Could not look up plant");
+    }
+    setAnalysing(false);
+  }
 
   async function handleSave() {
     if (!name.trim()) return;
     setSaving(true);
     await onSave({
       name: name.trim(),
-      species: species.trim() || null,
-      water_every_days: parseInt(waterDays) || 7,
-      light,
-      care: care.trim() || null,
+      species: details?.species || null,
+      water_every_days: details?.waterEveryDays || 7,
+      light: details?.light || "Bright indirect",
+      care: details?.care || null,
       warning: null,
-      co2_per_year: 80,
-      voc_per_hour: 1500,
-      voc_strengths: ["General VOCs"],
+      co2_per_year: details?.co2PerYear || 80,
+      voc_per_hour: details?.vocPerHour || 1500,
+      voc_strengths: details?.vocStrengths || ["General VOCs"],
     });
     setSaving(false);
     onClose();
@@ -1484,76 +1560,94 @@ function AddPlantModal({ onSave, onClose }) {
 
   const inputStyle = {
     background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
-    borderRadius: 12, padding: "11px 14px", fontSize: 13,
+    borderRadius: 12, padding: "11px 14px", fontSize: 15,
     color: "#fff", fontFamily: "'DM Sans', sans-serif", outline: "none",
     width: "100%", boxSizing: "border-box",
   };
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+    <div style={{ position: "fixed", inset: 0, zIndex: 202, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "85vh", overflowY: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <button onClick={onBack} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans', sans-serif", padding: "0 12px 0 0" }}>←</button>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>New plant</div>
-            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>Add to your garden</div>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>Manual add</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>What's the plant called?</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>x</button>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 20 }}>
-          <input style={inputStyle} placeholder="Plant name *" value={name} onChange={e => setName(e.target.value)} />
-          <input style={inputStyle} placeholder="Species (optional)" value={species} onChange={e => setSpecies(e.target.value)} />
-          
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Water every</div>
-            <div style={{ display: "flex", gap: 6 }}>
-              {["3", "5", "7", "10", "14", "21"].map(d => (
-                <button key={d} onClick={() => setWaterDays(d)} style={{
-                  flex: 1, padding: "8px 0", borderRadius: 10, border: "1px solid",
-                  borderColor: waterDays === d ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
-                  background: waterDays === d ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                  color: waterDays === d ? "var(--green)" : "var(--text-2)",
-                  fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
-                }}>
-                  {d}d
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "var(--text-2)", marginBottom: 8 }}>Light</div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-              {LIGHT_OPTIONS.map(l => (
-                <button key={l} onClick={() => setLight(l)} style={{
-                  padding: "7px 12px", borderRadius: 10, border: "1px solid",
-                  borderColor: light === l ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
-                  background: light === l ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                  color: light === l ? "var(--green)" : "var(--text-2)",
-                  fontSize: 11, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
-                }}>
-                  {l}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <textarea style={{ ...inputStyle, minHeight: 80, resize: "none", lineHeight: 1.5 }}
-            placeholder="Care notes (optional)"
-            value={care} onChange={e => setCare(e.target.value)}
+        <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+          <input
+            style={{ ...inputStyle, flex: 1 }}
+            placeholder="e.g. Monstera, ZZ Plant…"
+            value={name}
+            onChange={e => { setName(e.target.value); setDetails(null); setError(""); }}
+            onKeyDown={e => e.key === "Enter" && lookupPlant()}
+            autoFocus
           />
+          <button onClick={lookupPlant} disabled={!name.trim() || analysing} style={{
+            padding: "11px 16px", borderRadius: 12, border: "1px solid rgba(150,255,100,0.40)",
+            borderTopColor: "rgba(200,255,160,0.70)",
+            background: "rgba(100,220,80,0.22)", color: "#d4ffb0",
+            fontSize: 13, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+            cursor: !name.trim() || analysing ? "default" : "pointer",
+            opacity: !name.trim() || analysing ? 0.5 : 1,
+            flexShrink: 0,
+          }}>
+            {analysing ? "…" : "Look up"}
+          </button>
         </div>
 
-        <button onClick={handleSave} disabled={!name.trim() || saving} style={{
-          width: "100%", padding: "13px",
-          background: "rgba(74,222,128,0.22)", backdropFilter: "blur(20px)",
-          border: "1px solid rgba(150,255,100,0.4)", borderTopColor: "rgba(200,255,160,0.7)",
-          borderRadius: 20, color: "#d4ffb0",
+        {error && (
+          <div style={{ fontSize: 12, color: "var(--warn)", marginBottom: 14, padding: "8px 12px", background: "rgba(248,113,113,0.1)", borderRadius: 10 }}>{error}</div>
+        )}
+
+        {analysing && (
+          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", textAlign: "center", padding: "20px 0", fontStyle: "italic" }}>
+            Looking up care details…
+          </div>
+        )}
+
+        {details && !analysing && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
+              {details.species && (
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                  <span style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Species</span>
+                  <span style={{ color: "var(--text)", fontStyle: "italic" }}>{details.species}</span>
+                </div>
+              )}
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                <span style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Water every</span>
+                <span style={{ color: "var(--text)" }}>{details.waterEveryDays} days</span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
+                <span style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Light</span>
+                <span style={{ color: "var(--text)" }}>{details.light}</span>
+              </div>
+              {details.care && (
+                <div style={{ marginTop: 4, fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 10 }}>
+                  {details.care}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        <button onClick={handleSave} disabled={!name.trim() || saving || analysing} style={{
+          width: "100%", padding: "14px",
+          background: name.trim() && !analysing ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
+          backdropFilter: "blur(20px)",
+          border: `1px solid ${name.trim() && !analysing ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
+          borderTopColor: name.trim() && !analysing ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
+          borderRadius: 20,
+          color: name.trim() && !analysing ? "#d4ffb0" : "rgba(255,255,255,0.25)",
           fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-          cursor: !name.trim() || saving ? "default" : "pointer",
-          opacity: !name.trim() || saving ? 0.5 : 1, letterSpacing: "0.3px",
+          cursor: !name.trim() || saving || analysing ? "default" : "pointer",
+          letterSpacing: "0.3px",
         }}>
-          {saving ? "Saving…" : "Add plant"}
+          {saving ? "Saving…" : details ? "Add plant" : name.trim() ? "Add without looking up" : "Enter a plant name"}
         </button>
       </div>
     </div>
@@ -2181,7 +2275,7 @@ useEffect(() => {
               {/* Action buttons row */}
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                 <button className="btn-water" style={{ flex: 1, padding: "12px 4px", fontSize: 12 }} onClick={() => setWaterCheckOpen(true)}>
-                  {days !== null && days < 0 ? "Postponed" : days === 0 ? "Watered" : days !== null && days < plant.waterEveryDays ? `Water ${plant.waterEveryDays - days}d` : "Water"}
+                  {days === 0 ? "Watered" : days !== null && (plant.waterEveryDays - days) > 0 ? `Water in ${plant.waterEveryDays - days}d` : "Water"}
                 </button>
                 <button className="btn-fertilize" style={{ flex: 1, padding: "12px 4px", fontSize: 12, marginTop: 0 }} onClick={() => setFertilizeModalOpen(true)}>
                   {fertDays === null ? "Fertilize" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fert. ${fertDaysLeft}d` : "Fertilize"}
@@ -2200,7 +2294,40 @@ useEffect(() => {
 
         {/* ── MODALS ── */}
         {addPlantOpen && (
-          <AddPlantModal onSave={addPlant} onClose={() => setAddPlantOpen(false)} />
+          <AddPlantModal
+            onSave={addPlant}
+            onClose={() => setAddPlantOpen(false)}
+            scanButton={
+              <ScanButton
+                onResult={async (entry) => {
+                  setAddPlantOpen(false);
+                  await addPlant({
+                    name: entry.commonName,
+                    species: entry.scientificName || null,
+                    water_every_days: 7,
+                    light: "Bright indirect",
+                    care: entry.funFact ? `${entry.funFact}` : null,
+                    warning: entry.toxic ? `Toxic${entry.toxicTo ? ` to ${entry.toxicTo}` : ""}` : null,
+                    co2_per_year: 80,
+                    voc_per_hour: 1500,
+                    voc_strengths: ["General VOCs"],
+                  });
+                }}
+                renderTrigger={(onClick, scanning) => (
+                  <button onClick={onClick} disabled={scanning} style={{
+                    width: "100%", padding: "16px",
+                    background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
+                    borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
+                    color: "#d4ffb0", fontSize: 15, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                    cursor: scanning ? "default" : "pointer", letterSpacing: "0.3px",
+                  }}>
+                    {scanning ? "Scanning…" : "Scan plant"}
+                  </button>
+                )}
+              />
+            }
+          />
         )}
 
         {waterCheckOpen && screen === "detail" && plant && (
