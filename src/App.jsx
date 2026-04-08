@@ -1944,21 +1944,6 @@ useEffect(() => {
 
   function openDetail(i) { setIdx(i); setScreen("detail"); }
 
-  async function addPlant({ name, species, waterEveryDays, light, care }) {
-    const { data, error } = await supabase.from("plants").insert({
-      user_id: user.id, name, species, water_every_days: waterEveryDays,
-      light, care, sort_order: plants.length + 1,
-    }).select().single();
-    if (error) { console.error(error); return; }
-    setPlants(prev => [...prev, {
-      id: data.id, name: data.name, species: data.species,
-      waterEveryDays: data.water_every_days, light: data.light,
-      care: data.care, warning: data.warning,
-      co2PerYear: 0, vocPerHour: 0, vocStrengths: [],
-    }]);
-    setAddPlantOpen(false);
-  }
-
   async function addPlant(plantData) {
     const { data, error } = await supabase.from("plants").insert({
       ...plantData, user_id: user.id,
@@ -1973,7 +1958,9 @@ useEffect(() => {
         vocStrengths: data.voc_strengths || ["General VOCs"],
         image: null,
       }]);
+      return data.id;
     }
+    return null;
   }
 
   async function signOut() {
@@ -2270,7 +2257,6 @@ useEffect(() => {
 
 
               <div className="care-box">{plant.care}</div>
-              {plant.warning && <div className="warn-box">! {plant.warning}</div>}
 
               {/* Action buttons row */}
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
@@ -2301,7 +2287,7 @@ useEffect(() => {
               <ScanButton
                 onResult={async (entry) => {
                   setAddPlantOpen(false);
-                  await addPlant({
+                  const newPlantId = await addPlant({
                     name: entry.commonName,
                     species: entry.scientificName || null,
                     water_every_days: 7,
@@ -2312,6 +2298,24 @@ useEffect(() => {
                     voc_per_hour: 1500,
                     voc_strengths: ["General VOCs"],
                   });
+                  // Save the scan photo for this plant
+                  if (newPlantId && entry.dataUrl) {
+                    try {
+                      const path = `plant-${newPlantId}/${Date.now()}.jpg`;
+                      const blob = await fetch(entry.dataUrl).then(r => r.blob());
+                      await supabase.storage.from("plant-photos").upload(path, blob, { contentType: "image/jpeg" });
+                      const { data: urlData } = supabase.storage.from("plant-photos").getPublicUrl(path);
+                      const publicUrl = urlData?.publicUrl || entry.dataUrl;
+                      const { data: dbRow } = await supabase.from("plant_photos").insert({
+                        plant_id: newPlantId, storage_path: path, data_url: publicUrl,
+                        analysis: null, user_id: user.id,
+                      }).select().single();
+                      setPlantPhotos(prev => ({
+                        ...prev,
+                        [newPlantId]: [{ id: dbRow?.id, dataUrl: publicUrl, base64: null, analysis: null, date: new Date().toISOString() }],
+                      }));
+                    } catch (err) { console.error("Photo save error:", err); }
+                  }
                 }}
                 renderTrigger={(onClick, scanning) => (
                   <button onClick={onClick} disabled={scanning} style={{
