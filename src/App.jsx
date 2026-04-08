@@ -1213,6 +1213,151 @@ function FertilizeModal({ onConfirm, onClose }) {
   );
 }
 
+// ── WaterCheckModal ────────────────────────────────────────────────────────
+function WaterCheckModal({ plant, lastWatered, onWaterNow, onPostpone, onClose }) {
+  const days = daysSince(lastWatered);
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(100,220,80,0.8)", marginBottom: 6 }}>Watering check</div>
+            <div style={{ fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1.3 }}>
+              Is the soil ready<br />to be watered?
+            </div>
+            {days !== null && (
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 8 }}>
+                {days < 0 ? "Postponed" : days === 0 ? "Watered today" : `Last watered ${days}d ago`} · schedule every {plant.waterEveryDays}d
+              </div>
+            )}
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>✕</button>
+        </div>
+        <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "12px 16px", marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>
+          Stick your finger 2–3 cm into the soil. Dry? Water now. Still damp? Postpone.
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <button onClick={onWaterNow} style={{
+            width: "100%", padding: "15px",
+            background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
+            border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
+            borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
+            color: "#d4ffb0", fontSize: 15, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+            cursor: "pointer", letterSpacing: "0.3px",
+          }}>Soil is dry — water now</button>
+          <button onClick={onPostpone} style={{
+            width: "100%", padding: "15px",
+            background: "rgba(138,180,200,0.15)", backdropFilter: "blur(20px)",
+            border: "1px solid rgba(138,180,200,0.30)", borderTopColor: "rgba(180,220,240,0.50)",
+            borderRadius: 20,
+            color: "#b8dff0", fontSize: 15, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+            cursor: "pointer", letterSpacing: "0.3px",
+          }}>Still wet — postpone</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── PostponeModal ──────────────────────────────────────────────────────────
+function PostponeModal({ plant, onConfirm, onClose }) {
+  const QUICK_OPTIONS = [1, 2, 3];
+  const [selected, setSelected] = useState(1);
+  const [customMode, setCustomMode] = useState(false);
+  const [customVal, setCustomVal] = useState("");
+
+  const effectiveDays = customMode ? (parseInt(customVal) > 0 ? parseInt(customVal) : null) : selected;
+  const nextWaterDate = effectiveDays
+    ? new Date(Date.now() + effectiveDays * 86400000).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })
+    : null;
+
+  function handleQuickSelect(d) { setSelected(d); setCustomMode(false); setCustomVal(""); }
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(138,180,200,0.9)", marginBottom: 6 }}>Postpone watering</div>
+            <div style={{ fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1.3 }}>Skip how many days?</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>✕</button>
+        </div>
+
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          {QUICK_OPTIONS.map(d => (
+            <button key={d} onClick={() => handleQuickSelect(d)} style={{
+              flex: 1, padding: "14px 0", borderRadius: 16, border: "1px solid",
+              borderColor: !customMode && selected === d ? "rgba(138,180,200,0.55)" : "rgba(255,255,255,0.14)",
+              borderTopColor: !customMode && selected === d ? "rgba(180,220,240,0.75)" : "rgba(255,255,255,0.22)",
+              background: !customMode && selected === d ? "rgba(138,180,200,0.25)" : "rgba(255,255,255,0.07)",
+              color: !customMode && selected === d ? "#b8dff0" : "rgba(255,255,255,0.55)",
+              fontSize: 22, fontFamily: "'DM Sans', sans-serif", fontWeight: 600,
+              cursor: "pointer", transition: "all 0.15s",
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+            }}>
+              {d}
+              <span style={{ fontSize: 10, letterSpacing: "1px", textTransform: "uppercase", fontWeight: 400, opacity: 0.7 }}>{d === 1 ? "day" : "days"}</span>
+            </button>
+          ))}
+          <button onClick={() => { setCustomMode(true); setCustomVal(""); }} style={{
+            flex: 1, padding: "14px 0", borderRadius: 16, border: "1px solid",
+            borderColor: customMode ? "rgba(138,180,200,0.55)" : "rgba(255,255,255,0.14)",
+            borderTopColor: customMode ? "rgba(180,220,240,0.75)" : "rgba(255,255,255,0.22)",
+            background: customMode ? "rgba(138,180,200,0.25)" : "rgba(255,255,255,0.07)",
+            color: customMode ? "#b8dff0" : "rgba(255,255,255,0.55)",
+            fontSize: 13, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+            cursor: "pointer", transition: "all 0.15s",
+            display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+          }}>
+            <span style={{ fontSize: 18, fontWeight: 600 }}>···</span>
+            <span style={{ fontSize: 10, letterSpacing: "1px", textTransform: "uppercase", fontWeight: 400, opacity: 0.7 }}>custom</span>
+          </button>
+        </div>
+
+        {customMode && (
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ background: "rgba(138,180,200,0.10)", border: "1px solid rgba(138,180,200,0.30)", borderRadius: 14, padding: "4px 16px", display: "flex", alignItems: "center", gap: 10 }}>
+              <input
+                type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0"
+                value={customVal} onChange={e => setCustomVal(e.target.value.replace(/\D/g, ""))}
+                autoFocus
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 28, fontFamily: "'DM Sans', sans-serif", fontWeight: 600, color: "#b8dff0", padding: "10px 0", width: "100%", textAlign: "center" }}
+              />
+              <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>days</span>
+            </div>
+          </div>
+        )}
+
+        {nextWaterDate
+          ? <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: "10px 16px", marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,0.45)", textAlign: "center" }}>
+              Next watering reminder: <span style={{ color: "#b8dff0", fontWeight: 500 }}>{nextWaterDate}</span>
+            </div>
+          : <div style={{ marginBottom: 20 }} />
+        }
+
+        <button
+          onClick={() => effectiveDays && onConfirm(effectiveDays)}
+          disabled={!effectiveDays}
+          style={{
+            width: "100%", padding: "15px",
+            background: effectiveDays ? "rgba(138,180,200,0.22)" : "rgba(255,255,255,0.06)",
+            backdropFilter: "blur(20px)",
+            border: `1px solid ${effectiveDays ? "rgba(138,180,200,0.40)" : "rgba(255,255,255,0.10)"}`,
+            borderTopColor: effectiveDays ? "rgba(180,220,240,0.65)" : "rgba(255,255,255,0.15)",
+            borderRadius: 20,
+            color: effectiveDays ? "#b8dff0" : "rgba(255,255,255,0.25)",
+            fontSize: 15, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+            cursor: effectiveDays ? "pointer" : "default", letterSpacing: "0.3px", transition: "all 0.15s",
+          }}
+        >
+          {effectiveDays ? `Postpone ${effectiveDays} ${effectiveDays === 1 ? "day" : "days"}` : "Enter days to postpone"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ── ConsultGardener ────────────────────────────────────────────────────────
 function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext, onClose }) {
   const [messages, setMessages] = useState([]);
@@ -1511,6 +1656,8 @@ export default function App() {
   const [nickInput, setNickInput] = useState("");
   const [gardenerOpen, setGardenerOpen] = useState(false);
   const [fertilizeModalOpen, setFertilizeModalOpen] = useState(false);
+  const [waterCheckOpen, setWaterCheckOpen] = useState(false);
+  const [postponeOpen, setPostponeOpen] = useState(false);
   const [editDateModal, setEditDateModal] = useState(null); // { type: "water"|"fertilize", plantId, currentDate }
   const [dbLoading, setDbLoading] = useState(true);
   const touchX = useRef(null);
@@ -1646,6 +1793,12 @@ useEffect(() => {
     const now = new Date().toISOString();
     setWaterLog(p => ({ ...p, [id]: now }));
     await supabase.from("water_log").insert({ plant_id: id, watered_at: now, user_id: user.id });
+  }
+
+  async function postponeWatering(id, daysToSkip) {
+    const futureDate = new Date(Date.now() + daysToSkip * 86400000).toISOString();
+    setWaterLog(p => ({ ...p, [id]: futureDate }));
+    await supabase.from("water_log").insert({ plant_id: id, watered_at: futureDate, user_id: user.id });
   }
 
   async function fertilizePlant(id, dose = 1) {
@@ -2003,7 +2156,7 @@ useEffect(() => {
                 <span className="d-val-tap">
                   <span className="d-val-tap-hint">✎</span>
                   {lastWatered
-                    ? (days === 0 ? "Today" : `${days}d ago · ${new Date(lastWatered).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}`)
+                    ? (days === 0 ? "Today" : days < 0 ? `Postponed · due ${new Date(lastWatered).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}` : `${days}d ago · ${new Date(lastWatered).toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}`)
                     : "Not logged"}
                 </span>
               </div>
@@ -2030,8 +2183,8 @@ useEffect(() => {
 
               {/* Action buttons row */}
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
-                <button className="btn-water" style={{ flex: 1, padding: "12px 4px", fontSize: 12 }} onClick={() => waterPlant(plant.id)}>
-                  {days === 0 ? "Watered" : days !== null && days < plant.waterEveryDays ? `Water ${plant.waterEveryDays - days}d` : "Water"}
+                <button className="btn-water" style={{ flex: 1, padding: "12px 4px", fontSize: 12 }} onClick={() => setWaterCheckOpen(true)}>
+                  {days !== null && days < 0 ? "Postponed" : days === 0 ? "Watered" : days !== null && days < plant.waterEveryDays ? `Water ${plant.waterEveryDays - days}d` : "Water"}
                 </button>
                 <button className="btn-fertilize" style={{ flex: 1, padding: "12px 4px", fontSize: 12, marginTop: 0 }} onClick={() => setFertilizeModalOpen(true)}>
                   {fertDays === null ? "Fertilize" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fert. ${fertDaysLeft}d` : "Fertilize"}
@@ -2051,6 +2204,24 @@ useEffect(() => {
         {/* ── MODALS ── */}
         {addPlantOpen && (
           <AddPlantModal onSave={addPlant} onClose={() => setAddPlantOpen(false)} />
+        )}
+
+        {waterCheckOpen && screen === "detail" && plant && (
+          <WaterCheckModal
+            plant={plant}
+            lastWatered={lastWatered}
+            onWaterNow={() => { waterPlant(plant.id); setWaterCheckOpen(false); }}
+            onPostpone={() => { setWaterCheckOpen(false); setPostponeOpen(true); }}
+            onClose={() => setWaterCheckOpen(false)}
+          />
+        )}
+
+        {postponeOpen && screen === "detail" && plant && (
+          <PostponeModal
+            plant={plant}
+            onConfirm={(daysToSkip) => { postponeWatering(plant.id, daysToSkip); setPostponeOpen(false); }}
+            onClose={() => setPostponeOpen(false)}
+          />
         )}
 
         {editDateModal && screen === "detail" && (
