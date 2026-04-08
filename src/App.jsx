@@ -2317,7 +2317,6 @@ useEffect(() => {
               <div className="dnav-arrows">
                 <button className="darrow" disabled={idx === 0} onClick={() => setIdx(i => i - 1)}>‹</button>
                 <button className="darrow" disabled={idx === plants.length - 1} onClick={() => setIdx(i => i + 1)}>›</button>
-                <button className="darrow" onClick={() => setPlantSettingsOpen(true)} title="Plant settings" style={{ fontSize: 13 }}>⚙</button>
               </div>
             </div>
             <div className="dots">
@@ -2344,7 +2343,16 @@ useEffect(() => {
 
             <div className="detail-body">
               <div className="d-species">{plant.species}</div>
-              <div className="d-name">{nicknames[plant.id] || plant.name}</div>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+                <div className="d-name">{nicknames[plant.id] || plant.name}</div>
+                <button onClick={() => setPlantSettingsOpen(true)} style={{
+                  background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
+                  borderRadius: "50%", width: 32, height: 32, flexShrink: 0,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 14, color: "rgba(255,255,255,0.5)", cursor: "pointer",
+                  transition: "all 0.15s",
+                }}>⚙</button>
+              </div>
 
               <div className="nick-row">
                 {editingNick === plant.id ? (
