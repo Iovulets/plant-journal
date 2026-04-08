@@ -2275,7 +2275,7 @@ useEffect(() => {
               {/* Action buttons row */}
               <div style={{ display: "flex", gap: 8, marginTop: 4 }}>
                 <button className="btn-water" style={{ flex: 1, padding: "12px 4px", fontSize: 12 }} onClick={() => setWaterCheckOpen(true)}>
-                  {days === 0 ? "Watered" : days !== null && (plant.waterEveryDays - days) > 0 ? `Water in ${plant.waterEveryDays - days}d` : "Water"}
+                  {days === 0 ? "Watered" : days !== null && days < 0 ? `Water in ${Math.abs(days)}d` : days !== null && (plant.waterEveryDays - days) > 0 ? `Water in ${plant.waterEveryDays - days}d` : "Water"}
                 </button>
                 <button className="btn-fertilize" style={{ flex: 1, padding: "12px 4px", fontSize: 12, marginTop: 0 }} onClick={() => setFertilizeModalOpen(true)}>
                   {fertDays === null ? "Fertilize" : fertDaysLeft !== null && fertDaysLeft > 0 ? `Fert. ${fertDaysLeft}d` : "Fertilize"}
