@@ -1221,6 +1221,120 @@ function FertilizeModal({ onConfirm, onClose }) {
   );
 }
 
+// ── PlantSettingsModal ─────────────────────────────────────────────────────
+const POT_TYPES = ["Terracotta", "Ceramic", "Plastic", "Fabric", "Self-watering", "Other"];
+const LIGHT_DISTANCES = ["Near window", "1m", "2m", "3m", "4m", "5m", "No light"];
+
+function PlantSettingsModal({ plant, settings, nicknames, onSave, onClose }) {
+  const [nickname, setNickname] = useState(nicknames[plant.id] || "");
+  const [plantedDate, setPlantedDate] = useState(settings.plantedDate || "");
+  const [potType, setPotType] = useState(settings.potType || "");
+  const [potSize, setPotSize] = useState(settings.potSize || "");
+  const [soilType, setSoilType] = useState(settings.soilType || "");
+  const [room, setRoom] = useState(settings.room || "Living room");
+  const [lightDistance, setLightDistance] = useState(settings.lightDistance || "");
+
+  const inputStyle = {
+    background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
+    borderRadius: 12, padding: "11px 14px", fontSize: 13,
+    color: "#fff", fontFamily: "'DM Sans', sans-serif", outline: "none",
+    width: "100%", boxSizing: "border-box",
+  };
+  const labelStyle = { fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8, display: "block" };
+  const sectionStyle = { display: "flex", flexDirection: "column", gap: 4 };
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 210, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
+
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>Plant settings</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>{plant.name}</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+          {/* Nickname */}
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Nickname</label>
+            <input style={inputStyle} placeholder="Give it a name…" value={nickname} onChange={e => setNickname(e.target.value)} />
+          </div>
+
+          {/* Planted date */}
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Plant age — when did you get it?</label>
+            <input type="date" style={inputStyle} value={plantedDate} max={new Date().toISOString().slice(0, 10)} onChange={e => setPlantedDate(e.target.value)} />
+          </div>
+
+          {/* Pot type */}
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Pot type</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {POT_TYPES.map(t => (
+                <button key={t} onClick={() => setPotType(t === potType ? "" : t)} style={{
+                  padding: "7px 13px", borderRadius: 20, border: "1px solid",
+                  borderColor: potType === t ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
+                  background: potType === t ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
+                  color: potType === t ? "var(--green)" : "rgba(255,255,255,0.6)",
+                  fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                }}>{t}</button>
+              ))}
+            </div>
+          </div>
+
+          {/* Pot size */}
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Pot size (liters)</label>
+            <input style={inputStyle} type="text" inputMode="decimal" placeholder="e.g. 2.5" value={potSize} onChange={e => setPotSize(e.target.value.replace(/[^0-9.]/g, ""))} />
+          </div>
+
+          {/* Soil type */}
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Soil type</label>
+            <input style={inputStyle} placeholder="e.g. Peat-free, perlite mix…" value={soilType} onChange={e => setSoilType(e.target.value)} />
+          </div>
+
+          {/* Room */}
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Room</label>
+            <input style={inputStyle} placeholder="e.g. Living room, bedroom…" value={room} onChange={e => setRoom(e.target.value)} />
+          </div>
+
+          {/* Distance from light */}
+          <div style={sectionStyle}>
+            <label style={labelStyle}>Distance from light source</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {LIGHT_DISTANCES.map(d => (
+                <button key={d} onClick={() => setLightDistance(d === lightDistance ? "" : d)} style={{
+                  padding: "7px 13px", borderRadius: 20, border: "1px solid",
+                  borderColor: lightDistance === d ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
+                  background: lightDistance === d ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
+                  color: lightDistance === d ? "var(--green)" : "rgba(255,255,255,0.6)",
+                  fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                }}>{d}</button>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        <button onClick={() => onSave({ nickname, plantedDate, potType, potSize, soilType, room, lightDistance })} style={{
+          width: "100%", padding: "14px", marginTop: 24,
+          background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
+          border: "1px solid rgba(150,255,100,0.4)", borderTopColor: "rgba(200,255,160,0.7)",
+          borderRadius: 20, color: "#d4ffb0",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: "pointer", letterSpacing: "0.3px",
+        }}>Save settings</button>
+      </div>
+    </div>
+  );
+}
+
 // ── WaterCheckModal ────────────────────────────────────────────────────────
 function WaterCheckModal({ plant, lastWatered, onWaterNow, onPostpone, onClose }) {
   const days = daysSince(lastWatered);
@@ -1749,6 +1863,8 @@ export default function App() {
   const [fertilizeModalOpen, setFertilizeModalOpen] = useState(false);
   const [waterCheckOpen, setWaterCheckOpen] = useState(false);
   const [postponeOpen, setPostponeOpen] = useState(false);
+  const [plantSettingsOpen, setPlantSettingsOpen] = useState(false);
+  const [plantSettings, setPlantSettings] = useState({}); // keyed by plant.id
   const [editDateModal, setEditDateModal] = useState(null); // { type: "water"|"fertilize", plantId, currentDate }
   const [dbLoading, setDbLoading] = useState(true);
   const touchX = useRef(null);
@@ -1825,6 +1941,19 @@ useEffect(() => {
           vocStrengths: r.voc_strengths || ["General VOCs"],
           image: null,
         })));
+        // Load settings fields into plantSettings state
+        const ps = {};
+        (plRes.data || []).forEach(r => {
+          ps[r.id] = {
+            plantedDate: r.planted_date || "",
+            potType: r.pot_type || "",
+            potSize: r.pot_size != null ? String(r.pot_size) : "",
+            soilType: r.soil_type || "",
+            room: r.room || "",
+            lightDistance: r.light_distance || "",
+          };
+        });
+        setPlantSettings(ps);
         const wl = {};
         (wRes.data || []).forEach(r => { if (!wl[r.plant_id]) wl[r.plant_id] = r.watered_at; });
         setWaterLog(wl);
@@ -1918,6 +2047,29 @@ useEffect(() => {
       await supabase.from("nicknames").delete().eq("plant_id", id).eq("user_id", user.id);
     }
     setEditingNick(null); setNickInput("");
+  }
+
+  async function saveSettings(id, s) {
+    // Nickname
+    if (s.nickname.trim()) {
+      setNicknames(p => ({ ...p, [id]: s.nickname.trim() }));
+      await supabase.from("nicknames").upsert({ plant_id: id, nickname: s.nickname.trim(), user_id: user.id });
+    } else {
+      setNicknames(p => { const n = { ...p }; delete n[id]; return n; });
+      await supabase.from("nicknames").delete().eq("plant_id", id).eq("user_id", user.id);
+    }
+    // Persist settings columns to plants table
+    await supabase.from("plants").update({
+      planted_date: s.plantedDate || null,
+      pot_type: s.potType || null,
+      pot_size: s.potSize ? parseFloat(s.potSize) : null,
+      soil_type: s.soilType || null,
+      room: s.room || null,
+      light_distance: s.lightDistance || null,
+    }).eq("id", id).eq("user_id", user.id);
+    // Update local state
+    setPlantSettings(p => ({ ...p, [id]: { plantedDate: s.plantedDate, potType: s.potType, potSize: s.potSize, soilType: s.soilType, room: s.room, lightDistance: s.lightDistance } }));
+    setPlantSettingsOpen(false);
   }
 
   async function editDate(type, plantId, dateStr) {
@@ -2165,6 +2317,7 @@ useEffect(() => {
               <div className="dnav-arrows">
                 <button className="darrow" disabled={idx === 0} onClick={() => setIdx(i => i - 1)}>‹</button>
                 <button className="darrow" disabled={idx === plants.length - 1} onClick={() => setIdx(i => i + 1)}>›</button>
+                <button className="darrow" onClick={() => setPlantSettingsOpen(true)} title="Plant settings" style={{ fontSize: 13 }}>⚙</button>
               </div>
             </div>
             <div className="dots">
@@ -2331,6 +2484,16 @@ useEffect(() => {
                 )}
               />
             }
+          />
+        )}
+
+        {plantSettingsOpen && screen === "detail" && plant && (
+          <PlantSettingsModal
+            plant={plant}
+            settings={plantSettings[plant.id] || {}}
+            nicknames={nicknames}
+            onSave={(s) => saveSettings(plant.id, s)}
+            onClose={() => setPlantSettingsOpen(false)}
           />
         )}
 
