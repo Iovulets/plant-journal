@@ -507,6 +507,21 @@ const css = `
     background-repeat: no-repeat; background-position: right 16px center;
   }
   .ob-select option { background: #0f1a0f; color: #fff; }
+
+  /* ─── WEATHER ICON ANIMATIONS ───────────────────────────────── */
+  @keyframes wx-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @keyframes wx-pulse { 0%, 100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 1; transform: scale(1.08); } }
+  @keyframes wx-drift { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(3px); } }
+  @keyframes wx-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+  @keyframes wx-fall1 { 0% { transform: translateY(0); opacity: 0.8; } 100% { transform: translateY(6px); opacity: 0; } }
+  @keyframes wx-fall2 { 0% { transform: translateY(0); opacity: 0.7; } 100% { transform: translateY(6px); opacity: 0; } }
+  @keyframes wx-twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+  @keyframes wx-flash { 0%, 100% { opacity: 0; } 8% { opacity: 0.9; } 12% { opacity: 0; } 20% { opacity: 0.7; } 24% { opacity: 0; } }
+  @keyframes wx-tumble { 0% { transform: translateY(0) rotate(0deg); opacity: 0.7; } 100% { transform: translateY(5px) rotate(60deg); opacity: 0; } }
+  .wx-spin { animation: wx-spin 12s linear infinite; transform-origin: center; }
+  .wx-pulse { animation: wx-pulse 3s ease-in-out infinite; }
+  .wx-drift { animation: wx-drift 4s ease-in-out infinite; }
+  .wx-bob { animation: wx-bob 3s ease-in-out infinite; }
 `;
 
 // ── Weather Card ──────────────────────────────────────────────────────────
@@ -523,8 +538,7 @@ const WMO_CONDITIONS = {
   95: "Thunderstorm", 96: "Thunderstorm + hail", 99: "Thunderstorm + heavy hail",
 };
 
-function WeatherIcon({ code, isDay, size = 28 }) {
-  // Map WMO codes to icon type
+function WeatherIcon({ code, isDay, size = 32 }) {
   let type = "sunny";
   if ([0, 1].includes(code)) type = isDay ? "sunny" : "night";
   else if ([2].includes(code)) type = isDay ? "partly-cloudy" : "partly-cloudy-night";
@@ -536,68 +550,102 @@ function WeatherIcon({ code, isDay, size = 28 }) {
   const s = size;
   const icons = {
     sunny: (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <circle cx="16" cy="16" r="6" fill="#FFD93D" />
-        <g stroke="#FFD93D" strokeWidth="2" strokeLinecap="round">
-          <line x1="16" y1="2" x2="16" y2="6" /><line x1="16" y1="26" x2="16" y2="30" />
-          <line x1="2" y1="16" x2="6" y2="16" /><line x1="26" y1="16" x2="30" y2="16" />
-          <line x1="6.1" y1="6.1" x2="8.9" y2="8.9" /><line x1="23.1" y1="23.1" x2="25.9" y2="25.9" />
-          <line x1="6.1" y1="25.9" x2="8.9" y2="23.1" /><line x1="23.1" y1="8.9" x2="25.9" y2="6.1" />
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        {/* Rays — slow spin */}
+        <g className="wx-spin" style={{ transformOrigin: "18px 18px" }}>
+          <g stroke="#FFD93D" strokeWidth="2" strokeLinecap="round" opacity="0.6">
+            <line x1="18" y1="2" x2="18" y2="7" /><line x1="18" y1="29" x2="18" y2="34" />
+            <line x1="2" y1="18" x2="7" y2="18" /><line x1="29" y1="18" x2="34" y2="18" />
+            <line x1="6.3" y1="6.3" x2="9.8" y2="9.8" /><line x1="26.2" y1="26.2" x2="29.7" y2="29.7" />
+            <line x1="6.3" y1="29.7" x2="9.8" y2="26.2" /><line x1="26.2" y1="9.8" x2="29.7" y2="6.3" />
+          </g>
         </g>
+        {/* Core — gentle pulse */}
+        <circle className="wx-pulse" cx="18" cy="18" r="7" fill="#FFD93D" style={{ transformOrigin: "18px 18px" }} />
       </svg>
     ),
     night: (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <path d="M22 16a10 10 0 01-10-10C12 4 14.5 2.5 16 2a12 12 0 100 28c1.5-.5 4-2 4-4a10 10 0 01-8-10z" fill="#C8D8F0" opacity="0.9" />
-        <circle cx="23" cy="8" r="1" fill="#E8E8FF" opacity="0.6" />
-        <circle cx="27" cy="12" r="0.7" fill="#E8E8FF" opacity="0.4" />
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        <path className="wx-pulse" d="M24 18a11 11 0 01-11-11c0-2 2-3.5 3.5-4a13 13 0 100 30c1.5-.5 4.5-2.5 4.5-4a11 11 0 01-8-11z" fill="#C8D8F0" opacity="0.85" style={{ transformOrigin: "18px 18px" }} />
+        <circle cx="26" cy="8" r="1.2" fill="#E8E8FF" style={{ animation: "wx-twinkle 2.5s ease-in-out infinite" }} />
+        <circle cx="30" cy="14" r="0.8" fill="#E8E8FF" style={{ animation: "wx-twinkle 3.5s ease-in-out infinite 0.8s" }} />
+        <circle cx="28" cy="4" r="0.6" fill="#E8E8FF" style={{ animation: "wx-twinkle 4s ease-in-out infinite 1.5s" }} />
       </svg>
     ),
     "partly-cloudy": (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <circle cx="12" cy="12" r="5" fill="#FFD93D" />
-        <g stroke="#FFD93D" strokeWidth="1.5" strokeLinecap="round">
-          <line x1="12" y1="3" x2="12" y2="5.5" /><line x1="12" y1="18.5" x2="12" y2="21" />
-          <line x1="3" y1="12" x2="5.5" y2="12" /><line x1="18.5" y1="12" x2="21" y2="12" />
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        {/* Sun peeking */}
+        <g className="wx-pulse" style={{ transformOrigin: "12px 12px" }}>
+          <circle cx="12" cy="12" r="5.5" fill="#FFD93D" />
+          <g stroke="#FFD93D" strokeWidth="1.5" strokeLinecap="round" opacity="0.5">
+            <line x1="12" y1="2" x2="12" y2="5" /><line x1="3" y1="12" x2="6" y2="12" />
+            <line x1="5.5" y1="5.5" x2="7.5" y2="7.5" />
+          </g>
         </g>
-        <path d="M10 20a6 6 0 0112 0H10z" fill="rgba(255,255,255,0.7)" />
-        <ellipse cx="16" cy="20" rx="10" ry="5" fill="rgba(255,255,255,0.55)" />
+        {/* Cloud drifting */}
+        <g className="wx-drift">
+          <ellipse cx="20" cy="22" rx="12" ry="6" fill="rgba(255,255,255,0.5)" />
+          <ellipse cx="16" cy="18" rx="8" ry="5.5" fill="rgba(255,255,255,0.6)" />
+          <ellipse cx="24" cy="19" rx="6.5" ry="5" fill="rgba(255,255,255,0.55)" />
+        </g>
       </svg>
     ),
     "partly-cloudy-night": (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <path d="M14 10a6 6 0 01-4-6c0-1 1-2 2-2.5a8 8 0 100 17c1-.3 2.5-1.3 2.5-2.5a6 6 0 01-4.5-6z" fill="#C8D8F0" opacity="0.7" />
-        <ellipse cx="18" cy="22" rx="10" ry="5" fill="rgba(255,255,255,0.55)" />
-      </svg>
-    ),
-    cloudy: (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <ellipse cx="16" cy="18" rx="11" ry="6" fill="rgba(255,255,255,0.45)" />
-        <ellipse cx="13" cy="14" rx="7" ry="5" fill="rgba(255,255,255,0.55)" />
-        <ellipse cx="20" cy="15" rx="6" ry="4.5" fill="rgba(255,255,255,0.5)" />
-      </svg>
-    ),
-    rainy: (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <ellipse cx="16" cy="14" rx="10" ry="5.5" fill="rgba(255,255,255,0.45)" />
-        <ellipse cx="13" cy="11" rx="6" ry="4" fill="rgba(255,255,255,0.5)" />
-        <g stroke="#8ab4c8" strokeWidth="1.5" strokeLinecap="round">
-          <line x1="10" y1="22" x2="9" y2="26" /><line x1="16" y1="22" x2="15" y2="27" /><line x1="22" y1="22" x2="21" y2="26" />
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        <path className="wx-pulse" d="M14 11a7 7 0 01-5-7c0-1 1.2-2 2.5-2.5a9 9 0 100 19c1-.4 3-1.5 3-3a7 7 0 01-5-6.5z" fill="#C8D8F0" opacity="0.65" style={{ transformOrigin: "10px 10px" }} />
+        <g className="wx-drift">
+          <ellipse cx="20" cy="24" rx="12" ry="6" fill="rgba(255,255,255,0.5)" />
+          <ellipse cx="17" cy="20" rx="7" ry="5" fill="rgba(255,255,255,0.55)" />
         </g>
       </svg>
     ),
+    cloudy: (
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        <g className="wx-drift">
+          <ellipse cx="18" cy="20" rx="13" ry="7" fill="rgba(255,255,255,0.42)" />
+          <ellipse cx="14" cy="16" rx="8" ry="5.5" fill="rgba(255,255,255,0.52)" />
+          <ellipse cx="23" cy="17" rx="7" ry="5" fill="rgba(255,255,255,0.48)" />
+        </g>
+        {/* Second layer with offset drift */}
+        <g className="wx-bob">
+          <ellipse cx="19" cy="22" rx="9" ry="4.5" fill="rgba(255,255,255,0.3)" />
+        </g>
+      </svg>
+    ),
+    rainy: (
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        {/* Cloud */}
+        <g className="wx-bob">
+          <ellipse cx="18" cy="14" rx="12" ry="6" fill="rgba(255,255,255,0.42)" />
+          <ellipse cx="14" cy="11" rx="7" ry="4.5" fill="rgba(255,255,255,0.48)" />
+          <ellipse cx="23" cy="12" rx="6" ry="4" fill="rgba(255,255,255,0.45)" />
+        </g>
+        {/* Rain drops — staggered falling */}
+        <line x1="11" y1="22" x2="10" y2="27" stroke="#8ab4c8" strokeWidth="1.5" strokeLinecap="round" style={{ animation: "wx-fall1 1.2s ease-in infinite" }} />
+        <line x1="18" y1="22" x2="17" y2="28" stroke="#8ab4c8" strokeWidth="1.5" strokeLinecap="round" style={{ animation: "wx-fall1 1.2s ease-in infinite 0.3s" }} />
+        <line x1="25" y1="22" x2="24" y2="27" stroke="#8ab4c8" strokeWidth="1.5" strokeLinecap="round" style={{ animation: "wx-fall1 1.2s ease-in infinite 0.7s" }} />
+      </svg>
+    ),
     snowy: (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <ellipse cx="16" cy="14" rx="10" ry="5.5" fill="rgba(255,255,255,0.45)" />
-        <circle cx="10" cy="24" r="1.5" fill="rgba(255,255,255,0.6)" />
-        <circle cx="16" cy="26" r="1.5" fill="rgba(255,255,255,0.6)" />
-        <circle cx="22" cy="24" r="1.5" fill="rgba(255,255,255,0.6)" />
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        <g className="wx-bob">
+          <ellipse cx="18" cy="14" rx="12" ry="6" fill="rgba(255,255,255,0.42)" />
+          <ellipse cx="14" cy="11" rx="7" ry="4.5" fill="rgba(255,255,255,0.48)" />
+        </g>
+        {/* Snowflakes — tumbling fall */}
+        <circle cx="11" cy="23" r="1.8" fill="rgba(255,255,255,0.6)" style={{ animation: "wx-tumble 2s ease-in infinite" }} />
+        <circle cx="18" cy="25" r="1.8" fill="rgba(255,255,255,0.55)" style={{ animation: "wx-tumble 2.2s ease-in infinite 0.5s" }} />
+        <circle cx="25" cy="23" r="1.8" fill="rgba(255,255,255,0.6)" style={{ animation: "wx-tumble 1.8s ease-in infinite 1s" }} />
       </svg>
     ),
     stormy: (
-      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
-        <ellipse cx="16" cy="12" rx="10" ry="5.5" fill="rgba(255,255,255,0.4)" />
-        <polygon points="15,18 18,18 14,28 17,22 14,22 17,15" fill="#FFD93D" opacity="0.9" />
+      <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
+        <g className="wx-bob">
+          <ellipse cx="18" cy="12" rx="12" ry="6" fill="rgba(255,255,255,0.38)" />
+          <ellipse cx="14" cy="9" rx="7" ry="4.5" fill="rgba(255,255,255,0.42)" />
+        </g>
+        {/* Lightning — intermittent flash */}
+        <polygon points="17,18 20,18 15,30 19,23 15,23 19,16" fill="#FFD93D" style={{ animation: "wx-flash 3s ease-in-out infinite" }} />
       </svg>
     ),
   };
@@ -671,15 +719,12 @@ function WeatherCard({ userProfile }) {
       <GlassCard borderRadius={20} style={{ padding: "14px 18px" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           {/* Icon */}
-          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36 }}>
-            <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={32} />
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", width: 40, height: 40 }}>
+            <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={36} />
           </div>
-          {/* Temp + condition */}
+          {/* Temp */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-              <div style={{ fontSize: 26, fontWeight: 500, color: "#fff", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 400 }}>{weather.condition}</div>
-            </div>
+            <div style={{ fontSize: 26, fontWeight: 500, color: "#fff", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
             <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 3, letterSpacing: "0.5px" }}>{weather.city}</div>
           </div>
           {/* Humidity */}
