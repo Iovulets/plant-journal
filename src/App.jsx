@@ -1335,13 +1335,14 @@ function FertilizeModal({ onConfirm, onClose }) {
 const POT_TYPES = ["Terracotta", "Ceramic", "Plastic", "Fabric", "Self-watering", "Other"];
 const LIGHT_DISTANCES = ["Near window", "1m", "2m", "3m", "4m", "5m", "No light"];
 
-function PlantSettingsModal({ plant, settings, nicknames, onSave, onDelete, onClose }) {
+function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelete, onClose }) {
   const [nickname, setNickname] = useState(nicknames[plant.id] || "");
   const [plantedDate, setPlantedDate] = useState(settings.plantedDate || "");
   const [potType, setPotType] = useState(settings.potType || "");
   const [potSize, setPotSize] = useState(settings.potSize || "");
   const [soilType, setSoilType] = useState(settings.soilType || "");
-  const [room, setRoom] = useState(settings.room || "Living room");
+  const [location, setLocation] = useState(settings.location || "");
+  const [room, setRoom] = useState(settings.room || "");
   const [lightDistance, setLightDistance] = useState(settings.lightDistance || "");
   const [deleteMode, setDeleteMode] = useState(false);
   const [deleteInput, setDeleteInput] = useState("");
@@ -1410,11 +1411,42 @@ function PlantSettingsModal({ plant, settings, nicknames, onSave, onDelete, onCl
             <input style={inputStyle} placeholder="e.g. Peat-free, perlite mix…" value={soilType} onChange={e => setSoilType(e.target.value)} />
           </div>
 
-          {/* Room */}
+          {/* Location */}
           <div style={sectionStyle}>
-            <label style={labelStyle}>Room</label>
-            <input style={inputStyle} placeholder="e.g. Living room, bedroom…" value={room} onChange={e => setRoom(e.target.value)} />
+            <label style={labelStyle}>Location</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {[{ id: "in-door", label: "In-door" }, { id: "balcony", label: "Balcony" }, { id: "garden", label: "Garden" }].map(l => (
+                <button key={l.id} onClick={() => { setLocation(l.id === location ? "" : l.id); if (l.id !== "in-door") setRoom(""); }} style={{
+                  padding: "7px 13px", borderRadius: 20, border: "1px solid",
+                  borderColor: location === l.id ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
+                  background: location === l.id ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
+                  color: location === l.id ? "var(--green)" : "rgba(255,255,255,0.6)",
+                  fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                }}>{l.label}</button>
+              ))}
+            </div>
           </div>
+
+          {/* Room — only visible when location is in-door */}
+          {location === "in-door" && (
+            <div style={sectionStyle}>
+              <label style={labelStyle}>Room</label>
+              {rooms.length > 0 && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+                  {rooms.map(r => (
+                    <button key={r.id} onClick={() => setRoom(r.name)} style={{
+                      padding: "7px 13px", borderRadius: 20, border: "1px solid",
+                      borderColor: room === r.name ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
+                      background: room === r.name ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
+                      color: room === r.name ? "var(--green)" : "rgba(255,255,255,0.6)",
+                      fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                    }}>{r.name}</button>
+                  ))}
+                </div>
+              )}
+              <input style={inputStyle} placeholder="e.g. Living room, bedroom…" value={room} onChange={e => setRoom(e.target.value)} />
+            </div>
+          )}
 
           {/* Distance from light */}
           <div style={sectionStyle}>
@@ -1434,7 +1466,7 @@ function PlantSettingsModal({ plant, settings, nicknames, onSave, onDelete, onCl
 
         </div>
 
-        <button onClick={() => onSave({ nickname, plantedDate, potType, potSize, soilType, room, lightDistance })} style={{
+        <button onClick={() => onSave({ nickname, plantedDate, potType, potSize, soilType, location, room: location === "in-door" ? room : "", lightDistance })} style={{
           width: "100%", padding: "14px", marginTop: 24,
           background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
           border: "1px solid rgba(150,255,100,0.4)", borderTopColor: "rgba(200,255,160,0.7)",
@@ -1874,6 +1906,17 @@ function OnboardingFlow({ user, onComplete }) {
       onboarding_step: totalSteps,
     };
     await supabase.from("user_profiles").upsert(profile, { onConflict: "user_id" });
+    // Also insert into rooms table if in-house
+    if (needsRoom && roomName.trim()) {
+      await supabase.from("rooms").insert({
+        user_id: user.id,
+        name: roomName.trim(),
+        size: roomSize || null,
+        temperature: roomTemp ? parseFloat(roomTemp) : null,
+        has_windows: hasWindows,
+        window_direction: hasWindows ? windowDir : null,
+      });
+    }
     setSaving(false);
     onComplete(profile);
   }
@@ -2493,6 +2536,7 @@ useEffect(() => {
   const [nicknames, setNicknames] = useState({});
   const [gardenLog, setGardenLog] = useState([]);
   const [plantPhotos, setPlantPhotos] = useState({});
+  const [rooms, setRooms] = useState([]);
 
   const loadedRef = useRef(false);
 
@@ -2518,7 +2562,7 @@ useEffect(() => {
     async function loadAll() {
       try {
         const uid = user.id;
-        const [plRes, wRes, fRes, dRes, nRes, gRes, pRes] = await Promise.all([
+        const [plRes, wRes, fRes, dRes, nRes, gRes, pRes, rmRes] = await Promise.all([
           supabase.from("plants").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
           supabase.from("water_log").select("*").eq("user_id", uid).order("watered_at", { ascending: false }),
           supabase.from("fertilize_log").select("*").eq("user_id", uid).order("fertilized_at", { ascending: false }),
@@ -2526,7 +2570,9 @@ useEffect(() => {
           supabase.from("nicknames").select("*").eq("user_id", uid),
           supabase.from("garden_log").select("*").eq("user_id", uid).order("scanned_at", { ascending: false }),
           supabase.from("plant_photos").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
+          supabase.from("rooms").select("*").eq("user_id", uid).order("created_at", { ascending: true }),
         ]);
+        setRooms((rmRes.data || []).map(r => ({ id: r.id, name: r.name, size: r.size, temperature: r.temperature, hasWindows: r.has_windows, windowDirection: r.window_direction })));
         setPlants((plRes.data || []).map(r => ({
           id: r.id, name: r.name, species: r.species,
           waterEveryDays: r.water_every_days, light: r.light,
@@ -2544,6 +2590,7 @@ useEffect(() => {
             potType: r.pot_type || "",
             potSize: r.pot_size != null ? String(r.pot_size) : "",
             soilType: r.soil_type || "",
+            location: r.location || "",
             room: r.room || "",
             lightDistance: r.light_distance || "",
           };
@@ -2657,10 +2704,11 @@ useEffect(() => {
       pot_type: s.potType || null,
       pot_size: s.potSize ? parseFloat(s.potSize) : null,
       soil_type: s.soilType || null,
+      location: s.location || null,
       room: s.room || null,
       light_distance: s.lightDistance || null,
     }).eq("id", id).eq("user_id", user.id);
-    setPlantSettings(p => ({ ...p, [id]: { plantedDate: s.plantedDate, potType: s.potType, potSize: s.potSize, soilType: s.soilType, room: s.room, lightDistance: s.lightDistance } }));
+    setPlantSettings(p => ({ ...p, [id]: { plantedDate: s.plantedDate, potType: s.potType, potSize: s.potSize, soilType: s.soilType, location: s.location, room: s.room, lightDistance: s.lightDistance } }));
     setPlantSettingsOpen(false);
   }
 
@@ -2733,7 +2781,7 @@ useEffect(() => {
   async function signOut() {
     await supabase.auth.signOut();
     setWaterLog({}); setFertilizeLog({}); setDismissedWarnings({});
-    setNicknames({}); setGardenLog([]); setPlantPhotos({}); setPlants([]);
+    setNicknames({}); setGardenLog([]); setPlantPhotos({}); setPlants([]); setRooms([]);
     setOnboardingDone(null); setUserProfile(null);
     loadedRef.current = false;
     setScreen("overview");
@@ -3133,6 +3181,7 @@ useEffect(() => {
             plant={plant}
             settings={plantSettings[plant.id] || {}}
             nicknames={nicknames}
+            rooms={rooms}
             onSave={(s) => saveSettings(plant.id, s)}
             onDelete={() => deletePlant(plant.id)}
             onClose={() => setPlantSettingsOpen(false)}
