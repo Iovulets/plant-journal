@@ -3259,11 +3259,12 @@ useEffect(() => {
               <div style={{ padding: "0 14px 32px" }}>
                 {rooms.length === 1 && (
                   <div onClick={() => setEditRoomData(rooms[0])} style={{
-                    display: "inline-block", padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
                     background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
                     fontSize: 11, letterSpacing: "0.8px", color: "var(--green)",
                     fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
-                  }}>{rooms[0].name}</div>
+                  }}><span style={{ color: "rgba(255,255,255,0.45)" }}>Room:</span> {rooms[0].name} <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span></div>
                 )}
                 <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr" }}>
                 {plants.map((p, i) => {
@@ -3324,7 +3325,8 @@ useEffect(() => {
                     <div key={section.name} style={{ marginBottom: 10 }}>
                       {/* Room tag header */}
                       <div onClick={roomObj ? () => setEditRoomData(roomObj) : undefined} style={{
-                        display: "inline-block", padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
+                        display: "inline-flex", alignItems: "center", gap: 6,
+                        padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
                         background: section.name === "Unassigned" ? "rgba(255,255,255,0.06)" : "rgba(74,222,128,0.12)",
                         border: `1px solid ${section.name === "Unassigned" ? "rgba(255,255,255,0.12)" : "rgba(74,222,128,0.25)"}`,
                         fontSize: 11, letterSpacing: "0.8px",
@@ -3332,7 +3334,7 @@ useEffect(() => {
                         fontFamily: "'DM Sans', sans-serif",
                         cursor: roomObj ? "pointer" : "default",
                         transition: "background 0.15s",
-                      }}>{section.name}</div>
+                      }}>{section.name === "Unassigned" ? "Unassigned" : <><span style={{ color: "rgba(255,255,255,0.45)" }}>Room:</span> {section.name} <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span></>}</div>
 
                       {section.plants.length === 0 ? (
                         <div style={{ padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>No plants in this room</div>
