@@ -22,13 +22,13 @@ function daysSince(iso) {
 function getStatus(plant, lastWatered) {
   const d = daysSince(lastWatered);
   if (d === null) return "unknown";
-  if (d < 0) return "postponed";
+  if (d < 0) return "happy";
   if (d >= plant.waterEveryDays) return "thirsty";
   if (d >= plant.waterEveryDays * 0.7) return "soon";
   return "happy";
 }
-const STATUS_LABEL = { happy: "Hydrated", soon: "Water soon", thirsty: "Needs water", unknown: "Not logged", postponed: "Postponed" };
-const STATUS_COLOR = { happy: "#94b88a", soon: "#d4935a", thirsty: "#c46860", unknown: "#b0998e", postponed: "#8ab4c8" };
+const STATUS_LABEL = { happy: "Hydrated", soon: "Water soon", thirsty: "Needs water", unknown: "Not logged" };
+const STATUS_COLOR = { happy: "#94b88a", soon: "#d4935a", thirsty: "#c46860", unknown: "#b0998e" };
 const TILTS = [1.5, -2, 2.5, -1.2, 1.8, -2.3];
 const PIN_COLORS = ["#e05c5c", "#5c7de0", "#e0b45c", "#5cba7d", "#c45ce0", "#e07a5c"];
 
@@ -2310,6 +2310,150 @@ function AddRoomModal({ onSave, onClose }) {
 }
 
 
+// ── EditRoomModal ─────────────────────────────────────────────────────────
+function EditRoomModal({ room, onSave, onDelete, onClose }) {
+  const [roomName, setRoomName] = useState(room.name || "");
+  const [roomSize, setRoomSize] = useState(room.size || "");
+  const [tempUnit, setTempUnit] = useState("C");
+  const [roomTemp, setRoomTemp] = useState(room.temperature != null ? String(room.temperature) : "");
+  const [hasWindows, setHasWindows] = useState(room.hasWindows !== false);
+  const [windowDir, setWindowDir] = useState(room.windowDirection || "");
+  const [saving, setSaving] = useState(false);
+  const [deleteMode, setDeleteMode] = useState(false);
+
+  const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  const DIR_POSITIONS = {
+    N:  { top: 4, left: "50%", transform: "translateX(-50%)" },
+    NE: { top: 28, right: 16 },
+    E:  { top: "50%", right: 0, transform: "translateY(-50%)" },
+    SE: { bottom: 28, right: 16 },
+    S:  { bottom: 4, left: "50%", transform: "translateX(-50%)" },
+    SW: { bottom: 28, left: 16 },
+    W:  { top: "50%", left: 0, transform: "translateY(-50%)" },
+    NW: { top: 28, left: 16 },
+  };
+
+  const valid = roomName.trim().length >= 2 && roomSize && roomTemp && (!hasWindows || windowDir);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 210, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>Room settings</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>{room.name}</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room name</div>
+            <input className="ob-input" value={roomName} onChange={e => setRoomName(e.target.value.slice(0, 40))} />
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room size</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["Small", "Medium", "Large"].map(s => (
+                <div key={s} className={`ob-size-card${roomSize === s ? " selected" : ""}`} onClick={() => setRoomSize(s)}>
+                  <div className="ob-size-label">{s}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Average temperature</div>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input className="ob-input" style={{ flex: 1 }} type="text" inputMode="decimal" value={roomTemp} onChange={e => setRoomTemp(e.target.value.replace(/[^0-9.]/g, ""))} />
+              <div className="ob-toggle" style={{ width: 100, flexShrink: 0 }}>
+                <button className={tempUnit === "C" ? "active" : ""} onClick={() => setTempUnit("C")}>°C</button>
+                <button className={tempUnit === "F" ? "active" : ""} onClick={() => setTempUnit("F")}>°F</button>
+              </div>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Does the room have windows?</div>
+            <div className="ob-toggle" style={{ width: 160 }}>
+              <button className={hasWindows ? "active" : ""} onClick={() => setHasWindows(true)}>Yes</button>
+              <button className={!hasWindows ? "active" : ""} onClick={() => { setHasWindows(false); setWindowDir(""); }}>No</button>
+            </div>
+          </div>
+
+          {hasWindows && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Window direction</div>
+              <div className="ob-compass-ring" style={{ width: 180, height: 180 }}>
+                {DIRECTIONS.map(d => (
+                  <div key={d} className={`ob-compass-dir${windowDir === d ? " selected" : ""}`} style={{ ...DIR_POSITIONS[d], position: "absolute" }} onClick={() => setWindowDir(d)}>{d}</div>
+                ))}
+                <div className="ob-compass-center">
+                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Tap</div>}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button disabled={!valid || saving} onClick={async () => {
+          setSaving(true);
+          await onSave(room.id, {
+            name: roomName.trim(),
+            size: roomSize,
+            temperature: roomTemp ? parseFloat(roomTemp) : null,
+            has_windows: hasWindows,
+            window_direction: hasWindows ? windowDir : null,
+          });
+          setSaving(false);
+        }} style={{
+          width: "100%", padding: "14px", marginTop: 24,
+          background: valid ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
+          backdropFilter: "blur(20px)",
+          border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
+          borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
+          borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: valid && !saving ? "pointer" : "default", letterSpacing: "0.3px",
+          opacity: saving ? 0.5 : 1,
+        }}>{saving ? "Saving..." : "Save changes"}</button>
+
+        <button onClick={() => setDeleteMode(true)} style={{
+          width: "100%", padding: "12px", marginTop: 10,
+          background: "transparent", border: "1px solid rgba(248,113,113,0.25)",
+          borderRadius: 20, color: "rgba(248,113,113,0.6)",
+          fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+          cursor: "pointer", letterSpacing: "0.3px",
+        }}>Delete room</button>
+
+        {deleteMode && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 220, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.7)", backdropFilter: "blur(4px)" }} onClick={() => setDeleteMode(false)}>
+            <div onClick={e => e.stopPropagation()} style={{ background: "#1a0a0a", borderTop: "1px solid rgba(248,113,113,0.25)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+              <div style={{ marginBottom: 20 }}>
+                <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(248,113,113,0.8)", marginBottom: 6 }}>Delete room</div>
+                <div style={{ fontSize: 18, fontWeight: 500, color: "#fff", marginBottom: 8 }}>Remove "{room.name}"?</div>
+                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
+                  Plants in this room will become unassigned. This cannot be undone.
+                </div>
+              </div>
+              <button onClick={() => onDelete(room.id)} style={{
+                width: "100%", padding: "14px",
+                background: "rgba(248,113,113,0.25)", border: "1px solid rgba(248,113,113,0.5)",
+                borderRadius: 20, color: "#f87171",
+                fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+                cursor: "pointer",
+              }}>Delete room</button>
+              <button onClick={() => setDeleteMode(false)} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans', sans-serif" }}>Cancel</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+
 // ── App ────────────────────────────────────────────────────────────────────
 // ── AddPlantModal — choice screen ─────────────────────────────────────────
 function AddPlantModal({ onSave, onClose, scanButton }) {
@@ -2646,6 +2790,7 @@ useEffect(() => {
   const [plants, setPlants] = useState([]);
   const [addPlantOpen, setAddPlantOpen] = useState(false);
   const [addRoomOpen, setAddRoomOpen] = useState(false);
+  const [editRoomData, setEditRoomData] = useState(null); // room object or null
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
   const [dismissedWarnings, setDismissedWarnings] = useState({});
@@ -2904,6 +3049,44 @@ useEffect(() => {
     setAddRoomOpen(false);
   }
 
+  async function updateRoom(roomId, roomData) {
+    const oldRoom = rooms.find(r => r.id === roomId);
+    const oldName = oldRoom?.name;
+    await supabase.from("rooms").update(roomData).eq("id", roomId).eq("user_id", user.id);
+    setRooms(prev => prev.map(r => r.id === roomId ? { ...r, name: roomData.name, size: roomData.size, temperature: roomData.temperature, hasWindows: roomData.has_windows, windowDirection: roomData.window_direction } : r));
+    // If name changed, update plants that reference the old name
+    if (oldName && oldName !== roomData.name) {
+      await supabase.from("plants").update({ room: roomData.name }).eq("room", oldName).eq("user_id", user.id);
+      setPlantSettings(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(pid => {
+          if (updated[pid].room === oldName) updated[pid] = { ...updated[pid], room: roomData.name };
+        });
+        return updated;
+      });
+    }
+    setEditRoomData(null);
+  }
+
+  async function deleteRoom(roomId) {
+    const oldRoom = rooms.find(r => r.id === roomId);
+    const oldName = oldRoom?.name;
+    await supabase.from("rooms").delete().eq("id", roomId).eq("user_id", user.id);
+    setRooms(prev => prev.filter(r => r.id !== roomId));
+    // Unassign plants in this room
+    if (oldName) {
+      await supabase.from("plants").update({ room: null }).eq("room", oldName).eq("user_id", user.id);
+      setPlantSettings(prev => {
+        const updated = { ...prev };
+        Object.keys(updated).forEach(pid => {
+          if (updated[pid].room === oldName) updated[pid] = { ...updated[pid], room: "" };
+        });
+        return updated;
+      });
+    }
+    setEditRoomData(null);
+  }
+
   async function signOut() {
     await supabase.auth.signOut();
     setWaterLog({}); setFertilizeLog({}); setDismissedWarnings({});
@@ -3072,8 +3255,17 @@ useEffect(() => {
                 </div>
               </div>
             ) : rooms.length <= 1 ? (
-              /* Single room or no rooms — flat list (current behavior) */
-              <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "0 14px 32px" }}>
+              /* Single room or no rooms — flat list with room tag if room exists */
+              <div style={{ padding: "0 14px 32px" }}>
+                {rooms.length === 1 && (
+                  <div onClick={() => setEditRoomData(rooms[0])} style={{
+                    display: "inline-block", padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
+                    background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
+                    fontSize: 11, letterSpacing: "0.8px", color: "var(--green)",
+                    fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
+                  }}>{rooms[0].name}</div>
+                )}
+                <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr" }}>
                 {plants.map((p, i) => {
                   const s = getStatus(p, waterLog[p.id] || null);
                   const nick = nicknames[p.id];
@@ -3108,6 +3300,7 @@ useEffect(() => {
                   );
                 })}
               </GlassContainer>
+              </div>
             ) : (
               /* Multiple rooms — group plants under room tags */
               <div style={{ padding: "0 14px 32px", display: "flex", flexDirection: "column", gap: 6 }}>
@@ -3125,16 +3318,20 @@ useEffect(() => {
                   const sections = roomNames.map(rn => ({ name: rn, plants: grouped[rn] }));
                   if (grouped["_unassigned"].length > 0) sections.push({ name: "Unassigned", plants: grouped["_unassigned"] });
 
-                  return sections.map(section => (
+                  return sections.map(section => {
+                    const roomObj = section.name !== "Unassigned" ? rooms.find(r => r.name === section.name) : null;
+                    return (
                     <div key={section.name} style={{ marginBottom: 10 }}>
                       {/* Room tag header */}
-                      <div style={{
+                      <div onClick={roomObj ? () => setEditRoomData(roomObj) : undefined} style={{
                         display: "inline-block", padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
                         background: section.name === "Unassigned" ? "rgba(255,255,255,0.06)" : "rgba(74,222,128,0.12)",
                         border: `1px solid ${section.name === "Unassigned" ? "rgba(255,255,255,0.12)" : "rgba(74,222,128,0.25)"}`,
                         fontSize: 11, letterSpacing: "0.8px",
                         color: section.name === "Unassigned" ? "rgba(255,255,255,0.45)" : "var(--green)",
                         fontFamily: "'DM Sans', sans-serif",
+                        cursor: roomObj ? "pointer" : "default",
+                        transition: "background 0.15s",
                       }}>{section.name}</div>
 
                       {section.plants.length === 0 ? (
@@ -3177,7 +3374,7 @@ useEffect(() => {
                         </GlassContainer>
                       )}
                     </div>
-                  ));
+                  ); });
                 })()}
               </div>
             )}
@@ -3392,6 +3589,15 @@ useEffect(() => {
           <AddRoomModal
             onSave={addRoom}
             onClose={() => setAddRoomOpen(false)}
+          />
+        )}
+
+        {editRoomData && (
+          <EditRoomModal
+            room={editRoomData}
+            onSave={updateRoom}
+            onDelete={deleteRoom}
+            onClose={() => setEditRoomData(null)}
           />
         )}
 
