@@ -404,6 +404,109 @@ const css = `
     background: radial-gradient(ellipse at 70% 15%, rgba(160,255,100,0.12) 0%, transparent 60%);
     pointer-events: none; z-index: 1;
   }
+
+  /* ─── ONBOARDING ────────────────────────────────────────────── */
+  .ob-screen {
+    min-height: 100vh; display: flex; flex-direction: column;
+    padding: 0 24px; justify-content: center;
+  }
+  .ob-step-indicator { display: flex; gap: 6px; margin-bottom: 32px; }
+  .ob-step-dot {
+    height: 3px; flex: 1; border-radius: 2px;
+    background: rgba(255,255,255,0.15); transition: background 0.3s;
+  }
+  .ob-step-dot.done { background: var(--green); }
+  .ob-step-dot.active { background: rgba(74,222,128,0.5); }
+  .ob-tag { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); margin-bottom: 10px; }
+  .ob-title { font-size: 28px; font-weight: 600; color: #fff; line-height: 1.15; margin-bottom: 8px; }
+  .ob-subtitle { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 28px; font-weight: 300; }
+  .ob-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 14px; padding: 14px 16px; font-size: 15px;
+    color: #fff; font-family: 'DM Sans', sans-serif; outline: none;
+    transition: border-color 0.2s;
+  }
+  .ob-input:focus { border-color: rgba(74,222,128,0.5); }
+  .ob-input::placeholder { color: rgba(255,255,255,0.25); }
+  .ob-error { font-size: 12px; color: var(--warn); margin-top: 8px; }
+  .ob-btn {
+    width: 100%; padding: 15px; margin-top: 24px;
+    background: rgba(100,220,80,0.22);
+    backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
+    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
+    border: 1px solid rgba(150,255,100,0.40);
+    border-top-color: rgba(200,255,160,0.70);
+    border-bottom-color: rgba(40,120,20,0.20);
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
+    color: #d4ffb0; font-size: 14px; font-family: 'DM Sans', sans-serif;
+    font-weight: 500; letter-spacing: 0.5px; cursor: pointer;
+    transition: all 0.22s ease; position: relative; overflow: hidden;
+  }
+  .ob-btn:disabled { opacity: 0.35; cursor: default; }
+  .ob-btn:not(:disabled):hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); }
+  .ob-btn:not(:disabled):active { transform: scale(0.98); }
+  .ob-loc-card {
+    padding: 16px 18px; border-radius: 16px; cursor: pointer;
+    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15);
+    transition: all 0.18s; display: flex; align-items: center; gap: 12px;
+  }
+  .ob-loc-card.selected {
+    background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.45);
+    box-shadow: 0 0 16px rgba(74,222,128,0.15);
+  }
+  .ob-loc-icon { font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: rgba(255,255,255,0.06); }
+  .ob-loc-label { font-size: 15px; font-weight: 500; color: var(--text); }
+  .ob-loc-check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2); margin-left: auto; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; }
+  .ob-loc-check.on { background: var(--green); border-color: var(--green); color: #0a1a0a; }
+  .ob-size-card {
+    flex: 1; padding: 14px 8px; border-radius: 14px; cursor: pointer; text-align: center;
+    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15);
+    transition: all 0.18s;
+  }
+  .ob-size-card.selected { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.45); }
+  .ob-size-label { font-size: 13px; color: var(--text); font-weight: 500; }
+  .ob-size-hint { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .ob-toggle {
+    display: flex; border-radius: 12px; overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06);
+  }
+  .ob-toggle button {
+    flex: 1; padding: 10px 0; border: none; background: transparent;
+    color: rgba(255,255,255,0.5); font-size: 13px; font-family: 'DM Sans', sans-serif;
+    cursor: pointer; transition: all 0.18s; font-weight: 500;
+  }
+  .ob-toggle button.active {
+    background: rgba(74,222,128,0.18); color: var(--green);
+  }
+  .ob-compass-ring {
+    width: 220px; height: 220px; border-radius: 50%; margin: 0 auto;
+    border: 2px solid rgba(255,255,255,0.15); position: relative;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(255,255,255,0.04);
+  }
+  .ob-compass-dir {
+    position: absolute; font-size: 11px; color: rgba(255,255,255,0.4);
+    font-weight: 500; letter-spacing: 1px; cursor: pointer;
+    padding: 6px 10px; border-radius: 20px; transition: all 0.15s;
+    user-select: none;
+  }
+  .ob-compass-dir:hover { background: rgba(255,255,255,0.08); }
+  .ob-compass-dir.selected { color: var(--green); background: rgba(74,222,128,0.15); }
+  .ob-compass-center {
+    font-size: 13px; color: rgba(255,255,255,0.5); text-align: center; line-height: 1.5;
+  }
+  .ob-select {
+    width: 100%; box-sizing: border-box;
+    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.20);
+    border-radius: 14px; padding: 14px 16px; font-size: 15px;
+    color: #fff; font-family: 'DM Sans', sans-serif; outline: none;
+    appearance: none; -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 16px center;
+  }
+  .ob-select option { background: #0f1a0f; color: #fff; }
 `;
 
 // ── Air Quality ────────────────────────────────────────────────────────────
@@ -1629,10 +1732,427 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
   );
 }
 
+// ── Postal code validation ────────────────────────────────────────────────
+const POSTAL_RULES = {
+  US: { pattern: /^\d{5}$/, hint: "5 digits (e.g. 90210)" },
+  GB: { pattern: /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, hint: "e.g. SW1A 1AA" },
+  DE: { pattern: /^\d{5}$/, hint: "5 digits" },
+  FR: { pattern: /^\d{5}$/, hint: "5 digits" },
+  MD: { pattern: /^(MD-?)?\d{4}$/, hint: "4 digits (e.g. 2001)" },
+  CA: { pattern: /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i, hint: "e.g. K1A 0B1" },
+};
+
+function validatePostal(code, countryCode) {
+  if (!code || code.trim().length < 2) return false;
+  const rule = POSTAL_RULES[countryCode];
+  if (rule) return rule.pattern.test(code.trim());
+  return code.trim().length >= 2 && code.trim().length <= 10;
+}
+
+function getPostalHint(countryCode) {
+  return POSTAL_RULES[countryCode]?.hint || "2-10 characters";
+}
+
+// ── Country list (ISO 3166-1) ─────────────────────────────────────────────
+const COUNTRIES = [
+  { code: "AF", name: "Afghanistan" }, { code: "AL", name: "Albania" }, { code: "DZ", name: "Algeria" },
+  { code: "AR", name: "Argentina" }, { code: "AM", name: "Armenia" }, { code: "AU", name: "Australia" },
+  { code: "AT", name: "Austria" }, { code: "AZ", name: "Azerbaijan" }, { code: "BD", name: "Bangladesh" },
+  { code: "BY", name: "Belarus" }, { code: "BE", name: "Belgium" }, { code: "BA", name: "Bosnia and Herzegovina" },
+  { code: "BR", name: "Brazil" }, { code: "BG", name: "Bulgaria" }, { code: "CA", name: "Canada" },
+  { code: "CL", name: "Chile" }, { code: "CN", name: "China" }, { code: "CO", name: "Colombia" },
+  { code: "HR", name: "Croatia" }, { code: "CZ", name: "Czech Republic" }, { code: "DK", name: "Denmark" },
+  { code: "EC", name: "Ecuador" }, { code: "EG", name: "Egypt" }, { code: "EE", name: "Estonia" },
+  { code: "FI", name: "Finland" }, { code: "FR", name: "France" }, { code: "GE", name: "Georgia" },
+  { code: "DE", name: "Germany" }, { code: "GR", name: "Greece" }, { code: "HU", name: "Hungary" },
+  { code: "IS", name: "Iceland" }, { code: "IN", name: "India" }, { code: "ID", name: "Indonesia" },
+  { code: "IE", name: "Ireland" }, { code: "IL", name: "Israel" }, { code: "IT", name: "Italy" },
+  { code: "JP", name: "Japan" }, { code: "KZ", name: "Kazakhstan" }, { code: "KE", name: "Kenya" },
+  { code: "KR", name: "South Korea" }, { code: "LV", name: "Latvia" }, { code: "LT", name: "Lithuania" },
+  { code: "LU", name: "Luxembourg" }, { code: "MY", name: "Malaysia" }, { code: "MX", name: "Mexico" },
+  { code: "MD", name: "Moldova" }, { code: "ME", name: "Montenegro" }, { code: "MA", name: "Morocco" },
+  { code: "NL", name: "Netherlands" }, { code: "NZ", name: "New Zealand" }, { code: "NG", name: "Nigeria" },
+  { code: "MK", name: "North Macedonia" }, { code: "NO", name: "Norway" }, { code: "PK", name: "Pakistan" },
+  { code: "PE", name: "Peru" }, { code: "PH", name: "Philippines" }, { code: "PL", name: "Poland" },
+  { code: "PT", name: "Portugal" }, { code: "RO", name: "Romania" }, { code: "RU", name: "Russia" },
+  { code: "RS", name: "Serbia" }, { code: "SG", name: "Singapore" }, { code: "SK", name: "Slovakia" },
+  { code: "SI", name: "Slovenia" }, { code: "ZA", name: "South Africa" }, { code: "ES", name: "Spain" },
+  { code: "SE", name: "Sweden" }, { code: "CH", name: "Switzerland" }, { code: "TW", name: "Taiwan" },
+  { code: "TH", name: "Thailand" }, { code: "TR", name: "Turkey" }, { code: "UA", name: "Ukraine" },
+  { code: "AE", name: "United Arab Emirates" }, { code: "GB", name: "United Kingdom" },
+  { code: "US", name: "United States" }, { code: "UY", name: "Uruguay" }, { code: "UZ", name: "Uzbekistan" },
+  { code: "VN", name: "Vietnam" },
+];
+
+// ── Onboarding Flow ───────────────────────────────────────────────────────
+const TOTAL_STEPS = 4; // name, location, postal, room (room only if in-house)
+
+function OnboardingFlow({ user, onComplete }) {
+  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
+
+  // Step 1: Name
+  const [displayName, setDisplayName] = useState("");
+  // Step 2: Location types
+  const [locationTypes, setLocationTypes] = useState([]);
+  // Step 3: Country + Postal
+  const [country, setCountry] = useState("");
+  const [postalCode, setPostalCode] = useState("");
+  const [postalError, setPostalError] = useState("");
+  // Step 4: Room creation (only if in-house)
+  const [roomName, setRoomName] = useState("");
+  const [roomSize, setRoomSize] = useState("");
+  const [tempUnit, setTempUnit] = useState("C");
+  const [roomTemp, setRoomTemp] = useState("");
+  const [hasWindows, setHasWindows] = useState(true);
+  const [windowDir, setWindowDir] = useState("");
+  const [compassMode, setCompassMode] = useState("manual"); // "live" | "manual"
+  const [compassHeading, setCompassHeading] = useState(null);
+  const [compassAvailable, setCompassAvailable] = useState(false);
+
+  const needsRoom = locationTypes.includes("in-house");
+  const totalSteps = needsRoom ? 4 : 3;
+
+  // Compass setup
+  useEffect(() => {
+    if (step !== 4 || !hasWindows) return;
+    let handler = null;
+
+    async function tryCompass() {
+      // iOS requires permission
+      if (typeof DeviceOrientationEvent !== "undefined" && typeof DeviceOrientationEvent.requestPermission === "function") {
+        try {
+          const perm = await DeviceOrientationEvent.requestPermission();
+          if (perm !== "granted") { setCompassMode("manual"); return; }
+        } catch { setCompassMode("manual"); return; }
+      }
+      handler = (e) => {
+        const heading = e.webkitCompassHeading ?? (e.alpha != null ? (360 - e.alpha) % 360 : null);
+        if (heading != null) {
+          setCompassHeading(heading);
+          setCompassAvailable(true);
+          setCompassMode("live");
+        }
+      };
+      window.addEventListener("deviceorientation", handler, true);
+      // Fallback if no data in 2s
+      setTimeout(() => {
+        if (!compassAvailable) setCompassMode("manual");
+      }, 2000);
+    }
+    tryCompass();
+    return () => { if (handler) window.removeEventListener("deviceorientation", handler, true); };
+  }, [step, hasWindows]);
+
+  function headingToDirection(deg) {
+    const dirs = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+    const idx = Math.round(deg / 45) % 8;
+    return dirs[idx];
+  }
+
+  function setCompassDirection() {
+    if (compassHeading != null) {
+      setWindowDir(headingToDirection(compassHeading));
+    }
+  }
+
+  async function handleComplete() {
+    setSaving(true);
+    const profile = {
+      user_id: user.id,
+      display_name: displayName.trim(),
+      location_types: locationTypes,
+      country,
+      postal_code: postalCode.trim(),
+      temp_unit: tempUnit,
+      room_name: needsRoom ? roomName.trim() : null,
+      room_size: needsRoom ? roomSize : null,
+      room_temperature: needsRoom && roomTemp ? parseFloat(roomTemp) : null,
+      has_windows: needsRoom ? hasWindows : null,
+      window_direction: needsRoom && hasWindows ? windowDir : null,
+      onboarding_complete: true,
+      onboarding_step: totalSteps,
+    };
+    await supabase.from("user_profiles").upsert(profile, { onConflict: "user_id" });
+    setSaving(false);
+    onComplete(profile);
+  }
+
+  async function saveProgress(nextStep) {
+    // Fire and forget — save partial progress
+    const partial = {
+      user_id: user.id,
+      onboarding_step: step,
+      onboarding_complete: false,
+    };
+    if (step >= 1) partial.display_name = displayName.trim();
+    if (step >= 2) partial.location_types = locationTypes;
+    if (step >= 3) { partial.country = country; partial.postal_code = postalCode.trim(); }
+    await supabase.from("user_profiles").upsert(partial, { onConflict: "user_id" });
+    setStep(nextStep);
+  }
+
+  const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  const DIR_POSITIONS = {
+    N:  { top: 4, left: "50%", transform: "translateX(-50%)" },
+    NE: { top: 28, right: 16 },
+    E:  { top: "50%", right: 0, transform: "translateY(-50%)" },
+    SE: { bottom: 28, right: 16 },
+    S:  { bottom: 4, left: "50%", transform: "translateX(-50%)" },
+    SW: { bottom: 28, left: 16 },
+    W:  { top: "50%", left: 0, transform: "translateY(-50%)" },
+    NW: { top: 28, left: 16 },
+  };
+
+  return (
+    <div className="fade-up">
+      {/* Step indicator */}
+      <div style={{ padding: "20px 24px 0" }}>
+        <div className="ob-step-indicator">
+          {Array.from({ length: totalSteps }).map((_, i) => (
+            <div key={i} className={`ob-step-dot${i + 1 < step ? " done" : i + 1 === step ? " active" : ""}`} />
+          ))}
+        </div>
+      </div>
+
+      {/* ── Step 1: Name ── */}
+      {step === 1 && (
+        <div className="ob-screen">
+          <div className="ob-tag">Welcome</div>
+          <div className="ob-title">What should we call you?</div>
+          <div className="ob-subtitle">This helps us personalize your experience.</div>
+          <input
+            className="ob-input"
+            placeholder="Your name"
+            value={displayName}
+            onChange={e => setDisplayName(e.target.value.slice(0, 50))}
+            autoFocus
+            onKeyDown={e => e.key === "Enter" && displayName.trim().length >= 2 && saveProgress(2)}
+          />
+          {displayName.length > 0 && displayName.trim().length < 2 && (
+            <div className="ob-error">At least 2 characters</div>
+          )}
+          <button className="ob-btn" disabled={displayName.trim().length < 2} onClick={() => saveProgress(2)}>
+            Continue
+          </button>
+        </div>
+      )}
+
+      {/* ── Step 2: Location types ── */}
+      {step === 2 && (
+        <div className="ob-screen">
+          <div className="ob-tag">Your plants</div>
+          <div className="ob-title">Where do you keep your plants?</div>
+          <div className="ob-subtitle">Select all that apply.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {[
+              { id: "in-house", label: "In-house", icon: "⌂" },
+              { id: "balcony", label: "Balcony", icon: "☐" },
+              { id: "garden", label: "Garden", icon: "✿" },
+            ].map(loc => {
+              const selected = locationTypes.includes(loc.id);
+              return (
+                <div key={loc.id} className={`ob-loc-card${selected ? " selected" : ""}`}
+                  onClick={() => setLocationTypes(prev =>
+                    selected ? prev.filter(t => t !== loc.id) : [...prev, loc.id]
+                  )}>
+                  <div className="ob-loc-icon">{loc.icon}</div>
+                  <div className="ob-loc-label">{loc.label}</div>
+                  <div className={`ob-loc-check${selected ? " on" : ""}`}>{selected ? "✓" : ""}</div>
+                </div>
+              );
+            })}
+          </div>
+          <button className="ob-btn" disabled={locationTypes.length === 0} onClick={() => saveProgress(3)}>
+            Continue
+          </button>
+        </div>
+      )}
+
+      {/* ── Step 3: Country + Postal Code ── */}
+      {step === 3 && (
+        <div className="ob-screen">
+          <div className="ob-tag">Location</div>
+          <div className="ob-title">Where are you located?</div>
+          <div className="ob-subtitle">We use this to understand your local weather and light conditions. We never see your exact address.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <select
+              className="ob-select"
+              value={country}
+              onChange={e => { setCountry(e.target.value); setPostalCode(""); setPostalError(""); }}
+            >
+              <option value="">Select country</option>
+              {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
+            </select>
+            {country && (
+              <>
+                <input
+                  className="ob-input"
+                  placeholder={`Postal code (${getPostalHint(country)})`}
+                  value={postalCode}
+                  onChange={e => { setPostalCode(e.target.value.slice(0, 10)); setPostalError(""); }}
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      if (!validatePostal(postalCode, country)) {
+                        setPostalError(`Invalid format. Expected: ${getPostalHint(country)}`);
+                      } else {
+                        needsRoom ? saveProgress(4) : handleComplete();
+                      }
+                    }
+                  }}
+                />
+                {postalError && <div className="ob-error">{postalError}</div>}
+              </>
+            )}
+          </div>
+          <button className="ob-btn" disabled={!country || !postalCode.trim()} onClick={() => {
+            if (!validatePostal(postalCode, country)) {
+              setPostalError(`Invalid format. Expected: ${getPostalHint(country)}`);
+              return;
+            }
+            if (needsRoom) saveProgress(4);
+            else handleComplete();
+          }}>
+            {saving ? "Saving..." : needsRoom ? "Continue" : "Complete setup"}
+          </button>
+        </div>
+      )}
+
+      {/* ── Step 4: Create Room ── */}
+      {step === 4 && needsRoom && (
+        <div className="ob-screen" style={{ justifyContent: "flex-start", paddingTop: 20, paddingBottom: 40, overflowY: "auto" }}>
+          <div className="ob-tag">Your first room</div>
+          <div className="ob-title">Set up where your plants live</div>
+          <div className="ob-subtitle">This helps us give accurate light and care advice.</div>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+            {/* Room name */}
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Room name</div>
+              <input className="ob-input" placeholder="e.g. Living Room, Bedroom" value={roomName} onChange={e => setRoomName(e.target.value.slice(0, 40))} />
+            </div>
+
+            {/* Room size */}
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Room size</div>
+              <div style={{ display: "flex", gap: 8 }}>
+                {["Small", "Medium", "Large"].map(s => (
+                  <div key={s} className={`ob-size-card${roomSize === s ? " selected" : ""}`} onClick={() => setRoomSize(s)}>
+                    <div className="ob-size-label">{s}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Temperature + unit toggle */}
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Average temperature</div>
+              <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                <input
+                  className="ob-input"
+                  style={{ flex: 1 }}
+                  type="text" inputMode="decimal"
+                  placeholder={tempUnit === "C" ? "e.g. 22" : "e.g. 72"}
+                  value={roomTemp}
+                  onChange={e => setRoomTemp(e.target.value.replace(/[^0-9.]/g, ""))}
+                />
+                <div className="ob-toggle" style={{ width: 100, flexShrink: 0 }}>
+                  <button className={tempUnit === "C" ? "active" : ""} onClick={() => setTempUnit("C")}>°C</button>
+                  <button className={tempUnit === "F" ? "active" : ""} onClick={() => setTempUnit("F")}>°F</button>
+                </div>
+              </div>
+              {roomTemp && (() => {
+                const v = parseFloat(roomTemp);
+                const min = tempUnit === "C" ? 5 : 41;
+                const max = tempUnit === "C" ? 40 : 104;
+                if (v < min || v > max) return <div style={{ fontSize: 11, color: "rgba(212,147,90,0.8)", marginTop: 6 }}>That seems unusual — are you sure?</div>;
+                return null;
+              })()}
+            </div>
+
+            {/* Windows */}
+            <div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Does the room have windows?</div>
+              <div className="ob-toggle" style={{ width: 160 }}>
+                <button className={hasWindows ? "active" : ""} onClick={() => setHasWindows(true)}>Yes</button>
+                <button className={!hasWindows ? "active" : ""} onClick={() => { setHasWindows(false); setWindowDir(""); }}>No</button>
+              </div>
+            </div>
+
+            {/* Window direction */}
+            {hasWindows && (
+              <div>
+                <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Window direction</div>
+                {compassMode === "live" && compassHeading != null ? (
+                  <div style={{ textAlign: "center" }}>
+                    <div className="ob-compass-ring">
+                      {DIRECTIONS.map(d => (
+                        <div key={d} className={`ob-compass-dir${windowDir === d ? " selected" : ""}`} style={{ ...DIR_POSITIONS[d], position: "absolute" }}>
+                          {d}
+                        </div>
+                      ))}
+                      <div className="ob-compass-center">
+                        <div style={{ fontSize: 28, fontWeight: 300, color: "var(--green)" }}>{Math.round(compassHeading)}°</div>
+                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{headingToDirection(compassHeading)}</div>
+                      </div>
+                    </div>
+                    {!windowDir ? (
+                      <button className="ob-btn" style={{ marginTop: 14, maxWidth: 220, marginLeft: "auto", marginRight: "auto" }} onClick={setCompassDirection}>
+                        Set direction
+                      </button>
+                    ) : (
+                      <div style={{ marginTop: 14, fontSize: 14, color: "var(--green)", fontWeight: 500 }}>
+                        {windowDir}-facing window
+                        <span onClick={() => setWindowDir("")} style={{ marginLeft: 10, fontSize: 12, color: "rgba(255,255,255,0.4)", cursor: "pointer", textDecoration: "underline" }}>redo</span>
+                      </div>
+                    )}
+                    <div onClick={() => setCompassMode("manual")} style={{ marginTop: 10, fontSize: 11, color: "rgba(255,255,255,0.35)", cursor: "pointer", textDecoration: "underline" }}>
+                      Pick manually instead
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className="ob-compass-ring">
+                      {DIRECTIONS.map(d => (
+                        <div key={d}
+                          className={`ob-compass-dir${windowDir === d ? " selected" : ""}`}
+                          style={{ ...DIR_POSITIONS[d], position: "absolute" }}
+                          onClick={() => setWindowDir(d)}>
+                          {d}
+                        </div>
+                      ))}
+                      <div className="ob-compass-center">
+                        {windowDir ? (
+                          <div style={{ fontSize: 16, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div>
+                        ) : (
+                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>Tap a direction</div>
+                        )}
+                      </div>
+                    </div>
+                    {windowDir && (
+                      <div style={{ textAlign: "center", marginTop: 10, fontSize: 13, color: "var(--green)", fontWeight: 500 }}>
+                        {windowDir}-facing window
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          <button className="ob-btn" disabled={
+            saving || roomName.trim().length < 2 || !roomSize || !roomTemp || (hasWindows && !windowDir)
+          } onClick={handleComplete}>
+            {saving ? "Creating room..." : "Create room"}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+
 // ── App ────────────────────────────────────────────────────────────────────
-
-
-// ── Add Plant Modal ────────────────────────────────────────────────────────
 // ── AddPlantModal — choice screen ─────────────────────────────────────────
 function AddPlantModal({ onSave, onClose, scanButton }) {
   const [mode, setMode] = useState(null); // null | "manual"
@@ -1925,6 +2445,8 @@ export default function App() {
   const [plantSettings, setPlantSettings] = useState({}); // keyed by plant.id
   const [editDateModal, setEditDateModal] = useState(null); // { type: "water"|"fertilize", plantId, currentDate }
   const [dbLoading, setDbLoading] = useState(true);
+  const [onboardingDone, setOnboardingDone] = useState(null); // null=unknown, true/false
+  const [userProfile, setUserProfile] = useState(null);
   const touchX = useRef(null);
 
 // ── Auth state ───────────────────────────────────────────────────────────
@@ -1974,9 +2496,24 @@ useEffect(() => {
 
   const loadedRef = useRef(false);
 
-  // ── Load from Supabase ───────────────────────────────────────────────────
+  // ── Check onboarding status ─────────────────────────────────────────────
   useEffect(() => {
-    if (!user || loadedRef.current) return;
+    if (!user) return;
+    supabase.from("user_profiles").select("*").eq("user_id", user.id).maybeSingle()
+      .then(({ data }) => {
+        if (data?.onboarding_complete) {
+          setOnboardingDone(true);
+          setUserProfile(data);
+        } else {
+          setOnboardingDone(false);
+          setDbLoading(false); // no data to load yet
+        }
+      });
+  }, [user]);
+
+  // ── Load from Supabase (only after onboarding is done) ──────────────────
+  useEffect(() => {
+    if (!user || !onboardingDone || loadedRef.current) return;
     loadedRef.current = true;
     async function loadAll() {
       try {
@@ -2041,7 +2578,7 @@ useEffect(() => {
       setDbLoading(false);
     }
     loadAll();
-  }, [user]);
+  }, [user, onboardingDone]);
 
   // ── Derived values ───────────────────────────────────────────────────────
   const plant = plants[idx] || null;
@@ -2196,7 +2733,9 @@ useEffect(() => {
   async function signOut() {
     await supabase.auth.signOut();
     setWaterLog({}); setFertilizeLog({}); setDismissedWarnings({});
-    setNicknames({}); setGardenLog([]); setPlantPhotos({}); setPlants([]); setPlants([]);
+    setNicknames({}); setGardenLog([]); setPlantPhotos({}); setPlants([]);
+    setOnboardingDone(null); setUserProfile(null);
+    loadedRef.current = false;
     setScreen("overview");
   }
 
@@ -2258,6 +2797,22 @@ useEffect(() => {
         {!authLoading && user && (
           <>
 
+        {/* ── ONBOARDING GATE ── */}
+        {onboardingDone === null && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
+            <div style={{ fontSize: 32, marginBottom: 4 }}>🌿</div>
+            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", letterSpacing: 0.5 }}>Loading...</div>
+          </div>
+        )}
+
+        {onboardingDone === false && (
+          <OnboardingFlow user={user} onComplete={(profile) => {
+            setUserProfile(profile);
+            setOnboardingDone(true);
+          }} />
+        )}
+
+        {onboardingDone === true && (<>
 
         {dbLoading ? (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
@@ -2762,6 +3317,7 @@ useEffect(() => {
         )}
         </>
         )}
+        </>)}
         </>
         )}
       </div>
