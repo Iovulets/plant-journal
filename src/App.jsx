@@ -523,6 +523,88 @@ const WMO_CONDITIONS = {
   95: "Thunderstorm", 96: "Thunderstorm + hail", 99: "Thunderstorm + heavy hail",
 };
 
+function WeatherIcon({ code, isDay, size = 28 }) {
+  // Map WMO codes to icon type
+  let type = "sunny";
+  if ([0, 1].includes(code)) type = isDay ? "sunny" : "night";
+  else if ([2].includes(code)) type = isDay ? "partly-cloudy" : "partly-cloudy-night";
+  else if ([3, 45, 48].includes(code)) type = "cloudy";
+  else if ([51, 53, 55, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)) type = "rainy";
+  else if ([71, 73, 75, 77, 85, 86].includes(code)) type = "snowy";
+  else if ([95, 96, 99].includes(code)) type = "stormy";
+
+  const s = size;
+  const icons = {
+    sunny: (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <circle cx="16" cy="16" r="6" fill="#FFD93D" />
+        <g stroke="#FFD93D" strokeWidth="2" strokeLinecap="round">
+          <line x1="16" y1="2" x2="16" y2="6" /><line x1="16" y1="26" x2="16" y2="30" />
+          <line x1="2" y1="16" x2="6" y2="16" /><line x1="26" y1="16" x2="30" y2="16" />
+          <line x1="6.1" y1="6.1" x2="8.9" y2="8.9" /><line x1="23.1" y1="23.1" x2="25.9" y2="25.9" />
+          <line x1="6.1" y1="25.9" x2="8.9" y2="23.1" /><line x1="23.1" y1="8.9" x2="25.9" y2="6.1" />
+        </g>
+      </svg>
+    ),
+    night: (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <path d="M22 16a10 10 0 01-10-10C12 4 14.5 2.5 16 2a12 12 0 100 28c1.5-.5 4-2 4-4a10 10 0 01-8-10z" fill="#C8D8F0" opacity="0.9" />
+        <circle cx="23" cy="8" r="1" fill="#E8E8FF" opacity="0.6" />
+        <circle cx="27" cy="12" r="0.7" fill="#E8E8FF" opacity="0.4" />
+      </svg>
+    ),
+    "partly-cloudy": (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <circle cx="12" cy="12" r="5" fill="#FFD93D" />
+        <g stroke="#FFD93D" strokeWidth="1.5" strokeLinecap="round">
+          <line x1="12" y1="3" x2="12" y2="5.5" /><line x1="12" y1="18.5" x2="12" y2="21" />
+          <line x1="3" y1="12" x2="5.5" y2="12" /><line x1="18.5" y1="12" x2="21" y2="12" />
+        </g>
+        <path d="M10 20a6 6 0 0112 0H10z" fill="rgba(255,255,255,0.7)" />
+        <ellipse cx="16" cy="20" rx="10" ry="5" fill="rgba(255,255,255,0.55)" />
+      </svg>
+    ),
+    "partly-cloudy-night": (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <path d="M14 10a6 6 0 01-4-6c0-1 1-2 2-2.5a8 8 0 100 17c1-.3 2.5-1.3 2.5-2.5a6 6 0 01-4.5-6z" fill="#C8D8F0" opacity="0.7" />
+        <ellipse cx="18" cy="22" rx="10" ry="5" fill="rgba(255,255,255,0.55)" />
+      </svg>
+    ),
+    cloudy: (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="18" rx="11" ry="6" fill="rgba(255,255,255,0.45)" />
+        <ellipse cx="13" cy="14" rx="7" ry="5" fill="rgba(255,255,255,0.55)" />
+        <ellipse cx="20" cy="15" rx="6" ry="4.5" fill="rgba(255,255,255,0.5)" />
+      </svg>
+    ),
+    rainy: (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="14" rx="10" ry="5.5" fill="rgba(255,255,255,0.45)" />
+        <ellipse cx="13" cy="11" rx="6" ry="4" fill="rgba(255,255,255,0.5)" />
+        <g stroke="#8ab4c8" strokeWidth="1.5" strokeLinecap="round">
+          <line x1="10" y1="22" x2="9" y2="26" /><line x1="16" y1="22" x2="15" y2="27" /><line x1="22" y1="22" x2="21" y2="26" />
+        </g>
+      </svg>
+    ),
+    snowy: (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="14" rx="10" ry="5.5" fill="rgba(255,255,255,0.45)" />
+        <circle cx="10" cy="24" r="1.5" fill="rgba(255,255,255,0.6)" />
+        <circle cx="16" cy="26" r="1.5" fill="rgba(255,255,255,0.6)" />
+        <circle cx="22" cy="24" r="1.5" fill="rgba(255,255,255,0.6)" />
+      </svg>
+    ),
+    stormy: (
+      <svg width={s} height={s} viewBox="0 0 32 32" fill="none">
+        <ellipse cx="16" cy="12" rx="10" ry="5.5" fill="rgba(255,255,255,0.4)" />
+        <polygon points="15,18 18,18 14,28 17,22 14,22 17,15" fill="#FFD93D" opacity="0.9" />
+      </svg>
+    ),
+  };
+
+  return icons[type] || icons.cloudy;
+}
+
 function WeatherCard({ userProfile }) {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -533,7 +615,6 @@ function WeatherCard({ userProfile }) {
 
     async function fetchWeather() {
       try {
-        // Step 1: Geocode postal code → lat/lng
         const searchQuery = `${userProfile.postal_code} ${userProfile.country}`;
         const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchQuery)}&count=1&language=en`);
         const geoData = await geoRes.json();
@@ -544,17 +625,15 @@ function WeatherCard({ userProfile }) {
           lng = geoData.results[0].longitude;
           cityName = geoData.results[0].name;
         } else {
-          // Fallback: try just country name
           const COUNTRY_COORDS = { MD: { lat: 47.01, lng: 28.86, name: "Chisinau" } };
           const fallback = COUNTRY_COORDS[userProfile.country];
           if (fallback) { lat = fallback.lat; lng = fallback.lng; cityName = fallback.name; }
           else { setError("Location not found"); setLoading(false); return; }
         }
 
-        // Step 2: Fetch current weather
         const unit = userProfile.temp_unit === "F" ? "fahrenheit" : "celsius";
         const wxRes = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,weather_code&temperature_unit=${unit}&timezone=auto`
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,weather_code,is_day&temperature_unit=${unit}&timezone=auto`
         );
         const wxData = await wxRes.json();
         const current = wxData.current;
@@ -564,6 +643,8 @@ function WeatherCard({ userProfile }) {
           unit: userProfile.temp_unit === "F" ? "°F" : "°C",
           humidity: current.relative_humidity_2m,
           condition: WMO_CONDITIONS[current.weather_code] || "Unknown",
+          weatherCode: current.weather_code,
+          isDay: current.is_day === 1,
           city: cityName,
         });
       } catch (err) {
@@ -578,25 +659,33 @@ function WeatherCard({ userProfile }) {
 
   if (!userProfile?.postal_code || error || (!loading && !weather)) return null;
   if (loading) return (
-    <div style={{ margin: "14px 16px 0", padding: "16px 18px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Loading weather...</div>
+    <div style={{ padding: "16px 16px 0" }}>
+      <div style={{ padding: "14px 18px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
+        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Loading weather...</div>
+      </div>
     </div>
   );
 
   return (
-    <div style={{ margin: "14px 16px 0" }}>
-      <GlassCard borderRadius={20} style={{ padding: "16px 18px" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-            <div style={{ fontSize: 32, fontWeight: 300, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
-              <div style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 400 }}>{weather.condition}</div>
-              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.40)", letterSpacing: "0.5px" }}>{weather.city}</div>
-            </div>
+    <div style={{ padding: "16px 16px 0" }}>
+      <GlassCard borderRadius={20} style={{ padding: "14px 18px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          {/* Icon */}
+          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", width: 36, height: 36 }}>
+            <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={32} />
           </div>
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.40)", marginBottom: 3 }}>Humidity</div>
-            <div style={{ fontSize: 18, fontWeight: 300, color: "#8ab4c8", lineHeight: 1 }}>{weather.humidity}%</div>
+          {/* Temp + condition */}
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
+              <div style={{ fontSize: 26, fontWeight: 500, color: "#fff", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
+              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.75)", fontWeight: 400 }}>{weather.condition}</div>
+            </div>
+            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 3, letterSpacing: "0.5px" }}>{weather.city}</div>
+          </div>
+          {/* Humidity */}
+          <div style={{ flexShrink: 0, textAlign: "right" }}>
+            <div style={{ fontSize: 20, fontWeight: 400, color: "#fff", lineHeight: 1 }}>{weather.humidity}%</div>
+            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 3, letterSpacing: "1px", textTransform: "uppercase" }}>Humidity</div>
           </div>
         </div>
       </GlassCard>
@@ -3278,6 +3367,7 @@ useEffect(() => {
         {/* ── OVERVIEW ── */}
         {screen === "overview" && (
           <div className="fade-up">
+            <WeatherCard userProfile={userProfile} />
             <GlassContainer gap={10} style={{ padding: "16px 16px 0", gridAutoRows: "130px" }}>
               <GlassCard borderRadius={20} variant="interactive" style={{ height: 130 }}>
                 <div className="stat"><div className="stat-n">{plants.length}</div><div className="stat-l">Total plants</div></div>
@@ -3329,8 +3419,6 @@ useEffect(() => {
                 </div>
               </GlassCard>
             </GlassContainer>
-
-            <WeatherCard userProfile={userProfile} />
 
             <div style={{ padding: "20px 24px 0", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <div className="ov-heading">My little <em>garden</em></div>
