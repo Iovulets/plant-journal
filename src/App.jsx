@@ -1428,23 +1428,20 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
           </div>
 
           {/* Room — only visible when location is in-door */}
-          {location === "in-door" && (
+          {location === "in-door" && rooms.length > 0 && (
             <div style={sectionStyle}>
               <label style={labelStyle}>Room</label>
-              {rooms.length > 0 && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
-                  {rooms.map(r => (
-                    <button key={r.id} onClick={() => setRoom(r.name)} style={{
-                      padding: "7px 13px", borderRadius: 20, border: "1px solid",
-                      borderColor: room === r.name ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
-                      background: room === r.name ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                      color: room === r.name ? "var(--green)" : "rgba(255,255,255,0.6)",
-                      fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
-                    }}>{r.name}</button>
-                  ))}
-                </div>
-              )}
-              <input style={inputStyle} placeholder="e.g. Living room, bedroom…" value={room} onChange={e => setRoom(e.target.value)} />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                {rooms.map(r => (
+                  <button key={r.id} onClick={() => setRoom(r.name)} style={{
+                    padding: "7px 13px", borderRadius: 20, border: "1px solid",
+                    borderColor: room === r.name ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
+                    background: room === r.name ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
+                    color: room === r.name ? "var(--green)" : "rgba(255,255,255,0.6)",
+                    fontSize: 12, fontFamily: "'DM Sans', sans-serif", cursor: "pointer",
+                  }}>{r.name}</button>
+                ))}
+              </div>
             </div>
           )}
 
@@ -2195,6 +2192,124 @@ function OnboardingFlow({ user, onComplete }) {
 }
 
 
+// ── AddRoomModal ──────────────────────────────────────────────────────────
+function AddRoomModal({ onSave, onClose }) {
+  const [roomName, setRoomName] = useState("");
+  const [roomSize, setRoomSize] = useState("");
+  const [tempUnit, setTempUnit] = useState("C");
+  const [roomTemp, setRoomTemp] = useState("");
+  const [hasWindows, setHasWindows] = useState(true);
+  const [windowDir, setWindowDir] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
+  const DIR_POSITIONS = {
+    N:  { top: 4, left: "50%", transform: "translateX(-50%)" },
+    NE: { top: 28, right: 16 },
+    E:  { top: "50%", right: 0, transform: "translateY(-50%)" },
+    SE: { bottom: 28, right: 16 },
+    S:  { bottom: 4, left: "50%", transform: "translateX(-50%)" },
+    SW: { bottom: 28, left: 16 },
+    W:  { top: "50%", left: 0, transform: "translateY(-50%)" },
+    NW: { top: 28, left: 16 },
+  };
+
+  const valid = roomName.trim().length >= 2 && roomSize && roomTemp && (!hasWindows || windowDir);
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 210, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
+        <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>New room</div>
+            <div style={{ fontSize: 18, fontWeight: 500, color: "var(--text)" }}>Add a room</div>
+          </div>
+          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+        </div>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+          {/* Name */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room name</div>
+            <input className="ob-input" placeholder="e.g. Living Room, Bedroom" value={roomName} onChange={e => setRoomName(e.target.value.slice(0, 40))} autoFocus />
+          </div>
+
+          {/* Size */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room size</div>
+            <div style={{ display: "flex", gap: 8 }}>
+              {["Small", "Medium", "Large"].map(s => (
+                <div key={s} className={`ob-size-card${roomSize === s ? " selected" : ""}`} onClick={() => setRoomSize(s)}>
+                  <div className="ob-size-label">{s}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Temperature */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Average temperature</div>
+            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+              <input className="ob-input" style={{ flex: 1 }} type="text" inputMode="decimal" placeholder={tempUnit === "C" ? "e.g. 22" : "e.g. 72"} value={roomTemp} onChange={e => setRoomTemp(e.target.value.replace(/[^0-9.]/g, ""))} />
+              <div className="ob-toggle" style={{ width: 100, flexShrink: 0 }}>
+                <button className={tempUnit === "C" ? "active" : ""} onClick={() => setTempUnit("C")}>°C</button>
+                <button className={tempUnit === "F" ? "active" : ""} onClick={() => setTempUnit("F")}>°F</button>
+              </div>
+            </div>
+          </div>
+
+          {/* Windows */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Does the room have windows?</div>
+            <div className="ob-toggle" style={{ width: 160 }}>
+              <button className={hasWindows ? "active" : ""} onClick={() => setHasWindows(true)}>Yes</button>
+              <button className={!hasWindows ? "active" : ""} onClick={() => { setHasWindows(false); setWindowDir(""); }}>No</button>
+            </div>
+          </div>
+
+          {/* Direction */}
+          {hasWindows && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Window direction</div>
+              <div className="ob-compass-ring" style={{ width: 180, height: 180 }}>
+                {DIRECTIONS.map(d => (
+                  <div key={d} className={`ob-compass-dir${windowDir === d ? " selected" : ""}`} style={{ ...DIR_POSITIONS[d], position: "absolute" }} onClick={() => setWindowDir(d)}>{d}</div>
+                ))}
+                <div className="ob-compass-center">
+                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Tap</div>}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button disabled={!valid || saving} onClick={async () => {
+          setSaving(true);
+          await onSave({
+            name: roomName.trim(),
+            size: roomSize,
+            temperature: roomTemp ? parseFloat(roomTemp) : null,
+            has_windows: hasWindows,
+            window_direction: hasWindows ? windowDir : null,
+          });
+          setSaving(false);
+        }} style={{
+          width: "100%", padding: "14px", marginTop: 24,
+          background: valid ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
+          backdropFilter: "blur(20px)",
+          border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
+          borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
+          borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
+          fontSize: 14, fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
+          cursor: valid && !saving ? "pointer" : "default", letterSpacing: "0.3px",
+          opacity: saving ? 0.5 : 1,
+        }}>{saving ? "Creating..." : "Create room"}</button>
+      </div>
+    </div>
+  );
+}
+
+
 // ── App ────────────────────────────────────────────────────────────────────
 // ── AddPlantModal — choice screen ─────────────────────────────────────────
 function AddPlantModal({ onSave, onClose, scanButton }) {
@@ -2530,6 +2645,7 @@ useEffect(() => {
 
   const [plants, setPlants] = useState([]);
   const [addPlantOpen, setAddPlantOpen] = useState(false);
+  const [addRoomOpen, setAddRoomOpen] = useState(false);
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
   const [dismissedWarnings, setDismissedWarnings] = useState({});
@@ -2778,6 +2894,16 @@ useEffect(() => {
     return null;
   }
 
+  async function addRoom(roomData) {
+    const { data, error } = await supabase.from("rooms").insert({
+      ...roomData, user_id: user.id,
+    }).select().single();
+    if (!error && data) {
+      setRooms(prev => [...prev, { id: data.id, name: data.name, size: data.size, temperature: data.temperature, hasWindows: data.has_windows, windowDirection: data.window_direction }]);
+    }
+    setAddRoomOpen(false);
+  }
+
   async function signOut() {
     await supabase.auth.signOut();
     setWaterLog({}); setFertilizeLog({}); setDismissedWarnings({});
@@ -2945,7 +3071,8 @@ useEffect(() => {
                   No plants yet.<br />Tap + Add plant to start your garden.
                 </div>
               </div>
-            ) : (
+            ) : rooms.length <= 1 ? (
+              /* Single room or no rooms — flat list (current behavior) */
               <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr", padding: "0 14px 32px" }}>
                 {plants.map((p, i) => {
                   const s = getStatus(p, waterLog[p.id] || null);
@@ -2981,7 +3108,92 @@ useEffect(() => {
                   );
                 })}
               </GlassContainer>
+            ) : (
+              /* Multiple rooms — group plants under room tags */
+              <div style={{ padding: "0 14px 32px", display: "flex", flexDirection: "column", gap: 6 }}>
+                {(() => {
+                  const roomNames = rooms.map(r => r.name);
+                  const grouped = {};
+                  roomNames.forEach(rn => { grouped[rn] = []; });
+                  grouped["_unassigned"] = [];
+                  plants.forEach((p, i) => {
+                    const ps = plantSettings[p.id] || {};
+                    const rm = ps.room || "";
+                    if (rm && grouped[rm]) grouped[rm].push({ plant: p, idx: i });
+                    else grouped["_unassigned"].push({ plant: p, idx: i });
+                  });
+                  const sections = roomNames.map(rn => ({ name: rn, plants: grouped[rn] }));
+                  if (grouped["_unassigned"].length > 0) sections.push({ name: "Unassigned", plants: grouped["_unassigned"] });
+
+                  return sections.map(section => (
+                    <div key={section.name} style={{ marginBottom: 10 }}>
+                      {/* Room tag header */}
+                      <div style={{
+                        display: "inline-block", padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
+                        background: section.name === "Unassigned" ? "rgba(255,255,255,0.06)" : "rgba(74,222,128,0.12)",
+                        border: `1px solid ${section.name === "Unassigned" ? "rgba(255,255,255,0.12)" : "rgba(74,222,128,0.25)"}`,
+                        fontSize: 11, letterSpacing: "0.8px",
+                        color: section.name === "Unassigned" ? "rgba(255,255,255,0.45)" : "var(--green)",
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}>{section.name}</div>
+
+                      {section.plants.length === 0 ? (
+                        <div style={{ padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>No plants in this room</div>
+                      ) : (
+                        <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr" }}>
+                          {section.plants.map(({ plant: p, idx: i }) => {
+                            const s = getStatus(p, waterLog[p.id] || null);
+                            const nick = nicknames[p.id];
+                            const photos = plantPhotos[p.id] || [];
+                            const topPhoto = photos.length > 0 ? photos[photos.length - 1] : null;
+                            return (
+                              <GlassCard key={p.id} borderRadius={18} variant="interactive">
+                                <div className="prow" onClick={() => openDetail(i)}>
+                                  <div style={{ position: "relative", flexShrink: 0 }}>
+                                    <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
+                                      <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i % PIN_COLORS.length], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
+                                      <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
+                                    </div>
+                                    <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i % TILTS.length]}deg)` }}>
+                                      {topPhoto
+                                        ? <img src={topPhoto.dataUrl} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
+                                        : <div style={{ width: 44, height: 40, background: "rgba(74,222,128,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>+</div>
+                                      }
+                                    </div>
+                                  </div>
+                                  <div className="prow-info">
+                                    <div className="prow-name">{nick || p.name}</div>
+                                    <div className="prow-sub">{nick ? p.name : p.species}</div>
+                                  </div>
+                                  <div className="prow-right">
+                                    <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
+                                    <span className="slabel" style={{ color: "#ffffff" }}>{STATUS_LABEL[s]}</span>
+                                  </div>
+                                  <div className="parrow">›</div>
+                                </div>
+                              </GlassCard>
+                            );
+                          })}
+                        </GlassContainer>
+                      )}
+                    </div>
+                  ));
+                })()}
+              </div>
             )}
+
+            {/* Add new room button */}
+            <div style={{ padding: "0 22px 8px" }}>
+              <button onClick={() => setAddRoomOpen(true)} style={{
+                width: "100%", padding: "12px",
+                background: "transparent",
+                border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 16, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
+                color: "rgba(255,255,255,0.45)", cursor: "pointer",
+                letterSpacing: "0.3px", transition: "all 0.15s",
+              }}>+ Add new room</button>
+            </div>
+
             {plants.length > 0 && <AirQualitySlider plants={plants} />}
             <div style={{ padding: "24px 24px 40px", textAlign: "center" }}>
               <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'DM Sans', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>Sign out</button>
@@ -3173,6 +3385,13 @@ useEffect(() => {
                 )}
               />
             }
+          />
+        )}
+
+        {addRoomOpen && (
+          <AddRoomModal
+            onSave={addRoom}
+            onClose={() => setAddRoomOpen(false)}
           />
         )}
 
