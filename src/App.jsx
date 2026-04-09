@@ -509,6 +509,102 @@ const css = `
   .ob-select option { background: #0f1a0f; color: #fff; }
 `;
 
+// ── Weather Card ──────────────────────────────────────────────────────────
+
+const WMO_CONDITIONS = {
+  0: "Clear sky", 1: "Mostly clear", 2: "Partly cloudy", 3: "Overcast",
+  45: "Foggy", 48: "Rime fog",
+  51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
+  61: "Light rain", 63: "Rain", 65: "Heavy rain",
+  66: "Freezing rain", 67: "Heavy freezing rain",
+  71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains",
+  80: "Light showers", 81: "Showers", 82: "Heavy showers",
+  85: "Light snow showers", 86: "Snow showers",
+  95: "Thunderstorm", 96: "Thunderstorm + hail", 99: "Thunderstorm + heavy hail",
+};
+
+function WeatherCard({ userProfile }) {
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!userProfile?.postal_code || !userProfile?.country) { setLoading(false); return; }
+
+    async function fetchWeather() {
+      try {
+        // Step 1: Geocode postal code → lat/lng
+        const searchQuery = `${userProfile.postal_code} ${userProfile.country}`;
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchQuery)}&count=1&language=en`);
+        const geoData = await geoRes.json();
+
+        let lat, lng, cityName;
+        if (geoData.results && geoData.results.length > 0) {
+          lat = geoData.results[0].latitude;
+          lng = geoData.results[0].longitude;
+          cityName = geoData.results[0].name;
+        } else {
+          // Fallback: try just country name
+          const COUNTRY_COORDS = { MD: { lat: 47.01, lng: 28.86, name: "Chisinau" } };
+          const fallback = COUNTRY_COORDS[userProfile.country];
+          if (fallback) { lat = fallback.lat; lng = fallback.lng; cityName = fallback.name; }
+          else { setError("Location not found"); setLoading(false); return; }
+        }
+
+        // Step 2: Fetch current weather
+        const unit = userProfile.temp_unit === "F" ? "fahrenheit" : "celsius";
+        const wxRes = await fetch(
+          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,weather_code&temperature_unit=${unit}&timezone=auto`
+        );
+        const wxData = await wxRes.json();
+        const current = wxData.current;
+
+        setWeather({
+          temp: Math.round(current.temperature_2m),
+          unit: userProfile.temp_unit === "F" ? "°F" : "°C",
+          humidity: current.relative_humidity_2m,
+          condition: WMO_CONDITIONS[current.weather_code] || "Unknown",
+          city: cityName,
+        });
+      } catch (err) {
+        console.error("Weather fetch error:", err);
+        setError("Could not load weather");
+      }
+      setLoading(false);
+    }
+
+    fetchWeather();
+  }, [userProfile?.postal_code, userProfile?.country, userProfile?.temp_unit]);
+
+  if (!userProfile?.postal_code || error || (!loading && !weather)) return null;
+  if (loading) return (
+    <div style={{ margin: "14px 16px 0", padding: "16px 18px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
+      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Loading weather...</div>
+    </div>
+  );
+
+  return (
+    <div style={{ margin: "14px 16px 0" }}>
+      <GlassCard borderRadius={20} style={{ padding: "16px 18px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+            <div style={{ fontSize: 32, fontWeight: 300, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div style={{ fontSize: 12, color: "var(--text-2)", fontWeight: 400 }}>{weather.condition}</div>
+              <div style={{ fontSize: 10, color: "rgba(255,255,255,0.40)", letterSpacing: "0.5px" }}>{weather.city}</div>
+            </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.40)", marginBottom: 3 }}>Humidity</div>
+            <div style={{ fontSize: 18, fontWeight: 300, color: "#8ab4c8", lineHeight: 1 }}>{weather.humidity}%</div>
+          </div>
+        </div>
+      </GlassCard>
+    </div>
+  );
+}
+
+
 // ── Air Quality ────────────────────────────────────────────────────────────
 
 const AIR_CARDS = [
@@ -3233,6 +3329,8 @@ useEffect(() => {
                 </div>
               </GlassCard>
             </GlassContainer>
+
+            <WeatherCard userProfile={userProfile} />
 
             <div style={{ padding: "20px 24px 0", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <div className="ov-heading">My little <em>garden</em></div>
