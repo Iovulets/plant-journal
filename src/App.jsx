@@ -3488,15 +3488,24 @@ useEffect(() => {
             ) : rooms.length <= 1 ? (
               /* Single room or no rooms — flat list with room tag if room exists */
               <div style={{ padding: "0 14px 32px" }}>
-                {rooms.length === 1 && (
-                  <div onClick={() => setEditRoomData(rooms[0])} style={{
-                    display: "inline-flex", alignItems: "center", gap: 6,
-                    padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
-                    background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
-                    fontSize: 11, letterSpacing: "0.8px", color: "var(--green)",
+                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8, marginLeft: 2 }}>
+                  {rooms.length === 1 && (
+                    <div onClick={() => setEditRoomData(rooms[0])} style={{
+                      display: "inline-flex", alignItems: "center", gap: 6,
+                      padding: "5px 14px", borderRadius: 20,
+                      background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
+                      fontSize: 11, letterSpacing: "0.8px", color: "var(--green)",
+                      fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
+                    }}><span style={{ color: "rgba(255,255,255,0.45)" }}>Room:</span> {rooms[0].name} <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span></div>
+                  )}
+                  <div onClick={() => setAddRoomOpen(true)} style={{
+                    display: "inline-flex", alignItems: "center", gap: 4,
+                    padding: "5px 14px", borderRadius: 20,
+                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+                    fontSize: 11, letterSpacing: "0.8px", color: "rgba(255,255,255,0.4)",
                     fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
-                  }}><span style={{ color: "rgba(255,255,255,0.45)" }}>Room:</span> {rooms[0].name} <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span></div>
-                )}
+                  }}>+ Create room</div>
+                </div>
                 <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr" }}>
                 {plants.map((p, i) => {
                   const s = getStatus(p, waterLog[p.id] || null);
@@ -3609,20 +3618,17 @@ useEffect(() => {
                     </div>
                   ); });
                 })()}
+                <div onClick={() => setAddRoomOpen(true)} style={{
+                  display: "inline-flex", alignItems: "center", gap: 4,
+                  padding: "5px 14px", borderRadius: 20, marginLeft: 2, marginTop: 4,
+                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+                  fontSize: 11, letterSpacing: "0.8px", color: "rgba(255,255,255,0.4)",
+                  fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
+                }}>+ Create room</div>
               </div>
             )}
 
-            {/* Add new room button */}
-            <div style={{ padding: "0 22px 8px" }}>
-              <button onClick={() => setAddRoomOpen(true)} style={{
-                width: "100%", padding: "12px",
-                background: "transparent",
-                border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 16, fontSize: 13, fontFamily: "'DM Sans', sans-serif",
-                color: "rgba(255,255,255,0.45)", cursor: "pointer",
-                letterSpacing: "0.3px", transition: "all 0.15s",
-              }}>+ Add new room</button>
-            </div>
+
 
             {plants.length > 0 && <AirQualitySlider plants={plants} />}
             <div style={{ padding: "24px 24px 40px", textAlign: "center" }}>
