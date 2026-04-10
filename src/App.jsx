@@ -3020,6 +3020,7 @@ useEffect(() => {
   const [plants, setPlants] = useState([]);
   const [addPlantOpen, setAddPlantOpen] = useState(false);
   const [addRoomOpen, setAddRoomOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null); // null = show all
   const [editRoomData, setEditRoomData] = useState(null); // room object or null
   const [waterLog, setWaterLog] = useState({});
   const [fertilizeLog, setFertilizeLog] = useState({});
@@ -3479,154 +3480,97 @@ useEffect(() => {
               }}>+ Add plant</button>
             </div>
 
+            {/* Room filter tabs */}
+            {rooms.length > 0 && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 16px 10px", alignItems: "center" }}>
+                {rooms.map(r => {
+                  const isActive = selectedRoom === r.name;
+                  return (
+                    <div key={r.id} onClick={() => setSelectedRoom(isActive ? null : r.name)} style={{
+                      display: "inline-flex", alignItems: "center", gap: 5,
+                      padding: "5px 14px", borderRadius: 20,
+                      background: isActive ? "rgba(74,222,128,0.12)" : "rgba(255,255,255,0.06)",
+                      border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "rgba(255,255,255,0.12)"}`,
+                      fontSize: 11, letterSpacing: "0.8px",
+                      color: isActive ? "var(--green)" : "rgba(255,255,255,0.4)",
+                      fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "all 0.15s",
+                    }}>
+                      {r.name}
+                      <span onClick={(e) => { e.stopPropagation(); setEditRoomData(r); }} style={{ fontSize: 10, opacity: 0.5, cursor: "pointer" }}>✎</span>
+                    </div>
+                  );
+                })}
+                <div onClick={() => setAddRoomOpen(true)} style={{
+                  display: "inline-flex", alignItems: "center", justifyContent: "center",
+                  width: 28, height: 28, borderRadius: "50%",
+                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
+                  fontSize: 14, color: "rgba(255,255,255,0.35)",
+                  cursor: "pointer", transition: "background 0.15s",
+                }}>+</div>
+              </div>
+            )}
+
             {plants.length === 0 ? (
               <div style={{ padding: "40px 24px", textAlign: "center" }}>
                 <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.7, fontWeight: 300 }}>
                   No plants yet.<br />Tap + Add plant to start your garden.
                 </div>
               </div>
-            ) : rooms.length <= 1 ? (
-              /* Single room or no rooms — flat list with room tag if room exists */
-              <div style={{ padding: "0 14px 32px" }}>
-                <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 8, marginLeft: 2 }}>
-                  {rooms.length === 1 && (
-                    <div onClick={() => setEditRoomData(rooms[0])} style={{
-                      display: "inline-flex", alignItems: "center", gap: 6,
-                      padding: "5px 14px", borderRadius: 20,
-                      background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
-                      fontSize: 11, letterSpacing: "0.8px", color: "var(--green)",
-                      fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
-                    }}><span style={{ color: "rgba(255,255,255,0.45)" }}>Room:</span> {rooms[0].name} <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span></div>
-                  )}
-                  <div onClick={() => setAddRoomOpen(true)} style={{
-                    display: "inline-flex", alignItems: "center", gap: 4,
-                    padding: "5px 14px", borderRadius: 20,
-                    background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
-                    fontSize: 11, letterSpacing: "0.8px", color: "rgba(255,255,255,0.4)",
-                    fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
-                  }}>+ Create room</div>
-                </div>
-                <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr" }}>
-                {plants.map((p, i) => {
-                  const s = getStatus(p, waterLog[p.id] || null);
-                  const nick = nicknames[p.id];
-                  const photos = plantPhotos[p.id] || [];
-                  const topPhoto = photos.length > 0 ? photos[photos.length - 1] : null;
-                  return (
-                    <GlassCard key={p.id} borderRadius={18} variant="interactive">
-                      <div className="prow" onClick={() => openDetail(i)}>
-                        <div style={{ position: "relative", flexShrink: 0 }}>
-                          <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-                            <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i % PIN_COLORS.length], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
-                            <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
-                          </div>
-                          <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i % TILTS.length]}deg)` }}>
-                            {topPhoto
-                              ? <img src={topPhoto.dataUrl} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
-                              : <div style={{ width: 44, height: 40, background: "rgba(74,222,128,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>+</div>
-                            }
-                          </div>
-                        </div>
-                        <div className="prow-info">
-                          <div className="prow-name">{nick || p.name}</div>
-                          <div className="prow-sub">{nick ? p.name : p.species}</div>
-                        </div>
-                        <div className="prow-right">
-                          <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
-                          <span className="slabel" style={{ color: "#ffffff" }}>{STATUS_LABEL[s]}</span>
-                        </div>
-                        <div className="parrow">›</div>
-                      </div>
-                    </GlassCard>
-                  );
-                })}
-              </GlassContainer>
-              </div>
-            ) : (
-              /* Multiple rooms — group plants under room tags */
-              <div style={{ padding: "0 14px 32px", display: "flex", flexDirection: "column", gap: 6 }}>
-                {(() => {
-                  const roomNames = rooms.map(r => r.name);
-                  const grouped = {};
-                  roomNames.forEach(rn => { grouped[rn] = []; });
-                  grouped["_unassigned"] = [];
-                  plants.forEach((p, i) => {
+            ) : (() => {
+              const filteredPlants = selectedRoom
+                ? plants.filter((p, i) => {
                     const ps = plantSettings[p.id] || {};
-                    const rm = ps.room || "";
-                    if (rm && grouped[rm]) grouped[rm].push({ plant: p, idx: i });
-                    else grouped["_unassigned"].push({ plant: p, idx: i });
-                  });
-                  const sections = roomNames.map(rn => ({ name: rn, plants: grouped[rn] }));
-                  if (grouped["_unassigned"].length > 0) sections.push({ name: "Unassigned", plants: grouped["_unassigned"] });
+                    return ps.room === selectedRoom;
+                  })
+                : plants;
 
-                  return sections.map(section => {
-                    const roomObj = section.name !== "Unassigned" ? rooms.find(r => r.name === section.name) : null;
-                    return (
-                    <div key={section.name} style={{ marginBottom: 10 }}>
-                      {/* Room tag header */}
-                      <div onClick={roomObj ? () => setEditRoomData(roomObj) : undefined} style={{
-                        display: "inline-flex", alignItems: "center", gap: 6,
-                        padding: "5px 14px", borderRadius: 20, marginBottom: 8, marginLeft: 2,
-                        background: section.name === "Unassigned" ? "rgba(255,255,255,0.06)" : "rgba(74,222,128,0.12)",
-                        border: `1px solid ${section.name === "Unassigned" ? "rgba(255,255,255,0.12)" : "rgba(74,222,128,0.25)"}`,
-                        fontSize: 11, letterSpacing: "0.8px",
-                        color: section.name === "Unassigned" ? "rgba(255,255,255,0.45)" : "var(--green)",
-                        fontFamily: "'DM Sans', sans-serif",
-                        cursor: roomObj ? "pointer" : "default",
-                        transition: "background 0.15s",
-                      }}>{section.name === "Unassigned" ? "Unassigned" : <><span style={{ color: "rgba(255,255,255,0.45)" }}>Room:</span> {section.name} <span style={{ fontSize: 10, opacity: 0.5 }}>✎</span></>}</div>
-
-                      {section.plants.length === 0 ? (
-                        <div style={{ padding: "12px 16px", fontSize: 12, color: "rgba(255,255,255,0.3)", fontStyle: "italic" }}>No plants in this room</div>
-                      ) : (
-                        <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr" }}>
-                          {section.plants.map(({ plant: p, idx: i }) => {
-                            const s = getStatus(p, waterLog[p.id] || null);
-                            const nick = nicknames[p.id];
-                            const photos = plantPhotos[p.id] || [];
-                            const topPhoto = photos.length > 0 ? photos[photos.length - 1] : null;
-                            return (
-                              <GlassCard key={p.id} borderRadius={18} variant="interactive">
-                                <div className="prow" onClick={() => openDetail(i)}>
-                                  <div style={{ position: "relative", flexShrink: 0 }}>
-                                    <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-                                      <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i % PIN_COLORS.length], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
-                                      <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
-                                    </div>
-                                    <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i % TILTS.length]}deg)` }}>
-                                      {topPhoto
-                                        ? <img src={topPhoto.dataUrl} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
-                                        : <div style={{ width: 44, height: 40, background: "rgba(74,222,128,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>+</div>
-                                      }
-                                    </div>
-                                  </div>
-                                  <div className="prow-info">
-                                    <div className="prow-name">{nick || p.name}</div>
-                                    <div className="prow-sub">{nick ? p.name : p.species}</div>
-                                  </div>
-                                  <div className="prow-right">
-                                    <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
-                                    <span className="slabel" style={{ color: "#ffffff" }}>{STATUS_LABEL[s]}</span>
-                                  </div>
-                                  <div className="parrow">›</div>
-                                </div>
-                              </GlassCard>
-                            );
-                          })}
-                        </GlassContainer>
-                      )}
+              return (
+                <div style={{ padding: "0 14px 32px" }}>
+                  {filteredPlants.length === 0 ? (
+                    <div style={{ padding: "24px 16px", textAlign: "center", fontSize: 13, color: "rgba(255,255,255,0.35)", fontStyle: "italic" }}>
+                      No plants in this room
                     </div>
-                  ); });
-                })()}
-                <div onClick={() => setAddRoomOpen(true)} style={{
-                  display: "inline-flex", alignItems: "center", gap: 4,
-                  padding: "5px 14px", borderRadius: 20, marginLeft: 2, marginTop: 4,
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
-                  fontSize: 11, letterSpacing: "0.8px", color: "rgba(255,255,255,0.4)",
-                  fontFamily: "'DM Sans', sans-serif", cursor: "pointer", transition: "background 0.15s",
-                }}>+ Create room</div>
-              </div>
-            )}
+                  ) : (
+                    <GlassContainer gap={8} style={{ display: "flex", flexDirection: "column", gridTemplateColumns: "1fr" }}>
+                      {filteredPlants.map((p) => {
+                        const i = plants.indexOf(p);
+                        const s = getStatus(p, waterLog[p.id] || null);
+                        const nick = nicknames[p.id];
+                        const photos = plantPhotos[p.id] || [];
+                        const topPhoto = photos.length > 0 ? photos[photos.length - 1] : null;
+                        return (
+                          <GlassCard key={p.id} borderRadius={18} variant="interactive">
+                            <div className="prow" onClick={() => openDetail(i)}>
+                              <div style={{ position: "relative", flexShrink: 0 }}>
+                                <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
+                                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i % PIN_COLORS.length], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
+                                  <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
+                                </div>
+                                <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i % TILTS.length]}deg)` }}>
+                                  {topPhoto
+                                    ? <img src={topPhoto.dataUrl} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
+                                    : <div style={{ width: 44, height: 40, background: "rgba(74,222,128,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>+</div>
+                                  }
+                                </div>
+                              </div>
+                              <div className="prow-info">
+                                <div className="prow-name">{nick || p.name}</div>
+                                <div className="prow-sub">{nick ? p.name : p.species}</div>
+                              </div>
+                              <div className="prow-right">
+                                <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
+                                <span className="slabel" style={{ color: "#ffffff" }}>{STATUS_LABEL[s]}</span>
+                              </div>
+                              <div className="parrow">›</div>
+                            </div>
+                          </GlassCard>
+                        );
+                      })}
+                    </GlassContainer>
+                  )}
+                </div>
+              );
+            })()}
 
 
 
