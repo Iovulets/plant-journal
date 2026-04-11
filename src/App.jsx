@@ -75,7 +75,7 @@ const STATUS_DOT = {
 
 // ── Design tokens (Impeccable: 4pt spacing, OKLCH, semantic names) ──────────
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700&family=Source+Sans+3:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;1,6..12,300;1,6..12,400&display=swap');
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
@@ -99,28 +99,28 @@ const css = `
     --text-2xl: 2.197rem;  /* ~35px */
 
     /* ── Colors (OKLCH, tinted toward green hue 145) ── */
-    --surface-0: oklch(12% 0.015 145);     /* deepest bg */
-    --surface-1: oklch(16% 0.012 145);     /* card bg */
-    --surface-2: oklch(20% 0.010 145);     /* elevated */
-    --surface-3: oklch(25% 0.008 145);     /* hover / active */
+    --surface-0: oklch(15% 0.018 145);     /* deepest bg */
+    --surface-1: oklch(19% 0.015 145);     /* card / row bg */
+    --surface-2: oklch(23% 0.012 145);     /* elevated */
+    --surface-3: oklch(28% 0.010 145);     /* hover / active */
 
-    --text-primary: oklch(93% 0.008 145);
-    --text-secondary: oklch(72% 0.015 145);
-    --text-tertiary: oklch(52% 0.012 145);
+    --text-primary: oklch(94% 0.006 145);
+    --text-secondary: oklch(75% 0.012 145);
+    --text-tertiary: oklch(55% 0.010 145);
 
-    --border: oklch(28% 0.010 145);
-    --border-subtle: oklch(22% 0.008 145);
+    --border: oklch(30% 0.012 145);
+    --border-subtle: oklch(24% 0.010 145);
 
-    --accent: oklch(72% 0.16 145);          /* green accent */
-    --accent-dim: oklch(60% 0.10 145);
-    --accent-surface: oklch(20% 0.04 145);
+    --accent: oklch(75% 0.18 145);          /* green accent */
+    --accent-dim: oklch(62% 0.12 145);
+    --accent-surface: oklch(22% 0.05 145);
 
-    --warn: oklch(65% 0.18 25);
-    --warn-surface: oklch(18% 0.04 25);
-    --warn-border: oklch(30% 0.06 25);
+    --warn: oklch(68% 0.18 25);
+    --warn-surface: oklch(20% 0.05 25);
+    --warn-border: oklch(32% 0.07 25);
 
-    --fertilize: oklch(72% 0.12 70);
-    --fertilize-surface: oklch(18% 0.03 70);
+    --fertilize: oklch(75% 0.14 70);
+    --fertilize-surface: oklch(20% 0.04 70);
 
     /* ── Motion (Impeccable: expo ease-out, no bounce) ─ */
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -152,9 +152,9 @@ const css = `
     max-width: 430px;
     margin: 0 auto;
     min-height: 100dvh;
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
     font-size: var(--text-base);
-    line-height: 1.55;
+    line-height: 1.6;
     color: var(--text-primary);
     user-select: none;
     position: relative;
@@ -173,21 +173,21 @@ const css = `
   .app-bg img {
     width: 100%; height: 100%;
     object-fit: cover;
-    opacity: 0.12;
-    filter: saturate(0.4) brightness(0.5);
+    opacity: 0.18;
+    filter: saturate(0.5) brightness(0.6);
   }
   .app > *:not(.app-bg) { position: relative; z-index: 1; }
 
   /* ── Heading font ────────────────────────────────── */
   .heading {
-    font-family: 'Bricolage Grotesque', sans-serif;
+    font-family: Manrope, sans-serif;
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.15;
   }
 
   .subheading {
-    font-family: 'Bricolage Grotesque', sans-serif;
+    font-family: Manrope, sans-serif;
     font-weight: 600;
     letter-spacing: -0.01em;
     line-height: 1.2;
@@ -244,7 +244,7 @@ const css = `
     color: var(--surface-0);
     border: none;
     border-radius: var(--radius-md);
-    font-family: 'Bricolage Grotesque', sans-serif;
+    font-family: Manrope, sans-serif;
     font-size: var(--text-sm);
     font-weight: 600;
     cursor: pointer;
@@ -271,7 +271,7 @@ const css = `
     color: var(--text-secondary);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
     font-size: var(--text-sm);
     cursor: pointer;
     transition: background var(--dur-fast) var(--ease-out);
@@ -283,7 +283,7 @@ const css = `
     background: none;
     border: none;
     color: var(--text-secondary);
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
     font-size: var(--text-sm);
     cursor: pointer;
     padding: var(--space-sm) 0;
@@ -399,7 +399,7 @@ const css = `
     font-weight: 500;
     color: var(--text-secondary);
     cursor: pointer;
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
     letter-spacing: 0.02em;
     transition: all var(--dur-fast) var(--ease-out);
   }
@@ -453,7 +453,7 @@ const css = `
     border-radius: var(--radius-sm);
     padding: var(--space-xs) var(--space-md);
     font-size: var(--text-sm);
-    font-family: 'Source Sans 3', sans-serif;
+    font-family: 'Nunito Sans', sans-serif;
     color: var(--text-primary);
     background: var(--surface-2);
     outline: none;
@@ -991,9 +991,9 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
       await new Promise(r => setTimeout(r, 300));
       onResult({
         commonName: "Scan failed", scientificName: err?.message || "Unknown error",
-        family: "\u2014", confidence: "low", origin: "\u2014",
+        family: "—", confidence: "low", origin: "—",
         funFact: "Error: " + (err?.message || "unknown"),
-        careLevel: "\u2014", edible: false, toxic: false, toxicTo: null,
+        careLevel: "—", edible: false, toxic: false, toxicTo: null,
         dataUrl: dataUrl || "", date: new Date().toISOString(), id: Date.now()
       });
     }
@@ -1050,7 +1050,7 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
         </div>
         <div style={{ background: "var(--surface-1)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", padding: "var(--space-xs) var(--space-lg)", marginBottom: "var(--space-md)" }}>
           <input type="date" value={dateVal} max={new Date().toISOString().slice(0, 10)} onChange={e => setDateVal(e.target.value)}
-            style={{ width: "100%", background: "transparent", border: "none", outline: "none", fontSize: "var(--text-lg)", fontFamily: "'Source Sans 3', sans-serif", color: "var(--text-primary)", padding: "var(--space-md) 0", cursor: "pointer" }} />
+            style={{ width: "100%", background: "transparent", border: "none", outline: "none", fontSize: "var(--text-lg)", fontFamily: "'Nunito Sans', sans-serif", color: "var(--text-primary)", padding: "var(--space-md) 0", cursor: "pointer" }} />
         </div>
         <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)", marginBottom: "var(--space-xl)", textAlign: "center" }}>
           This edit will be logged in your care history.
@@ -1191,7 +1191,7 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
         </div>
         <div style={{ padding: "var(--space-sm) var(--space-md) var(--space-xl)", display: "flex", gap: "var(--space-sm)", alignItems: "center" }}>
           <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask about your plant..."
-            style={{ flex: 1, background: "var(--surface-1)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", padding: "var(--space-md) var(--space-lg)", fontSize: "var(--text-sm)", color: "var(--text-primary)", fontFamily: "'Source Sans 3', sans-serif", outline: "none" }} />
+            style={{ flex: 1, background: "var(--surface-1)", border: "1px solid var(--border)", borderRadius: "var(--radius-md)", padding: "var(--space-md) var(--space-lg)", fontSize: "var(--text-sm)", color: "var(--text-primary)", fontFamily: "'Nunito Sans', sans-serif", outline: "none" }} />
           <button onClick={send} disabled={!input.trim() || loading}
             className="btn-primary" style={{ width: 38, height: 38, padding: 0, borderRadius: "50%", fontSize: "var(--text-base)", opacity: (!input.trim() || loading) ? 0.3 : 1 }}>↑</button>
         </div>
@@ -1215,7 +1215,7 @@ function BotanicalGardenScreen({ gardenLog, onBack, onScan, scanning }) {
     return (
       <div className="fade-up">
         <div className="nav">
-          <button className="btn-ghost" onClick={() => setSelected(null)}>\u2190 Garden</button>
+          <button className="btn-ghost" onClick={() => setSelected(null)}>← Garden</button>
           <div className="species">{e.scientificName}</div>
           <div style={{ width: 68 }} />
         </div>
@@ -1249,7 +1249,7 @@ function BotanicalGardenScreen({ gardenLog, onBack, onScan, scanning }) {
   return (
     <div className="fade-up">
       <div className="nav">
-        <button className="btn-ghost" onClick={onBack}>\u2190 Overview</button>
+        <button className="btn-ghost" onClick={onBack}>← Overview</button>
         <div className="subheading" style={{ fontSize: "var(--text-base)" }}>Botanical Garden</div>
         <div style={{ width: 68 }} />
       </div>
@@ -1336,10 +1336,7 @@ export default function App() {
   const [plantPhotos, setPlantPhotos] = useState({});
 
   // ── Load from Supabase ────────────────────────────────────────────────────
-  const loadedRef = useRef(false);
   useEffect(() => {
-    if (loadedRef.current) return;
-    loadedRef.current = true;
     async function loadAll() {
       try {
         const [wRes, fRes, dRes, nRes, gRes, pRes] = await Promise.all([
@@ -1550,7 +1547,7 @@ export default function App() {
                       <div style={{ width: 6, height: 6, borderRadius: "50%", background: STATUS_DOT[s] }} />
                       <span style={{ fontSize: "var(--text-xs)", color: STATUS_DOT[s] }}>{STATUS_LABEL[s]}</span>
                     </div>
-                    <span style={{ fontSize: "var(--text-lg)", color: "var(--text-tertiary)", marginLeft: 2 }}>\u203A</span>
+                    <span style={{ fontSize: "var(--text-lg)", color: "var(--text-tertiary)", marginLeft: 2 }}>›</span>
                   </div>
                 );
               })}
@@ -1564,11 +1561,11 @@ export default function App() {
         {screen === "detail" && (
           <div className="fade-up" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
             <div className="nav">
-              <button className="btn-ghost" onClick={() => setScreen("overview")}>\u2190 Overview</button>
+              <button className="btn-ghost" onClick={() => setScreen("overview")}>← Overview</button>
               <div style={{ fontSize: "var(--text-xs)", color: "var(--text-tertiary)" }}>{idx + 1} / {PLANTS.length}</div>
               <div className="nav-arrows">
-                <button className="nav-arrow" disabled={idx === 0} onClick={() => setIdx(i => i - 1)}>\u2039</button>
-                <button className="nav-arrow" disabled={idx === PLANTS.length - 1} onClick={() => setIdx(i => i + 1)}>\u203A</button>
+                <button className="nav-arrow" disabled={idx === 0} onClick={() => setIdx(i => i - 1)}>‹</button>
+                <button className="nav-arrow" disabled={idx === PLANTS.length - 1} onClick={() => setIdx(i => i + 1)}>›</button>
               </div>
             </div>
             <div className="dots">
@@ -1625,7 +1622,7 @@ export default function App() {
               <div style={{ marginBottom: "var(--space-xl)" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "var(--text-xs)", color: "var(--text-tertiary)", marginBottom: "var(--space-sm)" }}>
                   <span>{lastWatered ? (days === 0 ? "Watered today" : `${days}d ago`) : "Never logged"}</span>
-                  <span>{lastWatered ? `next in ${Math.max(0, plant.waterEveryDays - (days || 0))}d` : "\u2014"}</span>
+                  <span>{lastWatered ? `next in ${Math.max(0, plant.waterEveryDays - (days || 0))}d` : "—"}</span>
                 </div>
                 <div className="progress-track">
                   <div className="progress-fill" style={{ width: `${pct}%`, background: pct >= 100 ? "var(--warn)" : pct >= 70 ? "oklch(72% 0.14 70)" : "var(--accent)" }} />
@@ -1638,7 +1635,7 @@ export default function App() {
               {/* Action buttons — varied hierarchy (Impeccable: don't make every button primary) */}
               <button className="btn-primary" onClick={() => waterPlant(plant.id)}
                 style={lastWatered && days < plant.waterEveryDays ? { background: "var(--surface-2)", color: "var(--text-secondary)", border: "1px solid var(--border)" } : {}}>
-                {lastWatered && days < plant.waterEveryDays ? "Hydrated" : days !== null && days >= plant.waterEveryDays ? "Overdue \u2014 water now" : "Water now"}
+                {lastWatered && days < plant.waterEveryDays ? "Hydrated" : days !== null && days >= plant.waterEveryDays ? "Overdue — water now" : "Water now"}
               </button>
 
               <div style={{ display: "flex", gap: "var(--space-sm)", marginTop: "var(--space-sm)" }}>
@@ -1684,7 +1681,7 @@ export default function App() {
         {screen === "garden" && (
           <div className="fade-up">
             <div className="nav">
-              <button className="btn-ghost" onClick={() => setScreen("overview")}>\u2190 Overview</button>
+              <button className="btn-ghost" onClick={() => setScreen("overview")}>← Overview</button>
               <div style={{ flex: 1 }} />
               <ScanButton
                 onResult={async (entry) => {
@@ -1763,7 +1760,7 @@ export default function App() {
         {screen === "attention" && (
           <div className="fade-up">
             <div className="nav">
-              <button className="btn-ghost" onClick={() => setScreen("overview")}>\u2190 Overview</button>
+              <button className="btn-ghost" onClick={() => setScreen("overview")}>← Overview</button>
             </div>
             <div style={{ padding: `var(--space-xl) var(--space-xl) var(--space-sm)` }}>
               <div className="label" style={{ color: "var(--warn)", marginBottom: "var(--space-sm)" }}>Needs attention</div>
@@ -1784,7 +1781,7 @@ export default function App() {
                       <div className="species">{plant.species}</div>
                       <div style={{ fontSize: "var(--text-xs)", color: "var(--warn)", marginTop: "var(--space-xs)", lineHeight: 1.4 }}>{plant.warning}</div>
                     </div>
-                    <span style={{ fontSize: "var(--text-lg)", color: "var(--warn)" }}>\u203A</span>
+                    <span style={{ fontSize: "var(--text-lg)", color: "var(--warn)" }}>›</span>
                   </div>
                 );
               })}
