@@ -694,7 +694,7 @@ function WeatherCardInline({ userProfile, onWeatherLoad }) {
 
   return (
     <div style={{ padding: "12px 10px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, height: "100%" }}>
-      <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={52} />
+      <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={104} />
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
         <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
         <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.15)" }} />
