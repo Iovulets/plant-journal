@@ -81,6 +81,7 @@ const css = `
   @import url('https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;0,7..72,600;0,7..72,700;1,7..72,300;1,7..72,400&family=Nunito+Sans:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,300;1,6..12,400&display=swap');
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  button, input, select, textarea { font-family: inherit; }
 
   :root {
     --green: #4ade80;
@@ -233,7 +234,7 @@ const css = `
     background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 55%);
     pointer-events: none;
   }
-  .dnav-back { background: none; border: none; font-size: 13px; color: var(--text-2); cursor: pointer; font-family: 'Nunito Sans', sans-serif; padding: 6px 0; }
+  .dnav-back { background: none; border: none; font-size: 13px; color: var(--text-2); cursor: pointer; padding: 6px 0; }
   .dnav-counter { font-size: 11px; color: var(--text-2); letter-spacing: 1px; }
   .dnav-arrows { display: flex; gap: 4px; }
   .darrow {
@@ -268,11 +269,11 @@ const css = `
     background: rgba(255,255,255,0.08);
     border: 1px dashed rgba(255,255,255,0.28);
     border-radius: 20px; padding: 4px 13px; font-size: 11px; color: var(--text-2);
-    cursor: pointer; font-family: 'Nunito Sans', sans-serif; transition: all 0.15s;
+    cursor: pointer; transition: all 0.15s;
   }
   .nick-btn:hover { background: rgba(255,255,255,0.13); border-style: solid; }
-  .nick-input { border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; font-family: 'Nunito Sans', sans-serif; color: var(--text); background: rgba(255,255,255,0.1); outline: none; width: 155px; }
-  .nick-save  { background: var(--green); border: none; border-radius: 20px; padding: 5px 13px; font-size: 11px; color: #0a1a0a; cursor: pointer; font-family: 'Nunito Sans', sans-serif; font-weight: 600; }
+  .nick-input { border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--text); background: rgba(255,255,255,0.1); outline: none; width: 155px; }
+  .nick-save  { background: var(--green); border: none; border-radius: 20px; padding: 5px 13px; font-size: 11px; color: #0a1a0a; cursor: pointer; font-weight: 600; }
 
   .rule { height: 1px; background: rgba(255,255,255,0.12); margin: 0 0 18px; }
   .d-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
@@ -329,7 +330,7 @@ const css = `
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
-    font-size: 14px; font-family: 'Nunito Sans', sans-serif; font-weight: 500;
+    font-size: 14px; font-weight: 500;
     letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.22s ease;
     position: relative; overflow: hidden;
@@ -354,7 +355,7 @@ const css = `
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
-    font-size: 14px; font-family: 'Nunito Sans', sans-serif; font-weight: 500;
+    font-size: 14px; font-weight: 500;
     letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.22s ease;
     position: relative; overflow: hidden;
@@ -374,7 +375,7 @@ const css = `
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
-    font-size: 13px; font-family: 'Nunito Sans', sans-serif; font-weight: 500;
+    font-size: 13px; font-weight: 500;
     cursor: pointer; transition: all 0.22s ease;
     text-align: center;
   }
@@ -384,7 +385,7 @@ const css = `
   .btn-reset {
     width: 100%; padding: 12px; background: rgba(255,255,255,0.06);
     color: var(--text-2); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px;
-    font-size: 12px; font-family: 'Nunito Sans', sans-serif; cursor: pointer; margin-top: 8px;
+    font-size: 12px; cursor: pointer; margin-top: 8px;
   }
   .btn-reset:active { background: rgba(255,255,255,0.10); }
 
@@ -424,7 +425,7 @@ const css = `
     width: 100%; box-sizing: border-box;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.20);
     border-radius: 14px; padding: 14px 16px; font-size: 15px;
-    color: #fff; font-family: 'Nunito Sans', sans-serif; outline: none;
+    color: #fff; outline: none;
     transition: border-color 0.2s;
   }
   .ob-input:focus { border-color: rgba(74,222,128,0.5); }
@@ -440,7 +441,7 @@ const css = `
     border-bottom-color: rgba(40,120,20,0.20);
     border-radius: 20px;
     box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
-    color: #d4ffb0; font-size: 14px; font-family: 'Nunito Sans', sans-serif;
+    color: #d4ffb0; font-size: 14px;
     font-weight: 500; letter-spacing: 0.5px; cursor: pointer;
     transition: all 0.22s ease; position: relative; overflow: hidden;
   }
@@ -474,7 +475,7 @@ const css = `
   }
   .ob-toggle button {
     flex: 1; padding: 10px 0; border: none; background: transparent;
-    color: rgba(255,255,255,0.5); font-size: 13px; font-family: 'Nunito Sans', sans-serif;
+    color: rgba(255,255,255,0.5); font-size: 13px;
     cursor: pointer; transition: all 0.18s; font-weight: 500;
   }
   .ob-toggle button.active {
@@ -501,7 +502,7 @@ const css = `
     width: 100%; box-sizing: border-box;
     background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.20);
     border-radius: 14px; padding: 14px 16px; font-size: 15px;
-    color: #fff; font-family: 'Nunito Sans', sans-serif; outline: none;
+    color: #fff; outline: none;
     appearance: none; -webkit-appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 16px center;
@@ -946,7 +947,7 @@ function AirQualitySlider({ plants }) {
             border: `1px solid ${activeCard === c.id ? c.color : "rgba(255,255,255,0.22)"}`,
             borderRadius: 20, padding: "5px 13px", fontSize: 11,
             color: activeCard === c.id ? "#0a1a0a" : "rgba(255,255,255,0.72)",
-            cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif", fontWeight: 400,
+            cursor: "pointer", fontWeight: 400,
             letterSpacing: "0.3px", transition: "all 0.2s",
           }}>
             {c.label}
@@ -1181,7 +1182,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           background: analysing ? "rgba(255,255,255,0.12)" : "var(--peach-dark)",
           border: "none", borderRadius: 20, padding: "7px 16px",
           fontSize: 12, color: "#fff", cursor: analysing ? "default" : "pointer",
-          fontFamily: "'Nunito Sans', sans-serif", letterSpacing: "0.5px", transition: "all 0.2s",
+          letterSpacing: "0.5px", transition: "all 0.2s",
         }}>
           {analysing ? "Analysing…" : "+ Add photo"}
         </button>
@@ -1189,7 +1190,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           <button onClick={() => { setGalleryStart(0); setGallery(true); }} style={{
             background: "var(--white)", border: "1px solid rgba(255,255,255,0.12)",
             borderRadius: 20, padding: "7px 14px", fontSize: 12, color: "var(--muted)",
-            cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif",
+            cursor: "pointer",
           }}>
             Gallery ({userPhotos.length})
           </button>
@@ -1483,7 +1484,7 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
             value={dateVal}
             max={new Date().toISOString().slice(0, 10)}
             onChange={e => setDateVal(e.target.value)}
-            style={{ width: "100%", background: "transparent", border: "none", outline: "none", fontSize: 18, fontFamily: "'Nunito Sans', sans-serif", color: "var(--text)", padding: "12px 0", cursor: "pointer" }}
+            style={{ width: "100%", background: "transparent", border: "none", outline: "none", fontSize: 18, color: "var(--text)", padding: "12px 0", cursor: "pointer" }}
           />
         </div>
         <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 20, textAlign: "center" }}>
@@ -1496,7 +1497,7 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
           border: `1px solid ${isWater ? "rgba(150,255,100,0.4)" : "rgba(212,147,90,0.4)"}`,
           borderTopColor: isWater ? "rgba(200,255,160,0.7)" : "rgba(240,190,140,0.7)",
           borderRadius: 20, color: isWater ? "#d4ffb0" : "#ffe0b0",
-          fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500, cursor: "pointer", letterSpacing: "0.5px",
+          fontSize: 14, fontWeight: 500, cursor: "pointer", letterSpacing: "0.5px",
         }}>Save date</button>
       </div>
     </div>
@@ -1553,7 +1554,7 @@ function FertilizeModal({ onConfirm, onClose }) {
           width: "100%", padding: "14px",
           background: "rgba(212,147,90,0.22)", backdropFilter: "blur(20px)",
           border: "1px solid rgba(212,147,90,0.4)", borderTopColor: "rgba(240,190,140,0.7)",
-          borderRadius: 20, color: "#ffe0b0", fontSize: 14, fontFamily: "'Nunito Sans', sans-serif",
+          borderRadius: 20, color: "#ffe0b0", fontSize: 14,
           fontWeight: 500, cursor: "pointer", letterSpacing: "0.5px",
         }}>Log {DOSE_LABELS[selected]}</button>
       </div>
@@ -1580,7 +1581,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
   const inputStyle = {
     background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
     borderRadius: 12, padding: "11px 14px", fontSize: 13,
-    color: "#fff", fontFamily: "'Nunito Sans', sans-serif", outline: "none",
+    color: "#fff", outline: "none",
     width: "100%", boxSizing: "border-box",
   };
   const labelStyle = { fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8, display: "block" };
@@ -1623,7 +1624,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                   borderColor: potType === t ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
                   background: potType === t ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
                   color: potType === t ? "var(--green)" : "rgba(255,255,255,0.6)",
-                  fontSize: 12, fontFamily: "'Nunito Sans', sans-serif", cursor: "pointer",
+                  fontSize: 12, cursor: "pointer",
                 }}>{t}</button>
               ))}
             </div>
@@ -1651,7 +1652,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                   borderColor: location === l.id ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
                   background: location === l.id ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
                   color: location === l.id ? "var(--green)" : "rgba(255,255,255,0.6)",
-                  fontSize: 12, fontFamily: "'Nunito Sans', sans-serif", cursor: "pointer",
+                  fontSize: 12, cursor: "pointer",
                 }}>{l.label}</button>
               ))}
             </div>
@@ -1668,7 +1669,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                     borderColor: room === r.name ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
                     background: room === r.name ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
                     color: room === r.name ? "var(--green)" : "rgba(255,255,255,0.6)",
-                    fontSize: 12, fontFamily: "'Nunito Sans', sans-serif", cursor: "pointer",
+                    fontSize: 12, cursor: "pointer",
                   }}>{r.name}</button>
                 ))}
               </div>
@@ -1685,7 +1686,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                   borderColor: lightDistance === d ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
                   background: lightDistance === d ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
                   color: lightDistance === d ? "var(--green)" : "rgba(255,255,255,0.6)",
-                  fontSize: 12, fontFamily: "'Nunito Sans', sans-serif", cursor: "pointer",
+                  fontSize: 12, cursor: "pointer",
                 }}>{d}</button>
               ))}
             </div>
@@ -1698,7 +1699,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
           background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
           border: "1px solid rgba(150,255,100,0.4)", borderTopColor: "rgba(200,255,160,0.7)",
           borderRadius: 20, color: "#d4ffb0",
-          fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+          fontSize: 14, fontWeight: 500,
           cursor: "pointer", letterSpacing: "0.3px",
         }}>Save settings</button>
 
@@ -1706,7 +1707,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
           width: "100%", padding: "12px", marginTop: 10,
           background: "transparent", border: "1px solid rgba(248,113,113,0.25)",
           borderRadius: 20, color: "rgba(248,113,113,0.6)",
-          fontSize: 13, fontFamily: "'Nunito Sans', sans-serif",
+          fontSize: 13,
           cursor: "pointer", letterSpacing: "0.3px",
         }}>Delete plant</button>
 
@@ -1730,7 +1731,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                   width: "100%", boxSizing: "border-box", background: "rgba(248,113,113,0.08)",
                   border: "1px solid rgba(248,113,113,0.30)", borderRadius: 12,
                   padding: "12px 14px", fontSize: 14, color: "#fff",
-                  fontFamily: "'Nunito Sans', sans-serif", outline: "none", marginBottom: 12,
+                  outline: "none", marginBottom: 12,
                 }}
               />
               <button
@@ -1741,12 +1742,12 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                   background: deleteInput === "delete plant" ? "rgba(248,113,113,0.25)" : "rgba(255,255,255,0.05)",
                   border: `1px solid ${deleteInput === "delete plant" ? "rgba(248,113,113,0.5)" : "rgba(255,255,255,0.1)"}`,
                   borderRadius: 20, color: deleteInput === "delete plant" ? "#f87171" : "rgba(255,255,255,0.2)",
-                  fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+                  fontSize: 14, fontWeight: 500,
                   cursor: deleteInput === "delete plant" ? "pointer" : "default",
                   transition: "all 0.15s",
                 }}
               >Delete plant</button>
-              <button onClick={() => { setDeleteMode(false); setDeleteInput(""); }} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif" }}>Cancel</button>
+              <button onClick={() => { setDeleteMode(false); setDeleteInput(""); }} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         )}
@@ -1782,13 +1783,13 @@ function WaterCheckModal({ plant, lastWatered, onWaterNow, onPostpone, onClose }
             background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
             border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
             borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
-            color: "#d4ffb0", fontSize: 15, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500, cursor: "pointer",
+            color: "#d4ffb0", fontSize: 15, fontWeight: 500, cursor: "pointer",
           }}>Soil is dry — water now</button>
           <button onClick={onPostpone} style={{
             width: "100%", padding: "15px",
             background: "rgba(138,180,200,0.15)", backdropFilter: "blur(20px)",
             border: "1px solid rgba(138,180,200,0.30)", borderTopColor: "rgba(180,220,240,0.50)",
-            borderRadius: 20, color: "#b8dff0", fontSize: 15, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500, cursor: "pointer",
+            borderRadius: 20, color: "#b8dff0", fontSize: 15, fontWeight: 500, cursor: "pointer",
           }}>Still wet — postpone</button>
         </div>
       </div>
@@ -1829,7 +1830,7 @@ function PostponeModal({ plant, onConfirm, onClose }) {
               borderTopColor: !customMode && selected === d ? "rgba(180,220,240,0.75)" : "rgba(255,255,255,0.22)",
               background: !customMode && selected === d ? "rgba(138,180,200,0.25)" : "rgba(255,255,255,0.07)",
               color: !customMode && selected === d ? "#b8dff0" : "rgba(255,255,255,0.55)",
-              fontSize: 22, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 600,
+              fontSize: 22, fontWeight: 600,
               cursor: "pointer", transition: "all 0.15s",
               display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
             }}>
@@ -1843,7 +1844,7 @@ function PostponeModal({ plant, onConfirm, onClose }) {
             borderTopColor: customMode ? "rgba(180,220,240,0.75)" : "rgba(255,255,255,0.22)",
             background: customMode ? "rgba(138,180,200,0.25)" : "rgba(255,255,255,0.07)",
             color: customMode ? "#b8dff0" : "rgba(255,255,255,0.55)",
-            fontSize: 13, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+            fontSize: 13, fontWeight: 500,
             cursor: "pointer", transition: "all 0.15s",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
           }}>
@@ -1859,7 +1860,7 @@ function PostponeModal({ plant, onConfirm, onClose }) {
                 type="text" inputMode="numeric" pattern="[0-9]*" placeholder="0"
                 value={customVal} onChange={e => setCustomVal(e.target.value.replace(/\D/g, ""))}
                 autoFocus
-                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 28, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 600, color: "#b8dff0", padding: "10px 0", width: "100%", textAlign: "center" }}
+                style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 28, fontWeight: 600, color: "#b8dff0", padding: "10px 0", width: "100%", textAlign: "center" }}
               />
               <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>days</span>
             </div>
@@ -1884,7 +1885,7 @@ function PostponeModal({ plant, onConfirm, onClose }) {
             borderTopColor: effectiveDays ? "rgba(180,220,240,0.65)" : "rgba(255,255,255,0.15)",
             borderRadius: 20,
             color: effectiveDays ? "#b8dff0" : "rgba(255,255,255,0.25)",
-            fontSize: 15, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+            fontSize: 15, fontWeight: 500,
             cursor: effectiveDays ? "pointer" : "default", transition: "all 0.15s",
           }}
         >
@@ -1983,7 +1984,7 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
         </div>
         <div style={{ padding: "8px 12px 20px", display: "flex", gap: 8, alignItems: "center" }}>
           <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask about your plant…"
-            style={{ flex: 1, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 20, padding: "10px 16px", fontSize: 13, color: "var(--text)", fontFamily: "'Nunito Sans', sans-serif", outline: "none" }} />
+            style={{ flex: 1, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 20, padding: "10px 16px", fontSize: 13, color: "var(--text)", outline: "none" }} />
           <button onClick={send} disabled={!input.trim() || loading} style={{ background: "var(--green)", border: "none", borderRadius: "50%", width: 38, height: 38, fontSize: 16, cursor: "pointer", color: "#0a1a0a", flexShrink: 0, opacity: (!input.trim() || loading) ? 0.4 : 1, transition: "opacity 0.15s" }}>↑</button>
         </div>
       </div>
@@ -2530,7 +2531,7 @@ function AddRoomModal({ onSave, onClose }) {
           border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
           borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
           borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
-          fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+          fontSize: 14, fontWeight: 500,
           cursor: valid && !saving ? "pointer" : "default", letterSpacing: "0.3px",
           opacity: saving ? 0.5 : 1,
         }}>{saving ? "Creating..." : "Create room"}</button>
@@ -2644,7 +2645,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
           border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
           borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
           borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
-          fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+          fontSize: 14, fontWeight: 500,
           cursor: valid && !saving ? "pointer" : "default", letterSpacing: "0.3px",
           opacity: saving ? 0.5 : 1,
         }}>{saving ? "Saving..." : "Save changes"}</button>
@@ -2653,7 +2654,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
           width: "100%", padding: "12px", marginTop: 10,
           background: "transparent", border: "1px solid rgba(248,113,113,0.25)",
           borderRadius: 20, color: "rgba(248,113,113,0.6)",
-          fontSize: 13, fontFamily: "'Nunito Sans', sans-serif",
+          fontSize: 13,
           cursor: "pointer", letterSpacing: "0.3px",
         }}>Delete room</button>
 
@@ -2671,10 +2672,10 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
                 width: "100%", padding: "14px",
                 background: "rgba(248,113,113,0.25)", border: "1px solid rgba(248,113,113,0.5)",
                 borderRadius: 20, color: "#f87171",
-                fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+                fontSize: 14, fontWeight: 500,
                 cursor: "pointer",
               }}>Delete room</button>
-              <button onClick={() => setDeleteMode(false)} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif" }}>Cancel</button>
+              <button onClick={() => setDeleteMode(false)} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         )}
@@ -2710,7 +2711,7 @@ function AddPlantModal({ onSave, onClose, scanButton }) {
             background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
             border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
             borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
-            color: "#d4ffb0", fontSize: 15, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+            color: "#d4ffb0", fontSize: 15, fontWeight: 500,
             cursor: "pointer", letterSpacing: "0.3px",
           }}>Add manually</button>
         </div>
@@ -2785,7 +2786,7 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
   const inputStyle = {
     background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
     borderRadius: 12, padding: "11px 14px", fontSize: 15,
-    color: "#fff", fontFamily: "'Nunito Sans', sans-serif", outline: "none",
+    color: "#fff", outline: "none",
     width: "100%", boxSizing: "border-box",
   };
 
@@ -2793,7 +2794,7 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
     <div style={{ position: "fixed", inset: 0, zIndex: 202, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
       <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "85vh", overflowY: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
-          <button onClick={onBack} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif", padding: "0 12px 0 0" }}>←</button>
+          <button onClick={onBack} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer", padding: "0 12px 0 0" }}>←</button>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>Manual add</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>What's the plant called?</div>
@@ -2814,7 +2815,7 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
             padding: "11px 16px", borderRadius: 12, border: "1px solid rgba(150,255,100,0.40)",
             borderTopColor: "rgba(200,255,160,0.70)",
             background: "rgba(100,220,80,0.22)", color: "#d4ffb0",
-            fontSize: 13, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+            fontSize: 13, fontWeight: 500,
             cursor: !name.trim() || analysing ? "default" : "pointer",
             opacity: !name.trim() || analysing ? 0.5 : 1,
             flexShrink: 0,
@@ -2867,7 +2868,7 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
           borderTopColor: name.trim() && !analysing ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
           borderRadius: 20,
           color: name.trim() && !analysing ? "#d4ffb0" : "rgba(255,255,255,0.25)",
-          fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+          fontSize: 14, fontWeight: 500,
           cursor: !name.trim() || saving || analysing ? "default" : "pointer",
           letterSpacing: "0.3px",
         }}>
@@ -2933,7 +2934,7 @@ function AuthScreen() {
             border: "1px solid rgba(255,255,255,0.3)",
             borderRadius: 16, cursor: loading ? "default" : "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
-            fontSize: 14, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+            fontSize: 14, fontWeight: 500,
             color: loading ? "rgba(255,255,255,0.4)" : "#1a1a1a",
             transition: "all 0.18s",
             boxShadow: loading ? "none" : "0 2px 8px rgba(0,0,0,0.12)",
@@ -3475,7 +3476,7 @@ useEffect(() => {
               <button onClick={() => setAddPlantOpen(true)} style={{
                 background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)",
                 borderRadius: 20, padding: "5px 14px", fontSize: 11,
-                color: "var(--green)", cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif",
+                color: "var(--green)", cursor: "pointer",
                 letterSpacing: "0.5px",
               }}>+ Add plant</button>
             </div>
@@ -3493,7 +3494,7 @@ useEffect(() => {
                       border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "rgba(255,255,255,0.12)"}`,
                       fontSize: 11, letterSpacing: "0.8px",
                       color: isActive ? "var(--green)" : "rgba(255,255,255,0.4)",
-                      fontFamily: "'Nunito Sans', sans-serif", cursor: "pointer", transition: "all 0.15s",
+                      cursor: "pointer", transition: "all 0.15s",
                     }}>
                       {r.name}
                       <span onClick={(e) => { e.stopPropagation(); setEditRoomData(r); }} style={{ fontSize: 10, opacity: 0.5, cursor: "pointer" }}>✎</span>
@@ -3576,7 +3577,7 @@ useEffect(() => {
 
             {plants.length > 0 && <AirQualitySlider plants={plants} />}
             <div style={{ padding: "24px 24px 40px", textAlign: "center" }}>
-              <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif", letterSpacing: "1.5px", textTransform: "uppercase" }}>Sign out</button>
+              <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", letterSpacing: "1.5px", textTransform: "uppercase" }}>Sign out</button>
             </div>
           </div>
         )}
@@ -3757,7 +3758,7 @@ useEffect(() => {
                     background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
                     border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
                     borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
-                    color: "#d4ffb0", fontSize: 15, fontFamily: "'Nunito Sans', sans-serif", fontWeight: 500,
+                    color: "#d4ffb0", fontSize: 15, fontWeight: 500,
                     cursor: scanning ? "default" : "pointer", letterSpacing: "0.3px",
                   }}>
                     {scanning ? "Scanning…" : "Scan plant"}
@@ -3844,7 +3845,7 @@ useEffect(() => {
         {screen === "garden" && (
           <div className="fade-up">
             <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif", padding: "6px 0" }}>← Overview</button>
+              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: "6px 0" }}>← Overview</button>
               <div style={{ flex: 1 }} />
               <ScanButton
                 onResult={async (entry) => {
@@ -3862,7 +3863,7 @@ useEffect(() => {
                   }
                 }}
                 renderTrigger={(onClick, scanning) => (
-                  <button onClick={onClick} style={{ background: "var(--green)", border: "none", borderRadius: 20, padding: "7px 16px", fontSize: 12, color: "#0a1a0a", fontWeight: 600, cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif" }}>
+                  <button onClick={onClick} style={{ background: "var(--green)", border: "none", borderRadius: 20, padding: "7px 16px", fontSize: 12, color: "#0a1a0a", fontWeight: 600, cursor: "pointer" }}>
                     {scanning ? "…" : "+ Scan"}
                   </button>
                 )}
@@ -3935,7 +3936,7 @@ useEffect(() => {
         {screen === "attention" && (
           <div className="fade-up">
             <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer", fontFamily: "'Nunito Sans', sans-serif", padding: "6px 0" }}>← Overview</button>
+              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: "6px 0" }}>← Overview</button>
             </div>
             <div style={{ padding: "24px 24px 8px" }}>
               <div style={{ fontSize: 10, letterSpacing: "3px", textTransform: "uppercase", color: "var(--warn)", marginBottom: 6 }}>Needs attention</div>
