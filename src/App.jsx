@@ -134,35 +134,14 @@ const css = `
   .lg-wrap-sm { border-radius: 18px; }
 
   .lg {
-    background: var(--glass-bg);
-    backdrop-filter: var(--glass-filter);
-    -webkit-backdrop-filter: var(--glass-filter);
-    border: 1px solid var(--glass-border);
-    border-top-color: var(--glass-border-top);
-    border-bottom-color: rgba(0,0,0,0.15);
-    box-shadow: var(--glass-shadow);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.15);
     border-radius: inherit;
     position: relative;
     overflow: hidden;
   }
-  .lg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(145deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.06) 30%, transparent 55%);
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 1;
-  }
-  .lg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: none;
-    border-radius: inherit;
-    pointer-events: none;
-    z-index: 1;
-  }
+  .lg::before { display: none; }
+  .lg::after { display: none; }
 
   @media (max-width: 430px) {
     .prow { background: rgba(255,255,255,0.04); }
@@ -187,23 +166,8 @@ const css = `
   .stat.span2 .stat-val { font-size: 14px; color: var(--text); }
   .action-tile { position: relative; }
 
-  .stat::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(148deg, rgba(255,255,255,0.20) 0%, rgba(255,255,255,0.05) 35%, transparent 60%);
-    border-radius: 20px;
-    pointer-events: none;
-    transition: opacity 0.4s ease;
-  }
-  .stat:hover::before { opacity: 1.4; }
-  .stat::after {
-    content: '';
-    position: absolute;
-    top: -30%; right: -15%;
-    width: 75%; height: 130%;
-    background: none;
-    pointer-events: none;
-  }
+  .stat::before { display: none; }
+  .stat::after { display: none; }
 
   .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
 
@@ -222,36 +186,25 @@ const css = `
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 18px;
     background: rgba(255,255,255,0.08);
-    backdrop-filter: blur(24px) saturate(160%) brightness(1.1);
-    -webkit-backdrop-filter: blur(24px) saturate(160%) brightness(1.1);
     z-index: 10;
-    border-bottom: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid rgba(255,255,255,0.12);
     position: relative;
   }
-  .detail-nav::after {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.10) 0%, transparent 55%);
-    pointer-events: none;
-  }
+  .detail-nav::after { display: none; }
   .dnav-back { background: none; border: none; font-size: 13px; color: var(--text-2); cursor: pointer; padding: 6px 0; }
   .dnav-counter { font-size: 11px; color: var(--text-2); letter-spacing: 1px; }
   .dnav-arrows { display: flex; gap: 4px; }
   .darrow {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    border-top-color: var(--glass-border-top);
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.18);
     border-radius: 20px;
     width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
     font-size: 15px; color: var(--text); cursor: pointer; transition: background 0.15s;
-    box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset;
   }
   .darrow:disabled { opacity: 0.3; cursor: default; }
   .darrow:not(:disabled):hover { background: rgba(255,255,255,0.16); transform: scale(1.08); }
-  .darrow:not(:disabled):active { background: var(--glass-bg-hover); transform: scale(0.95); }
+  .darrow:not(:disabled):active { background: rgba(255,255,255,0.20); transform: scale(0.95); }
 
   .dots { display: flex; justify-content: center; gap: 5px; padding: 10px 0 4px; }
   .dot  { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.22); transition: all 0.25s; width: 5px; cursor: pointer; }
@@ -297,22 +250,12 @@ const css = `
   .progress-fill  { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
 
   .care-box {
-    background: var(--glass-bg);
-    backdrop-filter: blur(16px) saturate(160%);
-    -webkit-backdrop-filter: blur(16px) saturate(160%);
-    border: 1px solid var(--glass-border);
-    border-top-color: var(--glass-border-top);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
     border-radius: 16px;
     padding: 14px 16px; font-size: 13px; line-height: 1.7; color: var(--text-2); font-weight: 300; margin-bottom: 14px;
-    position: relative; overflow: hidden;
   }
-  .care-box::before {
-    content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 48%;
-    background: linear-gradient(175deg, rgba(255,255,255,0.14) 0%, transparent 100%);
-    border-radius: 16px 16px 0 0;
-    pointer-events: none;
-  }
+  .care-box::before { display: none; }
   .warn-box {
     border: 1px solid rgba(248,113,113,0.35);
     background: rgba(248,113,113,0.12);
@@ -321,65 +264,44 @@ const css = `
 
   .btn-water {
     width: 100%; padding: 12px 8px;
-    background: rgba(100,220,80,0.22);
-    backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    border: 1px solid rgba(150,255,100,0.40);
-    border-top-color: rgba(200,255,160,0.70);
-    border-bottom-color: rgba(40,120,20,0.20);
+    background: rgba(100,220,80,0.18);
+    border: 1px solid rgba(150,255,100,0.30);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
     font-size: 14px; font-weight: 500;
     letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.22s ease;
-    position: relative; overflow: hidden;
     text-align: center;
   }
-  .btn-water::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 52%;
-    background: linear-gradient(to bottom, rgba(255,255,255,0.22), rgba(255,255,255,0.02));
-    border-radius: 20px 20px 0 0; pointer-events: none;
-  }
-  .btn-water:hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); box-shadow: 0 8px 28px rgba(60,180,30,0.30), 0 1.5px 0 rgba(200,255,160,0.55) inset; }
+  .btn-water::before { display: none; }
+  .btn-water:hover { transform: translateY(-1px); background: rgba(100,220,80,0.26); }
   .btn-water:active { transform: scale(0.98); }
 
   .btn-fertilize {
     width: 100%; padding: 12px 8px; margin-top: 8px;
-    background: rgba(100,220,80,0.22);
-    backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    border: 1px solid rgba(150,255,100,0.40);
-    border-top-color: rgba(200,255,160,0.70);
-    border-bottom-color: rgba(40,120,20,0.20);
+    background: rgba(100,220,80,0.18);
+    border: 1px solid rgba(150,255,100,0.30);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
     font-size: 14px; font-weight: 500;
     letter-spacing: 0.5px;
     cursor: pointer; transition: all 0.22s ease;
-    position: relative; overflow: hidden;
     text-align: center;
   }
-  .btn-fertilize:hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); box-shadow: 0 8px 28px rgba(60,180,30,0.30), 0 1.5px 0 rgba(200,255,160,0.55) inset; }
+  .btn-fertilize:hover { transform: translateY(-1px); background: rgba(100,220,80,0.26); }
   .btn-fertilize:active { transform: scale(0.98); }
 
   .btn-consult {
     width: 100%; padding: 10px 8px; margin-top: 8px;
-    background: rgba(100,220,80,0.22);
-    backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    border: 1px solid rgba(150,255,100,0.40);
-    border-top-color: rgba(200,255,160,0.70);
-    border-bottom-color: rgba(40,120,20,0.20);
+    background: rgba(100,220,80,0.18);
+    border: 1px solid rgba(150,255,100,0.30);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0;
     font-size: 13px; font-weight: 500;
     cursor: pointer; transition: all 0.22s ease;
     text-align: center;
   }
-  .btn-consult:hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); }
+  .btn-consult:hover { transform: translateY(-1px); background: rgba(100,220,80,0.26); }
   .btn-consult:active { transform: scale(0.98); }
 
   .btn-reset {
@@ -392,19 +314,8 @@ const css = `
   .swipe-hint { text-align: center; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-3); margin-top: 20px; }
 
   .shine { position: relative; overflow: hidden; }
-  .shine::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: linear-gradient(148deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 38%, transparent 58%);
-    border-radius: inherit; pointer-events: none; z-index: 1;
-  }
-  .shine::after {
-    content: '';
-    position: absolute; top: -40%; right: -20%;
-    width: 70%; height: 140%;
-    background: radial-gradient(ellipse at 70% 15%, rgba(160,255,100,0.12) 0%, transparent 60%);
-    pointer-events: none; z-index: 1;
-  }
+  .shine::before { display: none; }
+  .shine::after { display: none; }
 
   /* ─── ONBOARDING ────────────────────────────────────────────── */
   .ob-screen {
@@ -433,20 +344,15 @@ const css = `
   .ob-error { font-size: 12px; color: var(--warn); margin-top: 8px; }
   .ob-btn {
     width: 100%; padding: 15px; margin-top: 24px;
-    background: rgba(100,220,80,0.22);
-    backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    -webkit-backdrop-filter: blur(20px) saturate(200%) brightness(1.18);
-    border: 1px solid rgba(150,255,100,0.40);
-    border-top-color: rgba(200,255,160,0.70);
-    border-bottom-color: rgba(40,120,20,0.20);
+    background: rgba(100,220,80,0.18);
+    border: 1px solid rgba(150,255,100,0.30);
     border-radius: 20px;
-    box-shadow: 0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset;
     color: #d4ffb0; font-size: 14px;
     font-weight: 500; letter-spacing: 0.5px; cursor: pointer;
-    transition: all 0.22s ease; position: relative; overflow: hidden;
+    transition: all 0.22s ease;
   }
   .ob-btn:disabled { opacity: 0.35; cursor: default; }
-  .ob-btn:not(:disabled):hover { transform: translateY(-2px); background: rgba(100,220,80,0.32); }
+  .ob-btn:not(:disabled):hover { transform: translateY(-1px); background: rgba(100,220,80,0.26); }
   .ob-btn:not(:disabled):active { transform: scale(0.98); }
   .ob-loc-card {
     padding: 16px 18px; border-radius: 16px; cursor: pointer;
@@ -1207,7 +1113,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
         <div style={{
           margin: "0 22px 16px", width: "calc(100% - 44px)",
           background: "var(--card)",
-          backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
+         
           border: `1px solid ${URGENCY_COLOR[latestAnalysis.urgency]}44`,
           borderLeft: `3px solid ${URGENCY_COLOR[latestAnalysis.urgency]}`,
           borderRadius: 14, padding: "14px 16px",
@@ -1237,93 +1143,24 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
 const GLASS_VARS = {
   regular: {
-    bg: "rgba(255,255,255,0.11)", bgHover: "rgba(255,255,255,0.17)",
-    border: "rgba(255,255,255,0.22)", borderTop: "rgba(255,255,255,0.50)",
-    shadow: "0 2px 12px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.36) inset, 0 -1px 0 rgba(0,0,0,0.10) inset",
-    blur: "blur(22px) saturate(190%) brightness(1.14)",
+    bg: "rgba(255,255,255,0.10)", bgHover: "rgba(255,255,255,0.14)",
+    border: "rgba(255,255,255,0.15)",
   },
   interactive: {
-    bg: "rgba(255,255,255,0.13)", bgHover: "rgba(255,255,255,0.20)",
-    border: "rgba(255,255,255,0.26)", borderTop: "rgba(255,255,255,0.58)",
-    shadow: "0 3px 16px rgba(0,0,0,0.20), 0 1.5px 0 rgba(255,255,255,0.42) inset, 0 -1px 0 rgba(0,0,0,0.12) inset",
-    blur: "blur(24px) saturate(200%) brightness(1.16)",
+    bg: "rgba(255,255,255,0.12)", bgHover: "rgba(255,255,255,0.18)",
+    border: "rgba(255,255,255,0.18)",
   },
   prominent: {
-    bg: "rgba(100,220,80,0.22)", bgHover: "rgba(100,220,80,0.32)",
-    border: "rgba(150,255,100,0.40)", borderTop: "rgba(200,255,160,0.70)",
-    shadow: "0 4px 20px rgba(60,180,30,0.22), 0 1.5px 0 rgba(200,255,160,0.45) inset",
-    blur: "blur(20px) saturate(200%) brightness(1.18)",
+    bg: "rgba(100,220,80,0.15)", bgHover: "rgba(100,220,80,0.22)",
+    border: "rgba(150,255,100,0.25)",
   },
 };
 
-const _glass = { mouseX: 0.5, mouseY: 0.5, time: 0, rafId: null, listeners: new Set(), turbIds: ["liquid-refraction", "liquid-refraction-sm"] };
-
-function ensureGlassLoop() {
-  if (_glass.rafId) return;
-  let last = performance.now();
-  const turbs = {}; const disps = {};
-
-  function loop(now) {
-    const dt = Math.min((now - last) / 1000, 0.1);
-    last = now;
-    _glass.time += dt;
-    const t = _glass.time;
-
-    _glass.turbIds.forEach((id, i) => {
-      if (!turbs[id]) turbs[id] = document.querySelector(`#${id} feTurbulence`);
-      if (!disps[id]) disps[id] = document.querySelector(`#${id} feDisplacementMap`);
-      const turb = turbs[id]; const disp = disps[id];
-      if (!turb || !disp) return;
-
-      const base = i === 0 ? [0.012, 0.048] : [0.015, 0.060];
-      const fx = base[0] + Math.sin(t * 0.55 + i * 1.1) * 0.004;
-      const fy = base[1] + Math.cos(t * 0.38 + i * 0.85) * 0.008;
-      turb.setAttribute("baseFrequency", `${fx.toFixed(4)} ${fy.toFixed(4)}`);
-
-      const baseScale = i === 0 ? 18 : 11;
-      const target = baseScale * (0.35 + _glass.mouseX * 1.3 + _glass.mouseY * 0.2);
-      const cur = parseFloat(disp.getAttribute("scale") || baseScale);
-      disp.setAttribute("scale", (cur + (target - cur) * 0.055).toFixed(2));
-    });
-
-    _glass.listeners.forEach(fn => fn(t));
-    _glass.rafId = requestAnimationFrame(loop);
-  }
-  _glass.rafId = requestAnimationFrame(loop);
-
-  const onMove = (e) => {
-    const x = e.touches ? e.touches[0].clientX : e.clientX;
-    const y = e.touches ? e.touches[0].clientY : e.clientY;
-    _glass.mouseX = x / window.innerWidth;
-    _glass.mouseY = y / window.innerHeight;
-  };
-  window.addEventListener("mousemove", onMove, { passive: true });
-  window.addEventListener("touchmove", onMove, { passive: true });
-}
-
 function GlassContainer({ children, gap = 10, style = {}, className = "" }) {
-  useEffect(() => { ensureGlassLoop(); }, []);
-  // On mobile (<=430px) WebKit bleeds backdrop-filter outside its bounds regardless of clipping.
-  // We skip the shared blur div there and let card bg opacity handle the frosted look.
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= 430;
   return (
     <div style={{ position: "relative", display: "grid", gridTemplateColumns: "1fr 1fr", gap, ...style }} className={className}>
-      {!isMobile && (
-        <div style={{
-          position: "absolute", inset: 0,
-          backdropFilter: GLASS_VARS.regular.blur,
-          WebkitBackdropFilter: GLASS_VARS.regular.blur,
-          borderRadius: 22, zIndex: 0, pointerEvents: "none",
-        }} />
-      )}
       {children}
     </div>
-  );
-}
-
-function Specular({ borderRadius = 20 }) {
-  return (
-    <div style={{ position: "absolute", inset: 0, borderRadius, background: "linear-gradient(148deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.05) 32%, transparent 55%)", pointerEvents: "none", zIndex: 2 }} />
   );
 }
 
@@ -1339,19 +1176,16 @@ function GlassCard({ children, variant = "regular", borderRadius = 20, style = {
       onMouseLeave={() => setHovered(false)}
       style={{
         position: "relative", borderRadius,
-        background: hovered ? v.bgHover : (window.innerWidth <= 430 ? v.bgHover : v.bg),
+        background: hovered ? v.bgHover : v.bg,
         border: `1px solid ${v.border}`,
-        borderTopColor: v.borderTop, borderBottomColor: "rgba(0,0,0,0.12)",
-        boxShadow: hovered ? v.shadow.replace("rgba(0,0,0,0.18)", "rgba(0,0,0,0.26)").replace("rgba(0,0,0,0.20)", "rgba(0,0,0,0.28)") : v.shadow,
-        transform: hovered && isInteractive ? "translateY(-2px) scale(1.015)" : "none",
-        transition: "background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease",
+        transition: "background 0.18s ease, transform 0.18s ease",
+        transform: hovered && isInteractive ? "translateY(-1px)" : "none",
         cursor: isInteractive ? "pointer" : "default",
         overflow: "hidden", zIndex: 1, ...style,
       }}
       className={className}
     >
-      <Specular borderRadius={borderRadius} />
-      <div style={{ position: "relative", zIndex: 3 }}>{children}</div>
+      <div style={{ position: "relative", zIndex: 1 }}>{children}</div>
     </div>
   );
 }
@@ -1493,9 +1327,9 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
         <button onClick={() => onConfirm(dateVal)} style={{
           width: "100%", padding: "14px",
           background: isWater ? "rgba(100,220,80,0.22)" : "rgba(212,147,90,0.22)",
-          backdropFilter: "blur(20px)",
+         
           border: `1px solid ${isWater ? "rgba(150,255,100,0.4)" : "rgba(212,147,90,0.4)"}`,
-          borderTopColor: isWater ? "rgba(200,255,160,0.7)" : "rgba(240,190,140,0.7)",
+         
           borderRadius: 20, color: isWater ? "#d4ffb0" : "#ffe0b0",
           fontSize: 14, fontWeight: 500, cursor: "pointer", letterSpacing: "0.5px",
         }}>Save date</button>
@@ -1552,8 +1386,8 @@ function FertilizeModal({ onConfirm, onClose }) {
         </div>
         <button onClick={() => onConfirm(selected)} style={{
           width: "100%", padding: "14px",
-          background: "rgba(212,147,90,0.22)", backdropFilter: "blur(20px)",
-          border: "1px solid rgba(212,147,90,0.4)", borderTopColor: "rgba(240,190,140,0.7)",
+          background: "rgba(212,147,90,0.22)",
+          border: "1px solid rgba(212,147,90,0.4)",
           borderRadius: 20, color: "#ffe0b0", fontSize: 14,
           fontWeight: 500, cursor: "pointer", letterSpacing: "0.5px",
         }}>Log {DOSE_LABELS[selected]}</button>
@@ -1696,8 +1530,8 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
 
         <button onClick={() => onSave({ nickname, plantedDate, potType, potSize, soilType, location, room: location === "in-door" ? room : "", lightDistance })} style={{
           width: "100%", padding: "14px", marginTop: 24,
-          background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
-          border: "1px solid rgba(150,255,100,0.4)", borderTopColor: "rgba(200,255,160,0.7)",
+          background: "rgba(100,220,80,0.22)",
+          border: "1px solid rgba(150,255,100,0.4)",
           borderRadius: 20, color: "#d4ffb0",
           fontSize: 14, fontWeight: 500,
           cursor: "pointer", letterSpacing: "0.3px",
@@ -1780,15 +1614,15 @@ function WaterCheckModal({ plant, lastWatered, onWaterNow, onPostpone, onClose }
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <button onClick={onWaterNow} style={{
             width: "100%", padding: "15px",
-            background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
-            border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
-            borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
+            background: "rgba(100,220,80,0.22)",
+            border: "1px solid rgba(150,255,100,0.40)",
+            borderRadius: 20,
             color: "#d4ffb0", fontSize: 15, fontWeight: 500, cursor: "pointer",
           }}>Soil is dry — water now</button>
           <button onClick={onPostpone} style={{
             width: "100%", padding: "15px",
-            background: "rgba(138,180,200,0.15)", backdropFilter: "blur(20px)",
-            border: "1px solid rgba(138,180,200,0.30)", borderTopColor: "rgba(180,220,240,0.50)",
+            background: "rgba(138,180,200,0.15)",
+            border: "1px solid rgba(138,180,200,0.30)",
             borderRadius: 20, color: "#b8dff0", fontSize: 15, fontWeight: 500, cursor: "pointer",
           }}>Still wet — postpone</button>
         </div>
@@ -1880,7 +1714,7 @@ function PostponeModal({ plant, onConfirm, onClose }) {
           style={{
             width: "100%", padding: "15px",
             background: effectiveDays ? "rgba(138,180,200,0.22)" : "rgba(255,255,255,0.06)",
-            backdropFilter: "blur(20px)",
+           
             border: `1px solid ${effectiveDays ? "rgba(138,180,200,0.40)" : "rgba(255,255,255,0.10)"}`,
             borderTopColor: effectiveDays ? "rgba(180,220,240,0.65)" : "rgba(255,255,255,0.15)",
             borderRadius: 20,
@@ -2527,7 +2361,7 @@ function AddRoomModal({ onSave, onClose }) {
         }} style={{
           width: "100%", padding: "14px", marginTop: 24,
           background: valid ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
-          backdropFilter: "blur(20px)",
+         
           border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
           borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
           borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
@@ -2641,7 +2475,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
         }} style={{
           width: "100%", padding: "14px", marginTop: 24,
           background: valid ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
-          backdropFilter: "blur(20px)",
+         
           border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
           borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
           borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
@@ -2708,9 +2542,9 @@ function AddPlantModal({ onSave, onClose, scanButton }) {
           {scanButton}
           <button onClick={() => setMode("manual")} style={{
             width: "100%", padding: "16px",
-            background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
-            border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
-            borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
+            background: "rgba(100,220,80,0.22)",
+            border: "1px solid rgba(150,255,100,0.40)",
+            borderRadius: 20,
             color: "#d4ffb0", fontSize: 15, fontWeight: 500,
             cursor: "pointer", letterSpacing: "0.3px",
           }}>Add manually</button>
@@ -2813,7 +2647,7 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
           />
           <button onClick={lookupPlant} disabled={!name.trim() || analysing} style={{
             padding: "11px 16px", borderRadius: 12, border: "1px solid rgba(150,255,100,0.40)",
-            borderTopColor: "rgba(200,255,160,0.70)",
+           
             background: "rgba(100,220,80,0.22)", color: "#d4ffb0",
             fontSize: 13, fontWeight: 500,
             cursor: !name.trim() || analysing ? "default" : "pointer",
@@ -2863,7 +2697,7 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
         <button onClick={handleSave} disabled={!name.trim() || saving || analysing} style={{
           width: "100%", padding: "14px",
           background: name.trim() && !analysing ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
-          backdropFilter: "blur(20px)",
+         
           border: `1px solid ${name.trim() && !analysing ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
           borderTopColor: name.trim() && !analysing ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
           borderRadius: 20,
@@ -2918,12 +2752,8 @@ function AuthScreen() {
       <div style={{
         width: "100%", maxWidth: 360,
         background: "rgba(255,255,255,0.12)",
-        backdropFilter: "blur(24px) saturate(180%)",
-        WebkitBackdropFilter: "blur(24px) saturate(180%)",
-        border: "1px solid rgba(255,255,255,0.25)",
-        borderTopColor: "rgba(255,255,255,0.50)",
+        border: "1px solid rgba(255,255,255,0.15)",
         borderRadius: 24, padding: "32px 24px",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.18), 0 1.5px 0 rgba(255,255,255,0.35) inset",
       }}>
         <button
           onClick={signInWithGoogle}
@@ -3343,22 +3173,6 @@ useEffect(() => {
   return (
     <>
       <style>{css}</style>
-      <svg style={{ position: "absolute", width: 0, height: 0, overflow: "hidden" }} xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <filter id="liquid-refraction" x="-10%" y="-10%" width="120%" height="120%" colorInterpolationFilters="sRGB">
-            <feTurbulence id="lg-turbulence" type="fractalNoise" baseFrequency="0.012 0.048" numOctaves="3" seed="2" result="noise" />
-            <feGaussianBlur in="noise" stdDeviation="1.8" result="soft-noise" />
-            <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="22" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-            <feComposite in="displaced" in2="SourceGraphic" operator="atop" />
-          </filter>
-          <filter id="liquid-refraction-sm" x="-5%" y="-5%" width="110%" height="110%" colorInterpolationFilters="sRGB">
-            <feTurbulence type="fractalNoise" baseFrequency="0.015 0.06" numOctaves="2" seed="5" result="noise" />
-            <feGaussianBlur in="noise" stdDeviation="1.2" result="soft-noise" />
-            <feDisplacementMap in="SourceGraphic" in2="soft-noise" scale="14" xChannelSelector="R" yChannelSelector="G" result="displaced" />
-            <feComposite in="displaced" in2="SourceGraphic" operator="atop" />
-          </filter>
-        </defs>
-      </svg>
 
       <div
         className="app"
@@ -3755,9 +3569,9 @@ useEffect(() => {
                 renderTrigger={(onClick, scanning) => (
                   <button onClick={onClick} disabled={scanning} style={{
                     width: "100%", padding: "16px",
-                    background: "rgba(100,220,80,0.22)", backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(150,255,100,0.40)", borderTopColor: "rgba(200,255,160,0.70)",
-                    borderRadius: 20, boxShadow: "0 4px 20px rgba(60,180,30,0.18), 0 1.5px 0 rgba(200,255,160,0.40) inset",
+                    background: "rgba(100,220,80,0.22)",
+                    border: "1px solid rgba(150,255,100,0.40)",
+                    borderRadius: 20,
                     color: "#d4ffb0", fontSize: 15, fontWeight: 500,
                     cursor: scanning ? "default" : "pointer", letterSpacing: "0.3px",
                   }}>
@@ -3886,12 +3700,8 @@ useEffect(() => {
                 {gardenLog.map((entry) => (
                   <div key={entry.id} style={{
                     background: "rgba(255,255,255,0.09)",
-                    backdropFilter: "blur(20px) saturate(180%) brightness(1.1)",
-                    WebkitBackdropFilter: "blur(20px) saturate(180%) brightness(1.1)",
                     borderRadius: 20, overflow: "hidden",
-                    border: "1px solid rgba(255,255,255,0.22)",
-                    borderTop: "1px solid rgba(255,255,255,0.45)",
-                    boxShadow: "0 8px 32px rgba(0,0,0,0.2), 0 1.5px 0 rgba(255,255,255,0.30) inset"
+                    border: "1px solid rgba(255,255,255,0.15)",
                   }}>
                     <div style={{ position: "relative", height: 160 }}>
                       <img src={entry.dataUrl} alt={entry.commonName} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
