@@ -3334,7 +3334,7 @@ useEffect(() => {
         {screen === "overview" && (
           <div className="fade-up">
             <WeatherCard userProfile={userProfile} onWeatherLoad={setWeather} />
-            <GlassContainer gap={8} style={{ padding: "16px 16px 0", gridTemplateColumns: "1fr 1fr 1fr", gridAutoRows: "auto" }}>
+            <GlassContainer gap={8} style={{ padding: "16px 16px 0", gridTemplateColumns: "1fr 1fr", gridAutoRows: "auto" }}>
               <GlassCard borderRadius={16} variant="interactive" style={{ border: "none" }}>
                 <ScanButton
                   onResult={async (entry) => {
@@ -3354,7 +3354,12 @@ useEffect(() => {
                   }}
                   renderTrigger={(onClick, scanning) => (
                     <div style={{ cursor: "pointer", padding: "14px 12px", display: "flex", flexDirection: "column", gap: 8 }} onClick={onClick}>
-                      <div style={{ fontSize: 20 }}>⟡</div>
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                        <line x1="8" y1="11" x2="14" y2="11" />
+                        <line x1="11" y1="8" x2="11" y2="14" />
+                      </svg>
                       <div className="stat-l">{scanning ? "Scanning…" : "Find plant"}</div>
                     </div>
                   )}
@@ -3362,31 +3367,14 @@ useEffect(() => {
               </GlassCard>
               <GlassCard borderRadius={16} variant="interactive" onClick={() => setScreen("garden")} style={{ border: "none" }}>
                 <div style={{ cursor: "pointer", padding: "14px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
-                  <div style={{ fontSize: 20 }}>🌿</div>
-                  <div className="stat-l">Garden · {gardenLog.length}</div>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 22c-4-2-8-6-8-11a8 8 0 0 1 16 0c0 5-4 9-8 11z" />
+                    <path d="M12 8v6" />
+                    <path d="M9 11l3-3 3 3" />
+                  </svg>
+                  <div className="stat-l">Botanical garden · {gardenLog.length}</div>
                 </div>
               </GlassCard>
-              {(() => {
-                const warnPlants = plants.filter(p => {
-                  const d = daysSince(waterLog[p.id] || null);
-                  if (d !== null && d >= p.waterEveryDays) return true;
-                  const fDate = fertilizeLog[p.id] ? (typeof fertilizeLog[p.id] === "string" ? fertilizeLog[p.id] : fertilizeLog[p.id].date) : null;
-                  const fd = daysSince(fDate);
-                  if (fd !== null && fd >= 30) return true;
-                  return false;
-                });
-                const hasWarn = warnPlants.length > 0;
-                return (
-                  <GlassCard borderRadius={16} variant="interactive"
-                    onClick={hasWarn ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
-                    style={{ border: "none", ...(hasWarn ? { background: "rgba(248,113,113,0.15)" } : {}) }}>
-                    <div style={{ cursor: hasWarn ? "pointer" : "default", padding: "14px 12px", display: "flex", flexDirection: "column", gap: 8, opacity: hasWarn ? 1 : 0.45 }}>
-                      <div style={{ fontSize: 20 }}>{hasWarn ? "⚠" : "✓"}</div>
-                      <div className="stat-l">{hasWarn ? `Attention · ${warnPlants.length}` : "All good"}</div>
-                    </div>
-                  </GlassCard>
-                );
-              })()}
             </GlassContainer>
 
             <div style={{ padding: "20px 24px 0", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
@@ -3395,32 +3383,31 @@ useEffect(() => {
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 22px 10px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "oklch(0.78 0.03 145)" }}>Your plants</div>
-                <div style={{ fontSize: 11, color: "oklch(0.70 0.03 145)" }}>{plants.length}</div>
+                <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "oklch(0.78 0.03 145)" }}>Your plants ({plants.length})</div>
               </div>
             </div>
 
             {/* Room filter tabs */}
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 16px 10px", alignItems: "center" }}>
               <div onClick={() => setSelectedRoom(null)} style={{
-                display: "inline-flex", alignItems: "center", gap: 5,
-                padding: "5px 14px", borderRadius: 20,
-                background: selectedRoom === null ? "rgba(74,222,128,0.12)" : "oklch(0.95 0.015 145 / 0.06)",
-                border: `1px solid ${selectedRoom === null ? "rgba(74,222,128,0.25)" : "oklch(0.95 0.015 145 / 0.12)"}`,
+                display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5,
+                padding: "5px 14px", borderRadius: 20, minWidth: 64,
+                background: selectedRoom === null ? "rgba(74,222,128,0.12)" : "rgba(255,255,255,0.08)",
+                border: `1px solid ${selectedRoom === null ? "rgba(74,222,128,0.25)" : "rgba(255,255,255,0.18)"}`,
                 fontSize: 11, letterSpacing: "0.8px",
-                color: selectedRoom === null ? "var(--green)" : "oklch(0.67 0.03 145)",
+                color: selectedRoom === null ? "var(--green)" : "rgba(255,255,255,0.6)",
                 cursor: "pointer", transition: "all 0.15s",
               }}>All</div>
               {rooms.map(r => {
                 const isActive = selectedRoom === r.name;
                 return (
                   <div key={r.id} onClick={() => setSelectedRoom(isActive ? null : r.name)} style={{
-                    display: "inline-flex", alignItems: "center", gap: 5,
-                    padding: "5px 14px", borderRadius: 20,
-                    background: isActive ? "rgba(74,222,128,0.12)" : "oklch(0.95 0.015 145 / 0.06)",
-                    border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "oklch(0.95 0.015 145 / 0.12)"}`,
+                    display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 5,
+                    padding: "5px 14px", borderRadius: 20, minWidth: 64,
+                    background: isActive ? "rgba(74,222,128,0.12)" : "rgba(255,255,255,0.08)",
+                    border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "rgba(255,255,255,0.18)"}`,
                     fontSize: 11, letterSpacing: "0.8px",
-                    color: isActive ? "var(--green)" : "oklch(0.67 0.03 145)",
+                    color: isActive ? "var(--green)" : "rgba(255,255,255,0.6)",
                     cursor: "pointer", transition: "all 0.15s",
                   }}>
                     {r.name}
@@ -3431,8 +3418,8 @@ useEffect(() => {
               <div onClick={() => setAddRoomOpen(true)} style={{
                 display: "inline-flex", alignItems: "center", justifyContent: "center",
                 width: 28, height: 28, borderRadius: "50%",
-                background: "oklch(0.95 0.015 145 / 0.06)", border: "1px solid oklch(0.95 0.015 145 / 0.15)",
-                fontSize: 14, color: "oklch(0.63 0.03 145)",
+                background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.25)",
+                fontSize: 16, color: "rgba(255,255,255,0.7)", fontWeight: 300,
                 cursor: "pointer", transition: "background 0.15s",
               }}>+</div>
             </div>
