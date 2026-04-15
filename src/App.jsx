@@ -3482,22 +3482,21 @@ useEffect(() => {
                       })}
                     </GlassContainer>
                   )}
+                  <div style={{ display: "flex", justifyContent: "center", marginTop: 12 }}>
+                    <button onClick={() => setAddPlantOpen(true)} style={{
+                      background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
+                      borderRadius: 20, padding: "10px 28px", fontSize: 13,
+                      color: "var(--green)", cursor: "pointer",
+                      letterSpacing: "0.5px", fontWeight: 500,
+                      transition: "all 0.15s",
+                    }}>+ Add plant</button>
+                  </div>
                 </div>
               );
             })()}
 
 
 
-            {/* Add plant button */}
-            <div style={{ padding: "16px 16px 0", display: "flex", justifyContent: "center" }}>
-              <button onClick={() => setAddPlantOpen(true)} style={{
-                background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
-                borderRadius: 20, padding: "10px 28px", fontSize: 13,
-                color: "var(--green)", cursor: "pointer",
-                letterSpacing: "0.5px", fontWeight: 500,
-                transition: "all 0.15s",
-              }}>+ Add plant</button>
-            </div>
 
             {plants.length > 0 && <AirQualitySlider plants={plants} />}
             <div style={{ padding: "24px 24px 40px", textAlign: "center" }}>
