@@ -3229,32 +3229,8 @@ useEffect(() => {
         {screen === "overview" && (
           <div className="fade-up">
             <WeatherCard userProfile={userProfile} />
-            <GlassContainer gap={10} style={{ padding: "16px 16px 0", gridAutoRows: "130px" }}>
-              <GlassCard borderRadius={20} variant="interactive" style={{ height: 130 }}>
-                <div className="stat"><div className="stat-n">{plants.length}</div><div className="stat-l">Total plants</div></div>
-              </GlassCard>
-              {(() => {
-                const warnPlants = plants.filter(p => {
-                  const d = daysSince(waterLog[p.id] || null);
-                  if (d !== null && d >= p.waterEveryDays) return true;
-                  const fDate = fertilizeLog[p.id] ? (typeof fertilizeLog[p.id] === "string" ? fertilizeLog[p.id] : fertilizeLog[p.id].date) : null;
-                  const fd = daysSince(fDate);
-                  if (fd !== null && fd >= 30) return true;
-                  return false;
-                });
-                return (
-                  <GlassCard borderRadius={20} variant="interactive"
-                    onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
-                    style={{ height: 130, ...(warnPlants.length > 0 ? { background: "rgba(248,113,113,0.15)", borderColor: "rgba(248,113,113,0.35)", borderTopColor: "rgba(255,180,180,0.5)" } : {}) }}>
-                    <div className="stat" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default" }}>
-                      <div className="stat-n" style={{ color: warnPlants.length > 0 ? "var(--warn)" : "var(--text)" }}>{warnPlants.length}</div>
-                      <div className="stat-l">Need attention</div>
-                      {warnPlants.length > 0 && <div style={{ fontSize: 10, color: "rgba(248,113,113,0.7)", marginTop: 6, letterSpacing: 1 }}>tap to view →</div>}
-                    </div>
-                  </GlassCard>
-                );
-              })()}
-              <GlassCard borderRadius={20} variant="interactive" style={{ height: 130 }}>
+            <GlassContainer gap={8} style={{ padding: "16px 16px 0", gridTemplateColumns: "1fr 1fr 1fr", gridAutoRows: "auto" }}>
+              <GlassCard borderRadius={16} variant="interactive" style={{ border: "none" }}>
                 <ScanButton
                   onResult={async (entry) => {
                     setGardenLog(prev => [entry, ...prev]);
@@ -3271,14 +3247,49 @@ useEffect(() => {
                       });
                     }
                   }}
+                  renderTrigger={(onClick, scanning) => (
+                    <div className="stat" style={{ cursor: "pointer", padding: "16px 14px 14px" }} onClick={onClick}>
+                      {scanning ? (
+                        <>
+                          <div style={{ fontSize: 24, fontWeight: 600, lineHeight: 1, color: "var(--green)" }}>…</div>
+                          <div className="stat-l" style={{ marginTop: 4 }}>Scanning</div>
+                        </>
+                      ) : (
+                        <>
+                          <div style={{ fontSize: 22, lineHeight: 1, color: "var(--green)" }}>⟡</div>
+                          <div className="stat-l" style={{ marginTop: 6 }}>Scan</div>
+                        </>
+                      )}
+                    </div>
+                  )}
                 />
               </GlassCard>
-              <GlassCard borderRadius={20} variant="interactive" onClick={() => setScreen("garden")} style={{ height: 130 }}>
-                <div className="stat action-tile" style={{ cursor: "pointer" }}>
-                  <div className="stat-n">{gardenLog.length}</div>
-                  <div className="stat-l">Botanical garden</div>
+              <GlassCard borderRadius={16} variant="interactive" onClick={() => setScreen("garden")} style={{ border: "none" }}>
+                <div className="stat" style={{ cursor: "pointer", padding: "16px 14px 14px" }}>
+                  <div className="stat-n" style={{ fontSize: 28 }}>{gardenLog.length}</div>
+                  <div className="stat-l">Garden</div>
                 </div>
               </GlassCard>
+              {(() => {
+                const warnPlants = plants.filter(p => {
+                  const d = daysSince(waterLog[p.id] || null);
+                  if (d !== null && d >= p.waterEveryDays) return true;
+                  const fDate = fertilizeLog[p.id] ? (typeof fertilizeLog[p.id] === "string" ? fertilizeLog[p.id] : fertilizeLog[p.id].date) : null;
+                  const fd = daysSince(fDate);
+                  if (fd !== null && fd >= 30) return true;
+                  return false;
+                });
+                return (
+                  <GlassCard borderRadius={16} variant="interactive"
+                    onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
+                    style={{ border: "none", ...(warnPlants.length > 0 ? { background: "rgba(248,113,113,0.15)" } : {}) }}>
+                    <div className="stat" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default", padding: "16px 14px 14px", opacity: warnPlants.length === 0 ? 0.4 : 1 }}>
+                      <div className="stat-n" style={{ fontSize: 28, color: warnPlants.length > 0 ? "var(--warn)" : "var(--text)" }}>{warnPlants.length}</div>
+                      <div className="stat-l">Attention</div>
+                    </div>
+                  </GlassCard>
+                );
+              })()}
             </GlassContainer>
 
             <div style={{ padding: "20px 24px 0", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
@@ -3286,7 +3297,10 @@ useEffect(() => {
             </div>
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 22px 10px" }}>
-              <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>Your plants</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>Your plants</div>
+                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{plants.length}</div>
+              </div>
               <button onClick={() => setAddPlantOpen(true)} style={{
                 background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)",
                 borderRadius: 20, padding: "5px 14px", fontSize: 11,
