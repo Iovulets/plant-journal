@@ -695,13 +695,11 @@ function WeatherCardInline({ userProfile, onWeatherLoad }) {
   return (
     <div style={{ padding: "12px 10px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, height: "100%" }}>
       <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={52} />
-      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginTop: 6 }}>
-        <div style={{ textAlign: "center" }}>
-          <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
-        </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 6 }}>
+        <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
         <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.15)" }} />
-        <div style={{ textAlign: "center", display: "flex", alignItems: "center", gap: 4 }}>
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="rgba(255,255,255,0.45)" stroke="none">
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="rgba(255,255,255,0.45)" stroke="none">
             <path d="M12 2c0 0-7 8.5-7 13a7 7 0 0 0 14 0c0-4.5-7-13-7-13z" />
           </svg>
           <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.humidity}%</div>
