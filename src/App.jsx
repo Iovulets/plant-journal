@@ -78,7 +78,7 @@ function Polaroid({ src, tilt, pinColor, size = "large" }) {
 }
 
 const css = `
-  @import url('https://fonts.googleapis.com/css2?family=Literata:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Nunito+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500&family=Literata:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&family=Nunito+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400&display=swap');
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   button, input, select, textarea { font-family: inherit; }
@@ -89,7 +89,7 @@ const css = `
     --green-mid: rgba(74,222,128,0.18);
     --text: oklch(0.97 0.025 145);
     --text-2: oklch(0.85 0.025 145);
-    --text-3: oklch(0.65 0.03 145);
+    --text-3: oklch(0.75 0.03 145);
     --warn: #f87171;
     --warn-bg: rgba(248,113,113,0.15);
     /* Surfaces — green-tinted whites */
@@ -339,7 +339,7 @@ const css = `
     transition: border-color 0.2s;
   }
   .ob-input:focus { border-color: rgba(74,222,128,0.5); }
-  .ob-input::placeholder { color: oklch(0.42 0.03 145); }
+  .ob-input::placeholder { color: oklch(0.58 0.03 145); }
   .ob-error { font-size: 12px; color: var(--warn); margin-top: 8px; }
   .ob-btn {
     width: 100%; padding: 15px; margin-top: 24px;
@@ -373,7 +373,7 @@ const css = `
   }
   .ob-size-card.selected { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.45); }
   .ob-size-label { font-size: 13px; color: var(--text); font-weight: 500; }
-  .ob-size-hint { font-size: 10px; color: oklch(0.55 0.03 145); margin-top: 4px; }
+  .ob-size-hint { font-size: 10px; color: oklch(0.67 0.03 145); margin-top: 4px; }
   .ob-toggle {
     display: flex; border-radius: 12px; overflow: hidden;
     border: 1px solid oklch(0.95 0.015 145 / 0.18); background: oklch(0.95 0.015 145 / 0.06);
@@ -393,7 +393,7 @@ const css = `
     background: oklch(0.95 0.015 145 / 0.04);
   }
   .ob-compass-dir {
-    position: absolute; font-size: 11px; color: oklch(0.55 0.03 145);
+    position: absolute; font-size: 11px; color: oklch(0.67 0.03 145);
     font-weight: 500; letter-spacing: 1px; cursor: pointer;
     padding: 6px 10px; border-radius: 20px; transition: all 0.15s;
     user-select: none;
@@ -617,7 +617,7 @@ function WeatherCard({ userProfile, onWeatherLoad }) {
   if (loading) return (
     <div style={{ padding: "16px 16px 0" }}>
       <div style={{ padding: "14px 18px", borderRadius: 20, background: "oklch(0.95 0.015 145 / 0.06)", border: "1px solid oklch(0.95 0.015 145 / 0.10)" }}>
-        <div style={{ fontSize: 11, color: "oklch(0.45 0.03 145)" }}>Loading weather...</div>
+        <div style={{ fontSize: 11, color: "oklch(0.60 0.03 145)" }}>Loading weather...</div>
       </div>
     </div>
   );
@@ -773,7 +773,7 @@ function HumidityDetail({ plants, metrics }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
       {bars.map(b => (
         <div key={b.label}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "oklch(0.55 0.03 145)", marginBottom: 4 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "oklch(0.67 0.03 145)", marginBottom: 4 }}>
             <span>{b.label}</span><span>{b.value.toFixed(0)}%</span>
           </div>
           <div style={{ height: 4, background: "oklch(0.95 0.015 145 / 0.14)", borderRadius: 2, overflow: "hidden" }}>
@@ -781,7 +781,7 @@ function HumidityDetail({ plants, metrics }) {
           </div>
         </div>
       ))}
-      <div style={{ fontSize: 11, color: "oklch(0.55 0.03 145)", marginTop: 2, fontStyle: "italic" }}>
+      <div style={{ fontSize: 11, color: "oklch(0.67 0.03 145)", marginTop: 2, fontStyle: "italic" }}>
         Humidity is fine right now. Bookmark this in October when heating drops RH below 35%.
       </div>
     </div>
@@ -1056,7 +1056,7 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,15,5,0.96)", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
       <button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "oklch(0.70 0.03 145)", fontSize: 24, cursor: "pointer", lineHeight: 1 }}>✕</button>
-      <div style={{ position: "absolute", top: 24, left: 0, right: 0, textAlign: "center", fontSize: 11, color: "oklch(0.55 0.03 145)", letterSpacing: 2 }}>
+      <div style={{ position: "absolute", top: 24, left: 0, right: 0, textAlign: "center", fontSize: 11, color: "oklch(0.67 0.03 145)", letterSpacing: 2 }}>
         {current + 1} / {photos.length}
       </div>
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
@@ -1130,8 +1130,11 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           const rot = tilt + (stackIdx % 2 === 0 ? -stackIdx * 1.5 : stackIdx * 1.5);
           return (
             <div key={i} style={{ position: "absolute", top: offset, left: "50%", transform: `translateX(-50%) rotate(${rot}deg)`, zIndex: stackIdx }}>
-              <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 4px 16px rgba(60,30,10,0.14)" }}>
+              <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 4px 16px rgba(60,30,10,0.14)", position: "relative" }}>
                 <img src={photo.dataUrl} alt="" style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
+                <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center", fontFamily: "'Caveat', cursive", fontSize: 16, color: "#3a3a3a", letterSpacing: "0.5px" }}>
+                  {new Date(photo.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                </div>
               </div>
             </div>
           );
@@ -1144,8 +1147,11 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
             <div style={{ width: 2, height: 9, background: "linear-gradient(to bottom, #aaa, #ddd)", margin: "0 auto", borderRadius: "0 0 1px 1px" }} />
           </div>
           <div style={{ transform: `rotate(${tilt}deg)` }}>
-            <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)" }}>
+            <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)", position: "relative" }}>
               <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name} style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
+              <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center", fontFamily: "'Caveat', cursive", fontSize: 16, color: "#3a3a3a", letterSpacing: "0.5px" }}>
+                {topPhoto ? new Date(topPhoto.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "No photo yet"}
+              </div>
             </div>
           </div>
         </div>
@@ -1390,7 +1396,7 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
             style={{ width: "100%", background: "transparent", border: "none", outline: "none", fontSize: 18, color: "var(--text)", padding: "12px 0", cursor: "pointer" }}
           />
         </div>
-        <div style={{ fontSize: 11, color: "oklch(0.55 0.03 145)", marginBottom: 20, textAlign: "center" }}>
+        <div style={{ fontSize: 11, color: "oklch(0.67 0.03 145)", marginBottom: 20, textAlign: "center" }}>
           This edit will be logged in your care history.
         </div>
         <button onClick={() => onConfirm(dateVal)} style={{
@@ -1650,7 +1656,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                   transition: "all 0.15s",
                 }}
               >Delete plant</button>
-              <button onClick={() => { setDeleteMode(false); setDeleteInput(""); }} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "oklch(0.50 0.03 145)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setDeleteMode(false); setDeleteInput(""); }} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "oklch(0.63 0.03 145)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         )}
@@ -1765,7 +1771,7 @@ function PostponeModal({ plant, onConfirm, onClose }) {
                 autoFocus
                 style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 28, fontWeight: 600, color: "#b8dff0", padding: "10px 0", width: "100%", textAlign: "center" }}
               />
-              <span style={{ fontSize: 13, color: "oklch(0.55 0.03 145)", flexShrink: 0 }}>days</span>
+              <span style={{ fontSize: 13, color: "oklch(0.67 0.03 145)", flexShrink: 0 }}>days</span>
             </div>
           </div>
         )}
@@ -2269,7 +2275,7 @@ function OnboardingFlow({ user, onComplete }) {
                       ))}
                       <div className="ob-compass-center">
                         <div style={{ fontSize: 28, fontWeight: 300, color: "var(--green)" }}>{Math.round(compassHeading)}°</div>
-                        <div style={{ fontSize: 11, color: "oklch(0.55 0.03 145)" }}>{headingToDirection(compassHeading)}</div>
+                        <div style={{ fontSize: 11, color: "oklch(0.67 0.03 145)" }}>{headingToDirection(compassHeading)}</div>
                       </div>
                     </div>
                     {!windowDir ? (
@@ -2279,10 +2285,10 @@ function OnboardingFlow({ user, onComplete }) {
                     ) : (
                       <div style={{ marginTop: 14, fontSize: 14, color: "var(--green)", fontWeight: 500 }}>
                         {windowDir}-facing window
-                        <span onClick={() => setWindowDir("")} style={{ marginLeft: 10, fontSize: 12, color: "oklch(0.55 0.03 145)", cursor: "pointer", textDecoration: "underline" }}>redo</span>
+                        <span onClick={() => setWindowDir("")} style={{ marginLeft: 10, fontSize: 12, color: "oklch(0.67 0.03 145)", cursor: "pointer", textDecoration: "underline" }}>redo</span>
                       </div>
                     )}
-                    <div onClick={() => setCompassMode("manual")} style={{ marginTop: 10, fontSize: 11, color: "oklch(0.50 0.03 145)", cursor: "pointer", textDecoration: "underline" }}>
+                    <div onClick={() => setCompassMode("manual")} style={{ marginTop: 10, fontSize: 11, color: "oklch(0.63 0.03 145)", cursor: "pointer", textDecoration: "underline" }}>
                       Pick manually instead
                     </div>
                   </div>
@@ -2301,7 +2307,7 @@ function OnboardingFlow({ user, onComplete }) {
                         {windowDir ? (
                           <div style={{ fontSize: 16, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div>
                         ) : (
-                          <div style={{ fontSize: 12, color: "oklch(0.50 0.03 145)" }}>Tap a direction</div>
+                          <div style={{ fontSize: 12, color: "oklch(0.63 0.03 145)" }}>Tap a direction</div>
                         )}
                       </div>
                     </div>
@@ -2412,7 +2418,7 @@ function AddRoomModal({ onSave, onClose }) {
                   <div key={d} className={`ob-compass-dir${windowDir === d ? " selected" : ""}`} style={{ ...DIR_POSITIONS[d], position: "absolute" }} onClick={() => setWindowDir(d)}>{d}</div>
                 ))}
                 <div className="ob-compass-center">
-                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "oklch(0.50 0.03 145)" }}>Tap</div>}
+                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "oklch(0.63 0.03 145)" }}>Tap</div>}
                 </div>
               </div>
             </div>
@@ -2526,7 +2532,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
                   <div key={d} className={`ob-compass-dir${windowDir === d ? " selected" : ""}`} style={{ ...DIR_POSITIONS[d], position: "absolute" }} onClick={() => setWindowDir(d)}>{d}</div>
                 ))}
                 <div className="ob-compass-center">
-                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "oklch(0.50 0.03 145)" }}>Tap</div>}
+                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "oklch(0.63 0.03 145)" }}>Tap</div>}
                 </div>
               </div>
             </div>
@@ -2580,7 +2586,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
                 fontSize: 14, fontWeight: 500,
                 cursor: "pointer",
               }}>Delete room</button>
-              <button onClick={() => setDeleteMode(false)} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "oklch(0.50 0.03 145)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setDeleteMode(false)} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "oklch(0.63 0.03 145)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         )}
@@ -3432,7 +3438,7 @@ useEffect(() => {
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   width: 28, height: 28, borderRadius: "50%",
                   background: "oklch(0.95 0.015 145 / 0.06)", border: "1px solid oklch(0.95 0.015 145 / 0.15)",
-                  fontSize: 14, color: "oklch(0.50 0.03 145)",
+                  fontSize: 14, color: "oklch(0.63 0.03 145)",
                   cursor: "pointer", transition: "background 0.15s",
                 }}>+</div>
               </div>
@@ -3440,7 +3446,7 @@ useEffect(() => {
 
             {plants.length === 0 ? (
               <div style={{ padding: "40px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 13, color: "oklch(0.55 0.03 145)", lineHeight: 1.7, fontWeight: 300 }}>
+                <div style={{ fontSize: 13, color: "oklch(0.67 0.03 145)", lineHeight: 1.7, fontWeight: 300 }}>
                   No plants yet.<br />Tap + Add plant to start your garden.
                 </div>
               </div>
@@ -3455,7 +3461,7 @@ useEffect(() => {
               return (
                 <div style={{ padding: "0 14px 32px" }}>
                   {filteredPlants.length === 0 ? (
-                    <div style={{ padding: "24px 16px", textAlign: "center", fontSize: 13, color: "oklch(0.50 0.03 145)", fontStyle: "italic" }}>
+                    <div style={{ padding: "24px 16px", textAlign: "center", fontSize: 13, color: "oklch(0.63 0.03 145)", fontStyle: "italic" }}>
                       No plants in this room
                     </div>
                   ) : (
@@ -3844,7 +3850,7 @@ useEffect(() => {
                       <div style={{ background: "oklch(0.95 0.015 145 / 0.06)", borderRadius: 12, padding: "11px 14px", fontSize: 12, color: "oklch(0.67 0.03 145)", lineHeight: 1.65, fontWeight: 300, fontStyle: "italic" }}>
                         "{entry.funFact}"
                       </div>
-                      <div style={{ fontSize: 10, color: "oklch(0.45 0.03 145)", marginTop: 10, letterSpacing: "0.5px" }}>
+                      <div style={{ fontSize: 10, color: "oklch(0.60 0.03 145)", marginTop: 10, letterSpacing: "0.5px" }}>
                         Scanned {new Date(entry.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                       </div>
                     </div>
