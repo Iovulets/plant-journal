@@ -50,7 +50,7 @@ function Pin({ color }) {
 function Polaroid({ src, tilt, pinColor, size = "large" }) {
   const isLarge = size === "large";
   const photoW = isLarge ? 260 : 40;
-  const photoH = isLarge ? 260 : 36;
+  const photoH = isLarge ? 325 : 36;
   const padSide = isLarge ? 12 : 3;
   const padBottom = isLarge ? 44 : 12;
   const padTop = isLarge ? 12 : 3;
@@ -633,12 +633,12 @@ function WeatherCard({ userProfile, onWeatherLoad }) {
           {/* Temp */}
           <div style={{ flex: 1, minWidth: 0 }}>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 26, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
-            <div style={{ fontSize: 10, color: "oklch(0.60 0.03 145)", marginTop: 3, letterSpacing: "0.5px" }}>{weather.city}</div>
+            <div style={{ fontSize: 10, color: "oklch(0.82 0.03 145)", marginTop: 3, letterSpacing: "0.5px" }}>{weather.city}</div>
           </div>
           {/* Humidity */}
           <div style={{ flexShrink: 0, textAlign: "right" }}>
             <div style={{ fontSize: 20, fontWeight: 400, color: "var(--text)", lineHeight: 1 }}>{weather.humidity}%</div>
-            <div style={{ fontSize: 9, color: "oklch(0.60 0.03 145)", marginTop: 3, letterSpacing: "1px", textTransform: "uppercase" }}>Humidity</div>
+            <div style={{ fontSize: 9, color: "oklch(0.82 0.03 145)", marginTop: 3, letterSpacing: "1px", textTransform: "uppercase" }}>Humidity</div>
           </div>
         </div>
       </GlassCard>
@@ -1061,7 +1061,7 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
       </div>
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
         <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}>
-          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 300, height: 260, objectFit: "cover" }} />
+          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
           <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "#aaa", fontStyle: "italic" }}>
             {new Date(photos[current].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
           </div>
@@ -1123,7 +1123,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div style={{ position: "relative", width: 360, height: 328, marginBottom: 8 }}>
+      <div style={{ position: "relative", width: 360, height: 445, marginBottom: 8 }}>
         {stackPhotos.slice(1).reverse().map((photo, i) => {
           const stackIdx = stackPhotos.length - 1 - i;
           const offset = stackIdx * 4;
@@ -1131,7 +1131,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           return (
             <div key={i} style={{ position: "absolute", top: offset, left: "50%", transform: `translateX(-50%) rotate(${rot}deg)`, zIndex: stackIdx }}>
               <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 4px 16px rgba(60,30,10,0.14)" }}>
-                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 300, height: 260, objectFit: "cover" }} />
+                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
               </div>
             </div>
           );
@@ -1145,7 +1145,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           </div>
           <div style={{ transform: `rotate(${tilt}deg)` }}>
             <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)" }}>
-              <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name} style={{ display: "block", width: 300, height: 260, objectFit: "cover" }} />
+              <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name} style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
             </div>
           </div>
         </div>
@@ -3398,7 +3398,7 @@ useEffect(() => {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 22px 10px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "oklch(0.78 0.03 145)" }}>Your plants</div>
-                <div style={{ fontSize: 11, color: "oklch(0.50 0.03 145)" }}>{plants.length}</div>
+                <div style={{ fontSize: 11, color: "oklch(0.70 0.03 145)" }}>{plants.length}</div>
               </div>
               <button onClick={() => setAddPlantOpen(true)} style={{
                 background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)",
