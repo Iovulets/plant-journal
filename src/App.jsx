@@ -3353,26 +3353,17 @@ useEffect(() => {
                     }
                   }}
                   renderTrigger={(onClick, scanning) => (
-                    <div style={{ cursor: "pointer", padding: "16px 14px 14px", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%", boxSizing: "border-box" }} onClick={onClick}>
-                      {scanning ? (
-                        <>
-                          <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 600, lineHeight: 1, color: "var(--green)" }}>…</div>
-                          <div className="stat-l" style={{ marginTop: 6 }}>Scanning</div>
-                        </>
-                      ) : (
-                        <>
-                          <div style={{ fontSize: 22, lineHeight: 1, color: "var(--green)", marginBottom: 6 }}>⟡</div>
-                          <div className="stat-l">Find plant</div>
-                        </>
-                      )}
+                    <div style={{ cursor: "pointer", padding: "14px 12px", display: "flex", flexDirection: "column", gap: 8 }} onClick={onClick}>
+                      <div style={{ fontSize: 20 }}>⟡</div>
+                      <div className="stat-l">{scanning ? "Scanning…" : "Find plant"}</div>
                     </div>
                   )}
                 />
               </GlassCard>
               <GlassCard borderRadius={16} variant="interactive" onClick={() => setScreen("garden")} style={{ border: "none" }}>
-                <div style={{ cursor: "pointer", padding: "16px 14px 14px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                  <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 600, lineHeight: 1, color: "var(--text)" }}>{gardenLog.length}</div>
-                  <div className="stat-l" style={{ marginTop: 6 }}>Botanical garden</div>
+                <div style={{ cursor: "pointer", padding: "14px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
+                  <div style={{ fontSize: 20 }}>🌿</div>
+                  <div className="stat-l">Garden · {gardenLog.length}</div>
                 </div>
               </GlassCard>
               {(() => {
@@ -3384,13 +3375,14 @@ useEffect(() => {
                   if (fd !== null && fd >= 30) return true;
                   return false;
                 });
+                const hasWarn = warnPlants.length > 0;
                 return (
                   <GlassCard borderRadius={16} variant="interactive"
-                    onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
-                    style={{ border: "none", ...(warnPlants.length > 0 ? { background: "rgba(248,113,113,0.15)" } : {}) }}>
-                    <div style={{ cursor: warnPlants.length > 0 ? "pointer" : "default", padding: "16px 14px 14px", opacity: warnPlants.length === 0 ? 0.4 : 1, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
-                      <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 600, lineHeight: 1, color: warnPlants.length > 0 ? "var(--warn)" : "var(--text)" }}>{warnPlants.length}</div>
-                      <div className="stat-l" style={{ marginTop: 6 }}>Require attention</div>
+                    onClick={hasWarn ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
+                    style={{ border: "none", ...(hasWarn ? { background: "rgba(248,113,113,0.15)" } : {}) }}>
+                    <div style={{ cursor: hasWarn ? "pointer" : "default", padding: "14px 12px", display: "flex", flexDirection: "column", gap: 8, opacity: hasWarn ? 1 : 0.45 }}>
+                      <div style={{ fontSize: 20 }}>{hasWarn ? "⚠" : "✓"}</div>
+                      <div className="stat-l">{hasWarn ? `Attention · ${warnPlants.length}` : "All good"}</div>
                     </div>
                   </GlassCard>
                 );
@@ -3406,12 +3398,6 @@ useEffect(() => {
                 <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "oklch(0.78 0.03 145)" }}>Your plants</div>
                 <div style={{ fontSize: 11, color: "oklch(0.70 0.03 145)" }}>{plants.length}</div>
               </div>
-              <button onClick={() => setAddPlantOpen(true)} style={{
-                background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)",
-                borderRadius: 20, padding: "5px 14px", fontSize: 11,
-                color: "var(--green)", cursor: "pointer",
-                letterSpacing: "0.5px",
-              }}>+ Add plant</button>
             </div>
 
             {/* Room filter tabs */}
@@ -3514,6 +3500,17 @@ useEffect(() => {
             })()}
 
 
+
+            {/* Add plant button */}
+            <div style={{ padding: "16px 16px 0", display: "flex", justifyContent: "center" }}>
+              <button onClick={() => setAddPlantOpen(true)} style={{
+                background: "rgba(74,222,128,0.12)", border: "1px solid rgba(74,222,128,0.25)",
+                borderRadius: 20, padding: "10px 28px", fontSize: 13,
+                color: "var(--green)", cursor: "pointer",
+                letterSpacing: "0.5px", fontWeight: 500,
+                transition: "all 0.15s",
+              }}>+ Add plant</button>
+            </div>
 
             {plants.length > 0 && <AirQualitySlider plants={plants} />}
             <div style={{ padding: "24px 24px 40px", textAlign: "center" }}>
