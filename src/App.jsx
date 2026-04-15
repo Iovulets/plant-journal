@@ -693,13 +693,17 @@ function WeatherCardInline({ userProfile, onWeatherLoad }) {
   );
 
   return (
-    <div style={{ padding: "16px 14px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, height: "100%" }}>
-      <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={32} />
-      <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
-      <div style={{ fontSize: 10, color: "oklch(0.82 0.03 145)", letterSpacing: "0.5px" }}>{weather.city}</div>
-      <div style={{ marginTop: 4 }}>
-        <div style={{ fontSize: 16, fontWeight: 400, color: "var(--text)", lineHeight: 1, textAlign: "center" }}>{weather.humidity}%</div>
-        <div style={{ fontSize: 8, color: "oklch(0.82 0.03 145)", marginTop: 2, letterSpacing: "1px", textTransform: "uppercase", textAlign: "center" }}>Humidity</div>
+    <div style={{ padding: "12px 10px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 6, height: "100%" }}>
+      <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={52} />
+      <div style={{ fontSize: 10, color: "oklch(0.82 0.03 145)", letterSpacing: "0.5px", marginTop: 2 }}>{weather.city}</div>
+      <div style={{ display: "flex", alignItems: "baseline", gap: 12, marginTop: 4 }}>
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
+        </div>
+        <div style={{ width: 1, height: 18, background: "rgba(255,255,255,0.15)" }} />
+        <div style={{ textAlign: "center" }}>
+          <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.humidity}%</div>
+        </div>
       </div>
     </div>
   );
