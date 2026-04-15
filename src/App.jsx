@@ -37,10 +37,10 @@ function Pin({ color }) {
     <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", zIndex: 10, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
       <div style={{
         width: 18, height: 18, borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${color}dd, ${color})`,
-        boxShadow: `inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px rgba(255,255,255,0.35)`,
+        boxShadow: `inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px oklch(0.95 0.006 145 / 0.35)`,
         margin: "0 auto", position: "relative"
       }}>
-        <div style={{ position: "absolute", top: 3, left: 3, width: 5, height: 5, borderRadius: "50%", background: "rgba(255,255,255,0.5)" }} />
+        <div style={{ position: "absolute", top: 3, left: 3, width: 5, height: 5, borderRadius: "50%", background: "oklch(0.95 0.006 145 / 0.50)" }} />
       </div>
       <div style={{ width: 2, height: 9, background: "linear-gradient(to bottom, #aaa, #ddd)", margin: "0 auto", borderRadius: "0 0 1px 1px" }} />
     </div>
@@ -87,29 +87,28 @@ const css = `
     --green: #4ade80;
     --green-dim: #86efac;
     --green-mid: rgba(74,222,128,0.18);
-    --text: #ffffff;
-    --text-2: rgba(255,255,255,0.90);
-    --text-3: rgba(255,255,255,0.60);
+    --text: oklch(0.97 0.008 145);
+    --text-2: oklch(0.85 0.006 145);
+    --text-3: oklch(0.65 0.008 145);
     --warn: #f87171;
     --warn-bg: rgba(248,113,113,0.15);
-    --glass-bg: rgba(255,255,255,0.10);
-    --glass-bg-hover: rgba(255,255,255,0.14);
-    --glass-border: rgba(255,255,255,0.22);
-    --glass-border-top: rgba(255,255,255,0.48);
-    --glass-shadow: 0 8px 32px rgba(0,0,0,0.22), 0 1.5px 0 rgba(255,255,255,0.35) inset, 0 -1px 0 rgba(0,0,0,0.12) inset;
-    --glass-filter: blur(20px) saturate(180%) brightness(1.12);
-    --card: rgba(255,255,255,0.10);
-    --card-border: rgba(255,255,255,0.22);
+    /* Surfaces — green-tinted whites */
+    --surface: oklch(0.98 0.005 145 / 0.10);
+    --surface-hover: oklch(0.98 0.005 145 / 0.15);
+    --surface-border: oklch(0.90 0.008 145 / 0.18);
+    /* Legacy compat */
+    --card: oklch(0.98 0.005 145 / 0.10);
+    --card-border: oklch(0.90 0.008 145 / 0.18);
     --peach-dark: #4ade80;
     --peach-light: rgba(74,222,128,0.12);
     --peach-mid: rgba(74,222,128,0.28);
-    --warm: rgba(255,255,255,0.90);
-    --muted: rgba(255,255,255,0.80);
-    --text-muted: rgba(255,255,255,0.80);
-    --white: rgba(255,255,255,0.10);
+    --warm: oklch(0.85 0.006 145);
+    --muted: oklch(0.75 0.008 145);
+    --text-muted: oklch(0.75 0.008 145);
+    --white: oklch(0.98 0.005 145 / 0.10);
     --cream: #1a3a1a;
     --peach: rgba(74,222,128,0.18);
-    --soft-brown: rgba(255,255,255,0.8);
+    --soft-brown: oklch(0.80 0.006 145);
   }
 
   body { margin: 0; background: #0f1a0f; }
@@ -134,8 +133,8 @@ const css = `
   .lg-wrap-sm { border-radius: 18px; }
 
   .lg {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.15);
+    background: oklch(0.95 0.006 145 / 0.12);
+    border: 1px solid oklch(0.95 0.006 145 / 0.15);
     border-radius: inherit;
     position: relative;
     overflow: hidden;
@@ -144,14 +143,14 @@ const css = `
   .lg::after { display: none; }
 
   @media (max-width: 430px) {
-    .prow { background: rgba(255,255,255,0.04); }
+    .prow { background: oklch(0.95 0.006 145 / 0.04); }
 
   }
   .app > * { position: relative; z-index: 1; }
 
   .ov-hero { padding: 16px 24px 20px; background: transparent; }
   .ov-tag  { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); font-weight: 500; margin-bottom: 10px; }
-  .ov-heading { font-family: 'Literata', serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: #ffffff; }
+  .ov-heading { font-family: 'Literata', serif; font-size: 38px; font-weight: 600; line-height: 1.1; color: var(--text); }
   .ov-heading em { font-style: normal; color: #c8f0a0; }
   .ov-since { margin-top: 8px; font-size: 12px; color: var(--text-2); font-weight: 300; }
 
@@ -169,7 +168,7 @@ const css = `
   .stat::before { display: none; }
   .stat::after { display: none; }
 
-  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: rgba(255,255,255,0.7); }
+  .list-head { padding: 24px 22px 10px; font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase; color: oklch(0.78 0.008 145); }
 
   .prow { padding: 12px 14px; display: flex; align-items: center; gap: 12px; position: relative; }
   .prow > * { position: relative; z-index: 1; }
@@ -185,9 +184,9 @@ const css = `
   .detail-nav {
     display: flex; align-items: center; justify-content: space-between;
     padding: 14px 18px;
-    background: rgba(255,255,255,0.08);
+    background: oklch(0.95 0.006 145 / 0.08);
     z-index: 10;
-    border-bottom: 1px solid rgba(255,255,255,0.12);
+    border-bottom: 1px solid oklch(0.95 0.006 145 / 0.12);
     position: relative;
   }
   .detail-nav::after { display: none; }
@@ -195,19 +194,19 @@ const css = `
   .dnav-counter { font-size: 11px; color: var(--text-2); letter-spacing: 1px; }
   .dnav-arrows { display: flex; gap: 4px; }
   .darrow {
-    background: rgba(255,255,255,0.12);
-    border: 1px solid rgba(255,255,255,0.18);
+    background: oklch(0.95 0.006 145 / 0.12);
+    border: 1px solid oklch(0.95 0.006 145 / 0.18);
     border-radius: 20px;
     width: 32px; height: 32px;
     display: flex; align-items: center; justify-content: center;
     font-size: 15px; color: var(--text); cursor: pointer; transition: background 0.15s;
   }
   .darrow:disabled { opacity: 0.3; cursor: default; }
-  .darrow:not(:disabled):hover { background: rgba(255,255,255,0.16); transform: scale(1.08); }
-  .darrow:not(:disabled):active { background: rgba(255,255,255,0.20); transform: scale(0.95); }
+  .darrow:not(:disabled):hover { background: oklch(0.95 0.006 145 / 0.16); transform: scale(1.08); }
+  .darrow:not(:disabled):active { background: oklch(0.95 0.006 145 / 0.20); transform: scale(0.95); }
 
   .dots { display: flex; justify-content: center; gap: 5px; padding: 10px 0 4px; }
-  .dot  { height: 5px; border-radius: 3px; background: rgba(255,255,255,0.22); transition: all 0.25s; width: 5px; cursor: pointer; }
+  .dot  { height: 5px; border-radius: 3px; background: oklch(0.95 0.006 145 / 0.22); transition: all 0.25s; width: 5px; cursor: pointer; }
   .dot.on { background: var(--green); width: 18px; }
 
   .polaroid-stage { display: flex; justify-content: center; align-items: center; padding: 20px 0 8px; }
@@ -219,16 +218,16 @@ const css = `
   .nick-row { display: flex; align-items: center; gap: 8px; margin: 8px 0 20px; min-height: 30px; }
   .nick-show { font-size: 12px; color: var(--text-2); font-style: italic; }
   .nick-btn  {
-    background: rgba(255,255,255,0.08);
-    border: 1px dashed rgba(255,255,255,0.28);
+    background: oklch(0.95 0.006 145 / 0.08);
+    border: 1px dashed oklch(0.95 0.006 145 / 0.28);
     border-radius: 20px; padding: 4px 13px; font-size: 11px; color: var(--text-2);
     cursor: pointer; transition: all 0.15s;
   }
-  .nick-btn:hover { background: rgba(255,255,255,0.13); border-style: solid; }
-  .nick-input { border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--text); background: rgba(255,255,255,0.1); outline: none; width: 155px; }
+  .nick-btn:hover { background: oklch(0.95 0.006 145 / 0.13); border-style: solid; }
+  .nick-input { border: 1px solid oklch(0.95 0.006 145 / 0.30); border-radius: 20px; padding: 5px 14px; font-size: 12px; color: var(--text); background: oklch(0.95 0.006 145 / 0.10); outline: none; width: 155px; }
   .nick-save  { background: var(--green); border: none; border-radius: 20px; padding: 5px 13px; font-size: 11px; color: #0a1a0a; cursor: pointer; font-weight: 600; }
 
-  .rule { height: 1px; background: rgba(255,255,255,0.12); margin: 0 0 18px; }
+  .rule { height: 1px; background: oklch(0.95 0.006 145 / 0.12); margin: 0 0 18px; }
   .d-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
   .d-key { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-2); }
   .d-val { font-size: 13px; color: var(--text); }
@@ -239,19 +238,19 @@ const css = `
     margin-bottom: 12px; cursor: pointer; padding: 6px 10px; margin-left: -10px; margin-right: -10px;
     border-radius: 10px; transition: background 0.15s;
   }
-  .d-row-tap:hover { background: rgba(255,255,255,0.07); }
-  .d-row-tap:active { background: rgba(255,255,255,0.12); }
+  .d-row-tap:hover { background: oklch(0.95 0.006 145 / 0.07); }
+  .d-row-tap:active { background: oklch(0.95 0.006 145 / 0.12); }
   .d-val-tap { font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 5px; }
-  .d-val-tap-hint { font-size: 10px; color: rgba(255,255,255,0.55); background: rgba(255,255,255,0.1); border-radius: 4px; padding: 1px 5px; letter-spacing: 0.5px; }
+  .d-val-tap-hint { font-size: 10px; color: oklch(0.67 0.008 145); background: oklch(0.95 0.006 145 / 0.10); border-radius: 4px; padding: 1px 5px; letter-spacing: 0.5px; }
 
   .progress-wrap { margin-bottom: 20px; }
   .progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--text-2); margin-bottom: 6px; }
-  .progress-track { height: 4px; background: rgba(255,255,255,0.12); border-radius: 2px; overflow: hidden; }
+  .progress-track { height: 4px; background: oklch(0.95 0.006 145 / 0.12); border-radius: 2px; overflow: hidden; }
   .progress-fill  { height: 100%; border-radius: 2px; transition: width 0.5s ease; }
 
   .care-box {
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
+    background: oklch(0.95 0.006 145 / 0.08);
+    border: 1px solid oklch(0.95 0.006 145 / 0.12);
     border-radius: 16px;
     padding: 14px 16px; font-size: 13px; line-height: 1.7; color: var(--text-2); font-weight: 300; margin-bottom: 14px;
   }
@@ -305,11 +304,11 @@ const css = `
   .btn-consult:active { transform: scale(0.98); }
 
   .btn-reset {
-    width: 100%; padding: 12px; background: rgba(255,255,255,0.06);
-    color: var(--text-2); border: 1px solid rgba(255,255,255,0.15); border-radius: 16px;
+    width: 100%; padding: 12px; background: oklch(0.95 0.006 145 / 0.06);
+    color: var(--text-2); border: 1px solid oklch(0.95 0.006 145 / 0.15); border-radius: 16px;
     font-size: 12px; cursor: pointer; margin-top: 8px;
   }
-  .btn-reset:active { background: rgba(255,255,255,0.10); }
+  .btn-reset:active { background: oklch(0.95 0.006 145 / 0.10); }
 
   .swipe-hint { text-align: center; font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-3); margin-top: 20px; }
 
@@ -325,22 +324,22 @@ const css = `
   .ob-step-indicator { display: flex; gap: 6px; margin-bottom: 32px; }
   .ob-step-dot {
     height: 3px; flex: 1; border-radius: 2px;
-    background: rgba(255,255,255,0.15); transition: background 0.3s;
+    background: oklch(0.95 0.006 145 / 0.15); transition: background 0.3s;
   }
   .ob-step-dot.done { background: var(--green); }
   .ob-step-dot.active { background: rgba(74,222,128,0.5); }
   .ob-tag { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--green); margin-bottom: 10px; }
-  .ob-title { font-family: 'Literata', serif; font-size: 28px; font-weight: 600; color: #fff; line-height: 1.15; margin-bottom: 8px; }
-  .ob-subtitle { font-size: 13px; color: rgba(255,255,255,0.55); line-height: 1.6; margin-bottom: 28px; font-weight: 300; }
+  .ob-title { font-family: 'Literata', serif; font-size: 28px; font-weight: 600; color: var(--text); line-height: 1.15; margin-bottom: 8px; }
+  .ob-subtitle { font-size: 13px; color: oklch(0.67 0.008 145); line-height: 1.6; margin-bottom: 28px; font-weight: 300; }
   .ob-input {
     width: 100%; box-sizing: border-box;
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.20);
+    background: oklch(0.95 0.006 145 / 0.08); border: 1px solid oklch(0.95 0.006 145 / 0.20);
     border-radius: 14px; padding: 14px 16px; font-size: 15px;
-    color: #fff; outline: none;
+    color: var(--text); outline: none;
     transition: border-color 0.2s;
   }
   .ob-input:focus { border-color: rgba(74,222,128,0.5); }
-  .ob-input::placeholder { color: rgba(255,255,255,0.25); }
+  .ob-input::placeholder { color: oklch(0.42 0.008 145); }
   .ob-error { font-size: 12px; color: var(--warn); margin-top: 8px; }
   .ob-btn {
     width: 100%; padding: 15px; margin-top: 24px;
@@ -356,32 +355,32 @@ const css = `
   .ob-btn:not(:disabled):active { transform: scale(0.98); }
   .ob-loc-card {
     padding: 16px 18px; border-radius: 16px; cursor: pointer;
-    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15);
+    background: oklch(0.95 0.006 145 / 0.08); border: 1.5px solid oklch(0.95 0.006 145 / 0.15);
     transition: all 0.18s; display: flex; align-items: center; gap: 12px;
   }
   .ob-loc-card.selected {
     background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.45);
     box-shadow: 0 0 16px rgba(74,222,128,0.15);
   }
-  .ob-loc-icon { font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: rgba(255,255,255,0.06); }
+  .ob-loc-icon { font-size: 22px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 10px; background: oklch(0.95 0.006 145 / 0.06); }
   .ob-loc-label { font-size: 15px; font-weight: 500; color: var(--text); }
-  .ob-loc-check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,0.2); margin-left: auto; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; }
+  .ob-loc-check { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid oklch(0.95 0.006 145 / 0.20); margin-left: auto; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; }
   .ob-loc-check.on { background: var(--green); border-color: var(--green); color: #0a1a0a; }
   .ob-size-card {
     flex: 1; padding: 14px 8px; border-radius: 14px; cursor: pointer; text-align: center;
-    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.15);
+    background: oklch(0.95 0.006 145 / 0.08); border: 1.5px solid oklch(0.95 0.006 145 / 0.15);
     transition: all 0.18s;
   }
   .ob-size-card.selected { background: rgba(74,222,128,0.12); border-color: rgba(74,222,128,0.45); }
   .ob-size-label { font-size: 13px; color: var(--text); font-weight: 500; }
-  .ob-size-hint { font-size: 10px; color: rgba(255,255,255,0.4); margin-top: 4px; }
+  .ob-size-hint { font-size: 10px; color: oklch(0.55 0.008 145); margin-top: 4px; }
   .ob-toggle {
     display: flex; border-radius: 12px; overflow: hidden;
-    border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.06);
+    border: 1px solid oklch(0.95 0.006 145 / 0.18); background: oklch(0.95 0.006 145 / 0.06);
   }
   .ob-toggle button {
     flex: 1; padding: 10px 0; border: none; background: transparent;
-    color: rgba(255,255,255,0.5); font-size: 13px;
+    color: oklch(0.63 0.008 145); font-size: 13px;
     cursor: pointer; transition: all 0.18s; font-weight: 500;
   }
   .ob-toggle button.active {
@@ -389,31 +388,31 @@ const css = `
   }
   .ob-compass-ring {
     width: 220px; height: 220px; border-radius: 50%; margin: 0 auto;
-    border: 2px solid rgba(255,255,255,0.15); position: relative;
+    border: 2px solid oklch(0.95 0.006 145 / 0.15); position: relative;
     display: flex; align-items: center; justify-content: center;
-    background: rgba(255,255,255,0.04);
+    background: oklch(0.95 0.006 145 / 0.04);
   }
   .ob-compass-dir {
-    position: absolute; font-size: 11px; color: rgba(255,255,255,0.4);
+    position: absolute; font-size: 11px; color: oklch(0.55 0.008 145);
     font-weight: 500; letter-spacing: 1px; cursor: pointer;
     padding: 6px 10px; border-radius: 20px; transition: all 0.15s;
     user-select: none;
   }
-  .ob-compass-dir:hover { background: rgba(255,255,255,0.08); }
+  .ob-compass-dir:hover { background: oklch(0.95 0.006 145 / 0.08); }
   .ob-compass-dir.selected { color: var(--green); background: rgba(74,222,128,0.15); }
   .ob-compass-center {
-    font-size: 13px; color: rgba(255,255,255,0.5); text-align: center; line-height: 1.5;
+    font-size: 13px; color: oklch(0.63 0.008 145); text-align: center; line-height: 1.5;
   }
   .ob-select {
     width: 100%; box-sizing: border-box;
-    background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.20);
+    background: oklch(0.95 0.006 145 / 0.08); border: 1px solid oklch(0.95 0.006 145 / 0.20);
     border-radius: 14px; padding: 14px 16px; font-size: 15px;
-    color: #fff; outline: none;
+    color: var(--text); outline: none;
     appearance: none; -webkit-appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='rgba(255,255,255,0.4)' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='oklch(0.95 0.006 145 / 0.40)' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");
     background-repeat: no-repeat; background-position: right 16px center;
   }
-  .ob-select option { background: #0f1a0f; color: #fff; }
+  .ob-select option { background: #0f1a0f; color: var(--text); }
 
   /* ─── WEATHER ICON ANIMATIONS ───────────────────────────────── */
   @keyframes wx-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -491,9 +490,9 @@ function WeatherIcon({ code, isDay, size = 32 }) {
         </g>
         {/* Cloud drifting */}
         <g className="wx-drift">
-          <ellipse cx="20" cy="22" rx="12" ry="6" fill="rgba(255,255,255,0.5)" />
-          <ellipse cx="16" cy="18" rx="8" ry="5.5" fill="rgba(255,255,255,0.6)" />
-          <ellipse cx="24" cy="19" rx="6.5" ry="5" fill="rgba(255,255,255,0.55)" />
+          <ellipse cx="20" cy="22" rx="12" ry="6" fill="oklch(0.95 0.006 145 / 0.50)" />
+          <ellipse cx="16" cy="18" rx="8" ry="5.5" fill="oklch(0.95 0.006 145 / 0.60)" />
+          <ellipse cx="24" cy="19" rx="6.5" ry="5" fill="oklch(0.95 0.006 145 / 0.55)" />
         </g>
       </svg>
     ),
@@ -501,21 +500,21 @@ function WeatherIcon({ code, isDay, size = 32 }) {
       <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
         <path className="wx-pulse" d="M14 11a7 7 0 01-5-7c0-1 1.2-2 2.5-2.5a9 9 0 100 19c1-.4 3-1.5 3-3a7 7 0 01-5-6.5z" fill="#C8D8F0" opacity="0.65" style={{ transformOrigin: "10px 10px" }} />
         <g className="wx-drift">
-          <ellipse cx="20" cy="24" rx="12" ry="6" fill="rgba(255,255,255,0.5)" />
-          <ellipse cx="17" cy="20" rx="7" ry="5" fill="rgba(255,255,255,0.55)" />
+          <ellipse cx="20" cy="24" rx="12" ry="6" fill="oklch(0.95 0.006 145 / 0.50)" />
+          <ellipse cx="17" cy="20" rx="7" ry="5" fill="oklch(0.95 0.006 145 / 0.55)" />
         </g>
       </svg>
     ),
     cloudy: (
       <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
         <g className="wx-drift">
-          <ellipse cx="18" cy="20" rx="13" ry="7" fill="rgba(255,255,255,0.42)" />
-          <ellipse cx="14" cy="16" rx="8" ry="5.5" fill="rgba(255,255,255,0.52)" />
-          <ellipse cx="23" cy="17" rx="7" ry="5" fill="rgba(255,255,255,0.48)" />
+          <ellipse cx="18" cy="20" rx="13" ry="7" fill="oklch(0.95 0.006 145 / 0.42)" />
+          <ellipse cx="14" cy="16" rx="8" ry="5.5" fill="oklch(0.95 0.006 145 / 0.52)" />
+          <ellipse cx="23" cy="17" rx="7" ry="5" fill="oklch(0.95 0.006 145 / 0.48)" />
         </g>
         {/* Second layer with offset drift */}
         <g className="wx-bob">
-          <ellipse cx="19" cy="22" rx="9" ry="4.5" fill="rgba(255,255,255,0.3)" />
+          <ellipse cx="19" cy="22" rx="9" ry="4.5" fill="oklch(0.95 0.006 145 / 0.30)" />
         </g>
       </svg>
     ),
@@ -523,9 +522,9 @@ function WeatherIcon({ code, isDay, size = 32 }) {
       <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
         {/* Cloud */}
         <g className="wx-bob">
-          <ellipse cx="18" cy="14" rx="12" ry="6" fill="rgba(255,255,255,0.42)" />
-          <ellipse cx="14" cy="11" rx="7" ry="4.5" fill="rgba(255,255,255,0.48)" />
-          <ellipse cx="23" cy="12" rx="6" ry="4" fill="rgba(255,255,255,0.45)" />
+          <ellipse cx="18" cy="14" rx="12" ry="6" fill="oklch(0.95 0.006 145 / 0.42)" />
+          <ellipse cx="14" cy="11" rx="7" ry="4.5" fill="oklch(0.95 0.006 145 / 0.48)" />
+          <ellipse cx="23" cy="12" rx="6" ry="4" fill="oklch(0.95 0.006 145 / 0.45)" />
         </g>
         {/* Rain drops — staggered falling */}
         <line x1="11" y1="22" x2="10" y2="27" stroke="#8ab4c8" strokeWidth="1.5" strokeLinecap="round" style={{ animation: "wx-fall1 1.2s ease-in infinite" }} />
@@ -536,20 +535,20 @@ function WeatherIcon({ code, isDay, size = 32 }) {
     snowy: (
       <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
         <g className="wx-bob">
-          <ellipse cx="18" cy="14" rx="12" ry="6" fill="rgba(255,255,255,0.42)" />
-          <ellipse cx="14" cy="11" rx="7" ry="4.5" fill="rgba(255,255,255,0.48)" />
+          <ellipse cx="18" cy="14" rx="12" ry="6" fill="oklch(0.95 0.006 145 / 0.42)" />
+          <ellipse cx="14" cy="11" rx="7" ry="4.5" fill="oklch(0.95 0.006 145 / 0.48)" />
         </g>
         {/* Snowflakes — tumbling fall */}
-        <circle cx="11" cy="23" r="1.8" fill="rgba(255,255,255,0.6)" style={{ animation: "wx-tumble 2s ease-in infinite" }} />
-        <circle cx="18" cy="25" r="1.8" fill="rgba(255,255,255,0.55)" style={{ animation: "wx-tumble 2.2s ease-in infinite 0.5s" }} />
-        <circle cx="25" cy="23" r="1.8" fill="rgba(255,255,255,0.6)" style={{ animation: "wx-tumble 1.8s ease-in infinite 1s" }} />
+        <circle cx="11" cy="23" r="1.8" fill="oklch(0.95 0.006 145 / 0.60)" style={{ animation: "wx-tumble 2s ease-in infinite" }} />
+        <circle cx="18" cy="25" r="1.8" fill="oklch(0.95 0.006 145 / 0.55)" style={{ animation: "wx-tumble 2.2s ease-in infinite 0.5s" }} />
+        <circle cx="25" cy="23" r="1.8" fill="oklch(0.95 0.006 145 / 0.60)" style={{ animation: "wx-tumble 1.8s ease-in infinite 1s" }} />
       </svg>
     ),
     stormy: (
       <svg width={s} height={s} viewBox="0 0 36 36" fill="none">
         <g className="wx-bob">
-          <ellipse cx="18" cy="12" rx="12" ry="6" fill="rgba(255,255,255,0.38)" />
-          <ellipse cx="14" cy="9" rx="7" ry="4.5" fill="rgba(255,255,255,0.42)" />
+          <ellipse cx="18" cy="12" rx="12" ry="6" fill="oklch(0.95 0.006 145 / 0.38)" />
+          <ellipse cx="14" cy="9" rx="7" ry="4.5" fill="oklch(0.95 0.006 145 / 0.42)" />
         </g>
         {/* Lightning — intermittent flash */}
         <polygon points="17,18 20,18 15,30 19,23 15,23 19,16" fill="#FFD93D" style={{ animation: "wx-flash 3s ease-in-out infinite" }} />
@@ -615,8 +614,8 @@ function WeatherCard({ userProfile }) {
   if (!userProfile?.postal_code || error || (!loading && !weather)) return null;
   if (loading) return (
     <div style={{ padding: "16px 16px 0" }}>
-      <div style={{ padding: "14px 18px", borderRadius: 20, background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.10)" }}>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Loading weather...</div>
+      <div style={{ padding: "14px 18px", borderRadius: 20, background: "oklch(0.95 0.006 145 / 0.06)", border: "1px solid oklch(0.95 0.006 145 / 0.10)" }}>
+        <div style={{ fontSize: 11, color: "oklch(0.45 0.008 145)" }}>Loading weather...</div>
       </div>
     </div>
   );
@@ -631,13 +630,13 @@ function WeatherCard({ userProfile }) {
           </div>
           {/* Temp */}
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: "'Literata', serif", fontSize: 26, fontWeight: 500, color: "#fff", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
-            <div style={{ fontSize: 10, color: "rgba(255,255,255,0.45)", marginTop: 3, letterSpacing: "0.5px" }}>{weather.city}</div>
+            <div style={{ fontFamily: "'Literata', serif", fontSize: 26, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
+            <div style={{ fontSize: 10, color: "oklch(0.60 0.008 145)", marginTop: 3, letterSpacing: "0.5px" }}>{weather.city}</div>
           </div>
           {/* Humidity */}
           <div style={{ flexShrink: 0, textAlign: "right" }}>
-            <div style={{ fontSize: 20, fontWeight: 400, color: "#fff", lineHeight: 1 }}>{weather.humidity}%</div>
-            <div style={{ fontSize: 9, color: "rgba(255,255,255,0.45)", marginTop: 3, letterSpacing: "1px", textTransform: "uppercase" }}>Humidity</div>
+            <div style={{ fontSize: 20, fontWeight: 400, color: "var(--text)", lineHeight: 1 }}>{weather.humidity}%</div>
+            <div style={{ fontSize: 9, color: "oklch(0.60 0.008 145)", marginTop: 3, letterSpacing: "1px", textTransform: "uppercase" }}>Humidity</div>
           </div>
         </div>
       </GlassCard>
@@ -716,7 +715,7 @@ function VocDetail({ plants, metrics }) {
             onClick={() => setActiveVoc(activeVoc === voc ? null : voc)}>
             <div style={{ width: 7, height: 7, borderRadius: "50%", background: VOC_COLORS[voc] || "#c4b4a4", flexShrink: 0 }} />
             <div style={{ fontSize: 11, color: "var(--text)", width: 88, flexShrink: 0 }}>{voc}</div>
-            <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.14)", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ flex: 1, height: 3, background: "oklch(0.95 0.006 145 / 0.14)", borderRadius: 2, overflow: "hidden" }}>
               <div style={{ height: "100%", borderRadius: 2, width: `${(val/maxVoc)*100}%`, background: VOC_COLORS[voc] || "#c4b4a4" }} />
             </div>
             <div style={{ fontSize: 10, color: "var(--muted)", width: 40, textAlign: "right", flexShrink: 0 }}>{Math.round(val)}μg</div>
@@ -730,7 +729,7 @@ function VocDetail({ plants, metrics }) {
           return (
             <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 8, opacity: highlighted ? 1 : 0.25, transition: "opacity 0.2s" }}>
               <div style={{ fontSize: 9, width: 72, color: "var(--muted)", fontStyle: "italic", flexShrink: 0, lineHeight: 1.2 }}>{p.species}</div>
-              <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.14)", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ flex: 1, height: 3, background: "oklch(0.95 0.006 145 / 0.14)", borderRadius: 2, overflow: "hidden" }}>
                 <div style={{ height: "100%", borderRadius: 2, width: `${((p.vocPerHour||0)/maxPlantVoc)*100}%`, background: "linear-gradient(90deg, #c8b48a, #e8c4a0)" }} />
               </div>
               <div style={{ fontSize: 10, color: "var(--muted)", width: 52, textAlign: "right", flexShrink: 0 }}>{(p.vocPerHour/1000).toFixed(1)}k μg/h</div>
@@ -751,7 +750,7 @@ function Co2Detail({ plants, metrics }) {
       {sortedPlants.map(p => (
         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ fontSize: 9, width: 72, color: "var(--muted)", fontStyle: "italic", flexShrink: 0, lineHeight: 1.2 }}>{p.species}</div>
-          <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.14)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ flex: 1, height: 3, background: "oklch(0.95 0.006 145 / 0.14)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{ height: "100%", borderRadius: 2, width: `${((p.co2PerYear||0)/maxCo2)*100}%`, background: "linear-gradient(90deg, #b8c894, #d4e4b0)" }} />
           </div>
           <div style={{ fontSize: 10, color: "var(--muted)", width: 44, textAlign: "right", flexShrink: 0 }}>{p.co2PerYear}g/yr</div>
@@ -772,15 +771,15 @@ function HumidityDetail({ plants, metrics }) {
     <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 14 }}>
       {bars.map(b => (
         <div key={b.label}>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 4 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "oklch(0.55 0.008 145)", marginBottom: 4 }}>
             <span>{b.label}</span><span>{b.value.toFixed(0)}%</span>
           </div>
-          <div style={{ height: 4, background: "rgba(255,255,255,0.14)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ height: 4, background: "oklch(0.95 0.006 145 / 0.14)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{ height: "100%", borderRadius: 2, width: `${b.value}%`, background: b.color }} />
           </div>
         </div>
       ))}
-      <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginTop: 2, fontStyle: "italic" }}>
+      <div style={{ fontSize: 11, color: "oklch(0.55 0.008 145)", marginTop: 2, fontStyle: "italic" }}>
         Humidity is fine right now. Bookmark this in October when heating drops RH below 35%.
       </div>
     </div>
@@ -797,7 +796,7 @@ function Pm25Detail({ plants }) {
       {sortedPlants.map(p => (
         <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ fontSize: 9, width: 72, color: "var(--muted)", fontStyle: "italic", flexShrink: 0, lineHeight: 1.2 }}>{p.species}</div>
-          <div style={{ flex: 1, height: 3, background: "rgba(255,255,255,0.14)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ flex: 1, height: 3, background: "oklch(0.95 0.006 145 / 0.14)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{ height: "100%", borderRadius: 2, width: `${((pm25Scores[p.id]||10)/maxScore)*100}%`, background: "linear-gradient(90deg, #c8a894, #e8c4b0)" }} />
           </div>
           <div style={{ fontSize: 10, color: "var(--muted)", width: 44, textAlign: "right", flexShrink: 0 }}>{pm25Scores[p.id]||10}%</div>
@@ -820,7 +819,7 @@ function WellbeingDetail({ plants }) {
           <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--muted)", marginBottom: 4 }}>
             <span>{f.label}</span><span style={{ fontStyle: "italic" }}>{f.note}</span>
           </div>
-          <div style={{ height: 4, background: "rgba(255,255,255,0.14)", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ height: 4, background: "oklch(0.95 0.006 145 / 0.14)", borderRadius: 2, overflow: "hidden" }}>
             <div style={{ height: "100%", borderRadius: 2, width: `${(f.value/f.max)*100}%`, background: "linear-gradient(90deg, #a78bfa, #c4b5fd)" }} />
           </div>
         </div>
@@ -849,10 +848,10 @@ function AirQualitySlider({ plants }) {
         {AIR_CARDS.map(c => (
           <button key={c.id} onClick={() => setActiveCard(c.id)} style={{
             flexShrink: 0,
-            background: activeCard === c.id ? c.color : "rgba(255,255,255,0.09)",
-            border: `1px solid ${activeCard === c.id ? c.color : "rgba(255,255,255,0.22)"}`,
+            background: activeCard === c.id ? c.color : "oklch(0.95 0.006 145 / 0.09)",
+            border: `1px solid ${activeCard === c.id ? c.color : "oklch(0.95 0.006 145 / 0.22)"}`,
             borderRadius: 20, padding: "5px 13px", fontSize: 11,
-            color: activeCard === c.id ? "#0a1a0a" : "rgba(255,255,255,0.72)",
+            color: activeCard === c.id ? "#0a1a0a" : "oklch(0.85 0.006 145 / 0.72)",
             cursor: "pointer", fontWeight: 400,
             letterSpacing: "0.3px", transition: "all 0.2s",
           }}>
@@ -876,7 +875,7 @@ function AirQualitySlider({ plants }) {
         </div>
 
         <div style={{ marginBottom: 18 }}>
-          <div style={{ height: 6, background: "rgba(255,255,255,0.08)", borderRadius: 3, overflow: "hidden" }}>
+          <div style={{ height: 6, background: "oklch(0.95 0.006 145 / 0.08)", borderRadius: 3, overflow: "hidden" }}>
             <div style={{ height: "100%", borderRadius: 3, width: `${Math.min(m.pct, 100)}%`, background: `linear-gradient(90deg, ${card.color}, ${card.color}99)`, transition: "width 0.8s ease" }} />
           </div>
           <div style={{ textAlign: "right", fontSize: 10, color: card.color, marginTop: 4, letterSpacing: "0.5px", fontWeight: 500 }}>
@@ -886,7 +885,7 @@ function AirQualitySlider({ plants }) {
 
         {detailMap[activeCard]}
 
-        <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 10, padding: "10px 12px", fontSize: 11, color: "var(--text-2)", lineHeight: 1.6, fontWeight: 300 }}>
+        <div style={{ background: "oklch(0.95 0.006 145 / 0.06)", borderRadius: 10, padding: "10px 12px", fontSize: 11, color: "var(--text-2)", lineHeight: 1.6, fontWeight: 300 }}>
           {card.description}
         </div>
       </GlassCard>
@@ -986,8 +985,8 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   const [current, setCurrent] = useState(startIndex);
   return (
     <div style={{ position: "fixed", inset: 0, background: "rgba(30,15,5,0.96)", zIndex: 1000, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }} onClick={onClose}>
-      <button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "rgba(255,255,255,0.6)", fontSize: 24, cursor: "pointer", lineHeight: 1 }}>✕</button>
-      <div style={{ position: "absolute", top: 24, left: 0, right: 0, textAlign: "center", fontSize: 11, color: "rgba(255,255,255,0.4)", letterSpacing: 2 }}>
+      <button onClick={onClose} style={{ position: "absolute", top: 20, right: 20, background: "none", border: "none", color: "oklch(0.70 0.008 145)", fontSize: 24, cursor: "pointer", lineHeight: 1 }}>✕</button>
+      <div style={{ position: "absolute", top: 24, left: 0, right: 0, textAlign: "center", fontSize: 11, color: "oklch(0.55 0.008 145)", letterSpacing: 2 }}>
         {current + 1} / {photos.length}
       </div>
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
@@ -999,8 +998,8 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
         </div>
       </div>
       <div style={{ display: "flex", gap: 16, marginTop: 24 }} onClick={e => e.stopPropagation()}>
-        <button onClick={() => setCurrent(i => Math.max(0, i - 1))} disabled={current === 0} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === 0 ? 0.3 : 1 }}>‹</button>
-        <button onClick={() => setCurrent(i => Math.min(photos.length - 1, i + 1))} disabled={current === photos.length - 1} style={{ background: "rgba(255,255,255,0.1)", border: "none", color: "#fff", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === photos.length - 1 ? 0.3 : 1 }}>›</button>
+        <button onClick={() => setCurrent(i => Math.max(0, i - 1))} disabled={current === 0} style={{ background: "oklch(0.95 0.006 145 / 0.10)", border: "none", color: "var(--text)", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === 0 ? 0.3 : 1 }}>‹</button>
+        <button onClick={() => setCurrent(i => Math.min(photos.length - 1, i + 1))} disabled={current === photos.length - 1} style={{ background: "oklch(0.95 0.006 145 / 0.10)", border: "none", color: "var(--text)", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === photos.length - 1 ? 0.3 : 1 }}>›</button>
       </div>
       <div style={{ display: "flex", gap: 8, marginTop: 16, overflowX: "auto", padding: "4px 20px", maxWidth: 380 }} onClick={e => e.stopPropagation()}>
         {photos.map((p, i) => (
@@ -1069,8 +1068,8 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
         })}
         <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
           <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", zIndex: 11, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
-            <div style={{ width: 18, height: 18, borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${pinColor}dd, ${pinColor})`, boxShadow: "inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px rgba(255,255,255,0.35)", margin: "0 auto", position: "relative" }}>
-              <div style={{ position: "absolute", top: 3, left: 3, width: 5, height: 5, borderRadius: "50%", background: "rgba(255,255,255,0.5)" }} />
+            <div style={{ width: 18, height: 18, borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${pinColor}dd, ${pinColor})`, boxShadow: "inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px oklch(0.95 0.006 145 / 0.35)", margin: "0 auto", position: "relative" }}>
+              <div style={{ position: "absolute", top: 3, left: 3, width: 5, height: 5, borderRadius: "50%", background: "oklch(0.95 0.006 145 / 0.50)" }} />
             </div>
             <div style={{ width: 2, height: 9, background: "linear-gradient(to bottom, #aaa, #ddd)", margin: "0 auto", borderRadius: "0 0 1px 1px" }} />
           </div>
@@ -1085,16 +1084,16 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
       <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: userPhotos.length > 0 ? 16 : 8 }}>
         <input ref={fileRef} type="file" accept="image/*" style={{ display: "none" }} onChange={handleFile} />
         <button onClick={() => fileRef.current?.click()} disabled={analysing} style={{
-          background: analysing ? "rgba(255,255,255,0.12)" : "var(--peach-dark)",
+          background: analysing ? "oklch(0.95 0.006 145 / 0.12)" : "var(--peach-dark)",
           border: "none", borderRadius: 20, padding: "7px 16px",
-          fontSize: 12, color: "#fff", cursor: analysing ? "default" : "pointer",
+          fontSize: 12, color: "var(--text)", cursor: analysing ? "default" : "pointer",
           letterSpacing: "0.5px", transition: "all 0.2s",
         }}>
           {analysing ? "Analysing…" : "+ Add photo"}
         </button>
         {userPhotos.length > 0 && (
           <button onClick={() => { setGalleryStart(0); setGallery(true); }} style={{
-            background: "var(--white)", border: "1px solid rgba(255,255,255,0.12)",
+            background: "var(--white)", border: "1px solid oklch(0.95 0.006 145 / 0.12)",
             borderRadius: 20, padding: "7px 14px", fontSize: 12, color: "var(--muted)",
             cursor: "pointer",
           }}>
@@ -1125,7 +1124,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
               <div style={{ marginLeft: "auto", fontSize: 11, color: "var(--muted)", background: "var(--peach-light)", borderRadius: 10, padding: "2px 8px", flexShrink: 0 }}>~{latestAnalysis.waitDays}d</div>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.65)", lineHeight: 1.65, fontWeight: 300 }}>{latestAnalysis.recommendation}</div>
+          <div style={{ fontSize: 12, color: "oklch(0.73 0.008 145)", lineHeight: 1.65, fontWeight: 300 }}>{latestAnalysis.recommendation}</div>
           <div style={{ fontSize: 10, color: "rgba(176,153,142,0.6)", marginTop: 8, letterSpacing: "0.5px" }}>
             {new Date(allPhotos[0].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
           </div>
@@ -1143,12 +1142,12 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
 
 const GLASS_VARS = {
   regular: {
-    bg: "rgba(255,255,255,0.10)", bgHover: "rgba(255,255,255,0.14)",
-    border: "rgba(255,255,255,0.15)",
+    bg: "oklch(0.95 0.006 145 / 0.10)", bgHover: "oklch(0.95 0.006 145 / 0.14)",
+    border: "oklch(0.95 0.006 145 / 0.15)",
   },
   interactive: {
-    bg: "rgba(255,255,255,0.12)", bgHover: "rgba(255,255,255,0.18)",
-    border: "rgba(255,255,255,0.18)",
+    bg: "oklch(0.95 0.006 145 / 0.12)", bgHover: "oklch(0.95 0.006 145 / 0.18)",
+    border: "oklch(0.95 0.006 145 / 0.18)",
   },
   prominent: {
     bg: "rgba(100,220,80,0.15)", bgHover: "rgba(100,220,80,0.22)",
@@ -1272,7 +1271,7 @@ function ScanButton({ onResult, onStart, renderTrigger }) {
           {scanning ? (
             <>
               <div style={{ fontSize: 28, fontWeight: 600, lineHeight: 1, color: "var(--green)" }}>{progress}%</div>
-              <div style={{ marginTop: 6, height: 2, background: "rgba(255,255,255,0.12)", borderRadius: 1, overflow: "hidden" }}>
+              <div style={{ marginTop: 6, height: 2, background: "oklch(0.95 0.006 145 / 0.12)", borderRadius: 1, overflow: "hidden" }}>
                 <div style={{ height: "100%", width: `${progress}%`, background: "var(--green)", transition: "width 0.15s ease", borderRadius: 1 }} />
               </div>
               <div className="stat-l" style={{ marginTop: 4 }}>Scanning</div>
@@ -1304,13 +1303,13 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: accent, marginBottom: 2 }}>Edit date</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>{emoji} When did you {isWater ? "water" : "fertilize"}?</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
         <div style={{ background: accentBg, border: `1px solid ${accentBorder}`, borderRadius: 16, padding: "4px 16px", marginBottom: 12 }}>
           <input
@@ -1321,7 +1320,7 @@ function EditDateModal({ type, currentDate, onConfirm, onClose }) {
             style={{ width: "100%", background: "transparent", border: "none", outline: "none", fontSize: 18, color: "var(--text)", padding: "12px 0", cursor: "pointer" }}
           />
         </div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)", marginBottom: 20, textAlign: "center" }}>
+        <div style={{ fontSize: 11, color: "oklch(0.55 0.008 145)", marginBottom: 20, textAlign: "center" }}>
           This edit will be logged in your care history.
         </div>
         <button onClick={() => onConfirm(dateVal)} style={{
@@ -1347,24 +1346,24 @@ function FertilizeModal({ onConfirm, onClose }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(212,147,90,0.8)", marginBottom: 2 }}>Fertilize</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>How much did you use?</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
         <div style={{ marginBottom: 24 }}>
           <div style={{ position: "relative", height: 48, display: "flex", alignItems: "center" }}>
-            <div style={{ position: "absolute", left: 0, right: 0, height: 4, background: "rgba(255,255,255,0.12)", borderRadius: 2 }} />
+            <div style={{ position: "absolute", left: 0, right: 0, height: 4, background: "oklch(0.95 0.006 145 / 0.12)", borderRadius: 2 }} />
             <div style={{ position: "absolute", left: 0, height: 4, borderRadius: 2, background: "linear-gradient(90deg, rgba(212,147,90,0.6), rgba(212,147,90,1))", width: selected === 0 ? "0%" : selected === 0.5 ? "50%" : "100%", transition: "width 0.2s ease" }} />
             {DOSES.map((dose, i) => (
               <button key={dose} onClick={() => setSelected(dose)} style={{
                 position: "absolute", left: i === 0 ? "0%" : i === 1 ? "50%" : "100%",
                 transform: "translateX(-50%)", width: 28, height: 28, borderRadius: "50%",
-                background: selected === dose ? "rgba(212,147,90,1)" : "rgba(255,255,255,0.15)",
-                border: selected === dose ? "2px solid rgba(240,190,140,0.8)" : "2px solid rgba(255,255,255,0.2)",
+                background: selected === dose ? "rgba(212,147,90,1)" : "oklch(0.95 0.006 145 / 0.15)",
+                border: selected === dose ? "2px solid rgba(240,190,140,0.8)" : "2px solid oklch(0.95 0.006 145 / 0.20)",
                 cursor: "pointer", transition: "all 0.15s",
                 boxShadow: selected === dose ? "0 0 12px rgba(212,147,90,0.5)" : "none", zIndex: 1,
               }} />
@@ -1374,14 +1373,14 @@ function FertilizeModal({ onConfirm, onClose }) {
             {DOSES.map(dose => (
               <div key={dose} onClick={() => setSelected(dose)} style={{
                 fontSize: 11, cursor: "pointer",
-                color: selected === dose ? "rgba(212,147,90,1)" : "rgba(255,255,255,0.4)",
+                color: selected === dose ? "rgba(212,147,90,1)" : "oklch(0.95 0.006 145 / 0.40)",
                 fontWeight: selected === dose ? 500 : 400, transition: "color 0.15s",
                 width: "33%", textAlign: dose === 0 ? "left" : dose === 0.5 ? "center" : "right",
               }}>{DOSE_LABELS[dose]}</div>
             ))}
           </div>
         </div>
-        <div style={{ background: "rgba(212,147,90,0.08)", border: "1px solid rgba(212,147,90,0.2)", borderRadius: 12, padding: "10px 14px", fontSize: 12, color: "rgba(255,255,255,0.55)", marginBottom: 20, minHeight: 38 }}>
+        <div style={{ background: "rgba(212,147,90,0.08)", border: "1px solid rgba(212,147,90,0.2)", borderRadius: 12, padding: "10px 14px", fontSize: 12, color: "oklch(0.67 0.008 145)", marginBottom: 20, minHeight: 38 }}>
           {DOSE_DESC[selected]}
         </div>
         <button onClick={() => onConfirm(selected)} style={{
@@ -1413,17 +1412,17 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
   const [deleteInput, setDeleteInput] = useState("");
 
   const inputStyle = {
-    background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)",
+    background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.18)",
     borderRadius: 12, padding: "11px 14px", fontSize: 13,
-    color: "#fff", outline: "none",
+    color: "var(--text)", outline: "none",
     width: "100%", boxSizing: "border-box",
   };
-  const labelStyle = { fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8, display: "block" };
+  const labelStyle = { fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 8, display: "block" };
   const sectionStyle = { display: "flex", flexDirection: "column", gap: 4 };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 210, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
@@ -1431,7 +1430,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>Plant settings</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>{plant.name}</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
@@ -1455,9 +1454,9 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
               {POT_TYPES.map(t => (
                 <button key={t} onClick={() => setPotType(t === potType ? "" : t)} style={{
                   padding: "7px 13px", borderRadius: 20, border: "1px solid",
-                  borderColor: potType === t ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
-                  background: potType === t ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                  color: potType === t ? "var(--green)" : "rgba(255,255,255,0.6)",
+                  borderColor: potType === t ? "rgba(74,222,128,0.5)" : "oklch(0.95 0.006 145 / 0.15)",
+                  background: potType === t ? "rgba(74,222,128,0.15)" : "oklch(0.95 0.006 145 / 0.06)",
+                  color: potType === t ? "var(--green)" : "oklch(0.95 0.006 145 / 0.60)",
                   fontSize: 12, cursor: "pointer",
                 }}>{t}</button>
               ))}
@@ -1483,9 +1482,9 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
               {[{ id: "in-door", label: "In-door" }, { id: "balcony", label: "Balcony" }, { id: "garden", label: "Garden" }].map(l => (
                 <button key={l.id} onClick={() => { setLocation(l.id === location ? "" : l.id); if (l.id !== "in-door") setRoom(""); }} style={{
                   padding: "7px 13px", borderRadius: 20, border: "1px solid",
-                  borderColor: location === l.id ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
-                  background: location === l.id ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                  color: location === l.id ? "var(--green)" : "rgba(255,255,255,0.6)",
+                  borderColor: location === l.id ? "rgba(74,222,128,0.5)" : "oklch(0.95 0.006 145 / 0.15)",
+                  background: location === l.id ? "rgba(74,222,128,0.15)" : "oklch(0.95 0.006 145 / 0.06)",
+                  color: location === l.id ? "var(--green)" : "oklch(0.95 0.006 145 / 0.60)",
                   fontSize: 12, cursor: "pointer",
                 }}>{l.label}</button>
               ))}
@@ -1500,9 +1499,9 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                 {rooms.map(r => (
                   <button key={r.id} onClick={() => setRoom(r.name)} style={{
                     padding: "7px 13px", borderRadius: 20, border: "1px solid",
-                    borderColor: room === r.name ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
-                    background: room === r.name ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                    color: room === r.name ? "var(--green)" : "rgba(255,255,255,0.6)",
+                    borderColor: room === r.name ? "rgba(74,222,128,0.5)" : "oklch(0.95 0.006 145 / 0.15)",
+                    background: room === r.name ? "rgba(74,222,128,0.15)" : "oklch(0.95 0.006 145 / 0.06)",
+                    color: room === r.name ? "var(--green)" : "oklch(0.95 0.006 145 / 0.60)",
                     fontSize: 12, cursor: "pointer",
                   }}>{r.name}</button>
                 ))}
@@ -1517,9 +1516,9 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
               {LIGHT_DISTANCES.map(d => (
                 <button key={d} onClick={() => setLightDistance(d === lightDistance ? "" : d)} style={{
                   padding: "7px 13px", borderRadius: 20, border: "1px solid",
-                  borderColor: lightDistance === d ? "rgba(74,222,128,0.5)" : "rgba(255,255,255,0.15)",
-                  background: lightDistance === d ? "rgba(74,222,128,0.15)" : "rgba(255,255,255,0.06)",
-                  color: lightDistance === d ? "var(--green)" : "rgba(255,255,255,0.6)",
+                  borderColor: lightDistance === d ? "rgba(74,222,128,0.5)" : "oklch(0.95 0.006 145 / 0.15)",
+                  background: lightDistance === d ? "rgba(74,222,128,0.15)" : "oklch(0.95 0.006 145 / 0.06)",
+                  color: lightDistance === d ? "var(--green)" : "oklch(0.95 0.006 145 / 0.60)",
                   fontSize: 12, cursor: "pointer",
                 }}>{d}</button>
               ))}
@@ -1551,8 +1550,8 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
             <div onClick={e => e.stopPropagation()} style={{ background: "#1a0a0a", borderTop: "1px solid rgba(248,113,113,0.25)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
               <div style={{ marginBottom: 20 }}>
                 <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(248,113,113,0.8)", marginBottom: 6 }}>Permanent action</div>
-                <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "#fff", marginBottom: 8 }}>Delete {plant.name}?</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
+                <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>Delete {plant.name}?</div>
+                <div style={{ fontSize: 13, color: "oklch(0.60 0.008 145)", lineHeight: 1.6 }}>
                   This will remove all care logs, photos, and settings for this plant. Type <span style={{ color: "#f87171", fontWeight: 500 }}>delete plant</span> to confirm.
                 </div>
               </div>
@@ -1564,7 +1563,7 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                 style={{
                   width: "100%", boxSizing: "border-box", background: "rgba(248,113,113,0.08)",
                   border: "1px solid rgba(248,113,113,0.30)", borderRadius: 12,
-                  padding: "12px 14px", fontSize: 14, color: "#fff",
+                  padding: "12px 14px", fontSize: 14, color: "var(--text)",
                   outline: "none", marginBottom: 12,
                 }}
               />
@@ -1573,15 +1572,15 @@ function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelet
                 disabled={deleteInput !== "delete plant"}
                 style={{
                   width: "100%", padding: "14px",
-                  background: deleteInput === "delete plant" ? "rgba(248,113,113,0.25)" : "rgba(255,255,255,0.05)",
-                  border: `1px solid ${deleteInput === "delete plant" ? "rgba(248,113,113,0.5)" : "rgba(255,255,255,0.1)"}`,
-                  borderRadius: 20, color: deleteInput === "delete plant" ? "#f87171" : "rgba(255,255,255,0.2)",
+                  background: deleteInput === "delete plant" ? "rgba(248,113,113,0.25)" : "oklch(0.95 0.006 145 / 0.05)",
+                  border: `1px solid ${deleteInput === "delete plant" ? "rgba(248,113,113,0.5)" : "oklch(0.95 0.006 145 / 0.10)"}`,
+                  borderRadius: 20, color: deleteInput === "delete plant" ? "#f87171" : "oklch(0.95 0.006 145 / 0.20)",
                   fontSize: 14, fontWeight: 500,
                   cursor: deleteInput === "delete plant" ? "pointer" : "default",
                   transition: "all 0.15s",
                 }}
               >Delete plant</button>
-              <button onClick={() => { setDeleteMode(false); setDeleteInput(""); }} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => { setDeleteMode(false); setDeleteInput(""); }} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "oklch(0.50 0.008 145)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         )}
@@ -1595,20 +1594,20 @@ function WaterCheckModal({ plant, lastWatered, onWaterNow, onPostpone, onClose }
   const days = daysSince(lastWatered);
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(100,220,80,0.8)", marginBottom: 6 }}>Watering check</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1.3 }}>Is the soil ready<br />to be watered?</div>
             {days !== null && (
-              <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 8 }}>
+              <div style={{ fontSize: 12, color: "oklch(0.60 0.008 145)", marginTop: 8 }}>
                 {days < 0 ? "Postponed" : days === 0 ? "Watered today" : `Last watered ${days}d ago`} · schedule every {plant.waterEveryDays}d
               </div>
             )}
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>✕</button>
         </div>
-        <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 14, padding: "12px 16px", marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,0.5)", lineHeight: 1.6 }}>
+        <div style={{ background: "oklch(0.95 0.006 145 / 0.06)", borderRadius: 14, padding: "12px 16px", marginBottom: 20, fontSize: 12, color: "oklch(0.63 0.008 145)", lineHeight: 1.6 }}>
           Stick your finger 2–3 cm into the soil. Dry? Water now. Still damp? Postpone.
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -1647,23 +1646,23 @@ function PostponeModal({ plant, onConfirm, onClose }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(138,180,200,0.9)", marginBottom: 6 }}>Postpone watering</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)", lineHeight: 1.3 }}>Skip how many days?</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer", flexShrink: 0 }}>✕</button>
         </div>
 
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
           {QUICK_OPTIONS.map(d => (
             <button key={d} onClick={() => handleQuickSelect(d)} style={{
               flex: 1, padding: "14px 0", borderRadius: 16, border: "1px solid",
-              borderColor: !customMode && selected === d ? "rgba(138,180,200,0.55)" : "rgba(255,255,255,0.14)",
-              borderTopColor: !customMode && selected === d ? "rgba(180,220,240,0.75)" : "rgba(255,255,255,0.22)",
-              background: !customMode && selected === d ? "rgba(138,180,200,0.25)" : "rgba(255,255,255,0.07)",
-              color: !customMode && selected === d ? "#b8dff0" : "rgba(255,255,255,0.55)",
+              borderColor: !customMode && selected === d ? "rgba(138,180,200,0.55)" : "oklch(0.95 0.006 145 / 0.14)",
+              borderTopColor: !customMode && selected === d ? "rgba(180,220,240,0.75)" : "oklch(0.95 0.006 145 / 0.22)",
+              background: !customMode && selected === d ? "rgba(138,180,200,0.25)" : "oklch(0.95 0.006 145 / 0.07)",
+              color: !customMode && selected === d ? "#b8dff0" : "oklch(0.95 0.006 145 / 0.55)",
               fontSize: 22, fontWeight: 600,
               cursor: "pointer", transition: "all 0.15s",
               display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
@@ -1674,10 +1673,10 @@ function PostponeModal({ plant, onConfirm, onClose }) {
           ))}
           <button onClick={() => { setCustomMode(true); setCustomVal(""); }} style={{
             flex: 1, padding: "14px 0", borderRadius: 16, border: "1px solid",
-            borderColor: customMode ? "rgba(138,180,200,0.55)" : "rgba(255,255,255,0.14)",
-            borderTopColor: customMode ? "rgba(180,220,240,0.75)" : "rgba(255,255,255,0.22)",
-            background: customMode ? "rgba(138,180,200,0.25)" : "rgba(255,255,255,0.07)",
-            color: customMode ? "#b8dff0" : "rgba(255,255,255,0.55)",
+            borderColor: customMode ? "rgba(138,180,200,0.55)" : "oklch(0.95 0.006 145 / 0.14)",
+            borderTopColor: customMode ? "rgba(180,220,240,0.75)" : "oklch(0.95 0.006 145 / 0.22)",
+            background: customMode ? "rgba(138,180,200,0.25)" : "oklch(0.95 0.006 145 / 0.07)",
+            color: customMode ? "#b8dff0" : "oklch(0.95 0.006 145 / 0.55)",
             fontSize: 13, fontWeight: 500,
             cursor: "pointer", transition: "all 0.15s",
             display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
@@ -1696,13 +1695,13 @@ function PostponeModal({ plant, onConfirm, onClose }) {
                 autoFocus
                 style={{ flex: 1, background: "transparent", border: "none", outline: "none", fontSize: 28, fontWeight: 600, color: "#b8dff0", padding: "10px 0", width: "100%", textAlign: "center" }}
               />
-              <span style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", flexShrink: 0 }}>days</span>
+              <span style={{ fontSize: 13, color: "oklch(0.55 0.008 145)", flexShrink: 0 }}>days</span>
             </div>
           </div>
         )}
 
         {nextWaterDate
-          ? <div style={{ background: "rgba(255,255,255,0.05)", borderRadius: 12, padding: "10px 16px", marginBottom: 20, fontSize: 12, color: "rgba(255,255,255,0.45)", textAlign: "center" }}>
+          ? <div style={{ background: "oklch(0.95 0.006 145 / 0.05)", borderRadius: 12, padding: "10px 16px", marginBottom: 20, fontSize: 12, color: "oklch(0.60 0.008 145)", textAlign: "center" }}>
               Next watering reminder: <span style={{ color: "#b8dff0", fontWeight: 500 }}>{nextWaterDate}</span>
             </div>
           : <div style={{ marginBottom: 20 }} />
@@ -1713,12 +1712,12 @@ function PostponeModal({ plant, onConfirm, onClose }) {
           disabled={!effectiveDays}
           style={{
             width: "100%", padding: "15px",
-            background: effectiveDays ? "rgba(138,180,200,0.22)" : "rgba(255,255,255,0.06)",
+            background: effectiveDays ? "rgba(138,180,200,0.22)" : "oklch(0.95 0.006 145 / 0.06)",
            
-            border: `1px solid ${effectiveDays ? "rgba(138,180,200,0.40)" : "rgba(255,255,255,0.10)"}`,
-            borderTopColor: effectiveDays ? "rgba(180,220,240,0.65)" : "rgba(255,255,255,0.15)",
+            border: `1px solid ${effectiveDays ? "rgba(138,180,200,0.40)" : "oklch(0.95 0.006 145 / 0.10)"}`,
+            borderTopColor: effectiveDays ? "rgba(180,220,240,0.65)" : "oklch(0.95 0.006 145 / 0.15)",
             borderRadius: 20,
-            color: effectiveDays ? "#b8dff0" : "rgba(255,255,255,0.25)",
+            color: effectiveDays ? "#b8dff0" : "oklch(0.95 0.006 145 / 0.25)",
             fontSize: 15, fontWeight: 500,
             cursor: effectiveDays ? "pointer" : "default", transition: "all 0.15s",
           }}
@@ -1789,13 +1788,13 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 200, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", maxHeight: "75vh", display: "flex", flexDirection: "column", maxWidth: 430, width: "100%", margin: "0 auto" }}>
-        <div style={{ display: "flex", alignItems: "center", padding: "16px 20px 12px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", maxHeight: "75vh", display: "flex", flexDirection: "column", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+        <div style={{ display: "flex", alignItems: "center", padding: "16px 20px 12px", borderBottom: "1px solid oklch(0.95 0.006 145 / 0.08)" }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>AI Assistant</div>
             <div style={{ fontSize: 16, fontWeight: 500, color: "var(--text)" }}>Consult Gardener</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
         <div style={{ flex: 1, overflowY: "auto", padding: "16px 16px 8px", display: "flex", flexDirection: "column", gap: 10 }}>
           {messages.length === 0 && (
@@ -1807,18 +1806,18 @@ function ConsultGardener({ plant, latestAnalysis, latestPhotoBase64, careContext
           {messages.map((m, i) => (
             <div key={i} style={{
               alignSelf: m.role === "user" ? "flex-end" : "flex-start", maxWidth: "82%",
-              background: m.role === "user" ? "rgba(74,222,128,0.18)" : "rgba(255,255,255,0.09)",
-              border: `1px solid ${m.role === "user" ? "rgba(74,222,128,0.3)" : "rgba(255,255,255,0.15)"}`,
+              background: m.role === "user" ? "rgba(74,222,128,0.18)" : "oklch(0.95 0.006 145 / 0.09)",
+              border: `1px solid ${m.role === "user" ? "rgba(74,222,128,0.3)" : "oklch(0.95 0.006 145 / 0.15)"}`,
               borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
               padding: "10px 14px", fontSize: 13, color: "var(--text)", lineHeight: 1.55,
             }}>{m.text}</div>
           ))}
-          {loading && <div style={{ alignSelf: "flex-start", background: "rgba(255,255,255,0.09)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", fontSize: 13, color: "var(--text-2)" }}>Thinking…</div>}
+          {loading && <div style={{ alignSelf: "flex-start", background: "oklch(0.95 0.006 145 / 0.09)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "18px 18px 18px 4px", padding: "10px 14px", fontSize: 13, color: "var(--text-2)" }}>Thinking…</div>}
           <div ref={bottomRef} />
         </div>
         <div style={{ padding: "8px 12px 20px", display: "flex", gap: 8, alignItems: "center" }}>
           <input value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === "Enter" && send()} placeholder="Ask about your plant…"
-            style={{ flex: 1, background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.18)", borderRadius: 20, padding: "10px 16px", fontSize: 13, color: "var(--text)", outline: "none" }} />
+            style={{ flex: 1, background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.18)", borderRadius: 20, padding: "10px 16px", fontSize: 13, color: "var(--text)", outline: "none" }} />
           <button onClick={send} disabled={!input.trim() || loading} style={{ background: "var(--green)", border: "none", borderRadius: "50%", width: 38, height: 38, fontSize: 16, cursor: "pointer", color: "#0a1a0a", flexShrink: 0, opacity: (!input.trim() || loading) ? 0.4 : 1, transition: "opacity 0.15s" }}>↑</button>
         </div>
       </div>
@@ -2133,13 +2132,13 @@ function OnboardingFlow({ user, onComplete }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
             {/* Room name */}
             <div>
-              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Room name</div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 8 }}>Room name</div>
               <input className="ob-input" placeholder="e.g. Living Room, Bedroom" value={roomName} onChange={e => setRoomName(e.target.value.slice(0, 40))} />
             </div>
 
             {/* Room size */}
             <div>
-              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Room size</div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 8 }}>Room size</div>
               <div style={{ display: "flex", gap: 8 }}>
                 {["Small", "Medium", "Large"].map(s => (
                   <div key={s} className={`ob-size-card${roomSize === s ? " selected" : ""}`} onClick={() => setRoomSize(s)}>
@@ -2151,7 +2150,7 @@ function OnboardingFlow({ user, onComplete }) {
 
             {/* Temperature + unit toggle */}
             <div>
-              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Average temperature</div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 8 }}>Average temperature</div>
               <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                 <input
                   className="ob-input"
@@ -2177,7 +2176,7 @@ function OnboardingFlow({ user, onComplete }) {
 
             {/* Windows */}
             <div>
-              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Does the room have windows?</div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 8 }}>Does the room have windows?</div>
               <div className="ob-toggle" style={{ width: 160 }}>
                 <button className={hasWindows ? "active" : ""} onClick={() => setHasWindows(true)}>Yes</button>
                 <button className={!hasWindows ? "active" : ""} onClick={() => { setHasWindows(false); setWindowDir(""); }}>No</button>
@@ -2187,7 +2186,7 @@ function OnboardingFlow({ user, onComplete }) {
             {/* Window direction */}
             {hasWindows && (
               <div>
-                <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>Window direction</div>
+                <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 8 }}>Window direction</div>
                 {compassMode === "live" && compassHeading != null ? (
                   <div style={{ textAlign: "center" }}>
                     <div className="ob-compass-ring">
@@ -2198,7 +2197,7 @@ function OnboardingFlow({ user, onComplete }) {
                       ))}
                       <div className="ob-compass-center">
                         <div style={{ fontSize: 28, fontWeight: 300, color: "var(--green)" }}>{Math.round(compassHeading)}°</div>
-                        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.4)" }}>{headingToDirection(compassHeading)}</div>
+                        <div style={{ fontSize: 11, color: "oklch(0.55 0.008 145)" }}>{headingToDirection(compassHeading)}</div>
                       </div>
                     </div>
                     {!windowDir ? (
@@ -2208,10 +2207,10 @@ function OnboardingFlow({ user, onComplete }) {
                     ) : (
                       <div style={{ marginTop: 14, fontSize: 14, color: "var(--green)", fontWeight: 500 }}>
                         {windowDir}-facing window
-                        <span onClick={() => setWindowDir("")} style={{ marginLeft: 10, fontSize: 12, color: "rgba(255,255,255,0.4)", cursor: "pointer", textDecoration: "underline" }}>redo</span>
+                        <span onClick={() => setWindowDir("")} style={{ marginLeft: 10, fontSize: 12, color: "oklch(0.55 0.008 145)", cursor: "pointer", textDecoration: "underline" }}>redo</span>
                       </div>
                     )}
-                    <div onClick={() => setCompassMode("manual")} style={{ marginTop: 10, fontSize: 11, color: "rgba(255,255,255,0.35)", cursor: "pointer", textDecoration: "underline" }}>
+                    <div onClick={() => setCompassMode("manual")} style={{ marginTop: 10, fontSize: 11, color: "oklch(0.50 0.008 145)", cursor: "pointer", textDecoration: "underline" }}>
                       Pick manually instead
                     </div>
                   </div>
@@ -2230,7 +2229,7 @@ function OnboardingFlow({ user, onComplete }) {
                         {windowDir ? (
                           <div style={{ fontSize: 16, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div>
                         ) : (
-                          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.35)" }}>Tap a direction</div>
+                          <div style={{ fontSize: 12, color: "oklch(0.50 0.008 145)" }}>Tap a direction</div>
                         )}
                       </div>
                     </div>
@@ -2283,25 +2282,25 @@ function AddRoomModal({ onSave, onClose }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 210, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>New room</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>Add a room</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           {/* Name */}
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room name</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Room name</div>
             <input className="ob-input" placeholder="e.g. Living Room, Bedroom" value={roomName} onChange={e => setRoomName(e.target.value.slice(0, 40))} autoFocus />
           </div>
 
           {/* Size */}
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room size</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Room size</div>
             <div style={{ display: "flex", gap: 8 }}>
               {["Small", "Medium", "Large"].map(s => (
                 <div key={s} className={`ob-size-card${roomSize === s ? " selected" : ""}`} onClick={() => setRoomSize(s)}>
@@ -2313,7 +2312,7 @@ function AddRoomModal({ onSave, onClose }) {
 
           {/* Temperature */}
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Average temperature</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Average temperature</div>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <input className="ob-input" style={{ flex: 1 }} type="text" inputMode="decimal" placeholder={tempUnit === "C" ? "e.g. 22" : "e.g. 72"} value={roomTemp} onChange={e => setRoomTemp(e.target.value.replace(/[^0-9.]/g, ""))} />
               <div className="ob-toggle" style={{ width: 100, flexShrink: 0 }}>
@@ -2325,7 +2324,7 @@ function AddRoomModal({ onSave, onClose }) {
 
           {/* Windows */}
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Does the room have windows?</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Does the room have windows?</div>
             <div className="ob-toggle" style={{ width: 160 }}>
               <button className={hasWindows ? "active" : ""} onClick={() => setHasWindows(true)}>Yes</button>
               <button className={!hasWindows ? "active" : ""} onClick={() => { setHasWindows(false); setWindowDir(""); }}>No</button>
@@ -2335,13 +2334,13 @@ function AddRoomModal({ onSave, onClose }) {
           {/* Direction */}
           {hasWindows && (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Window direction</div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Window direction</div>
               <div className="ob-compass-ring" style={{ width: 180, height: 180 }}>
                 {DIRECTIONS.map(d => (
                   <div key={d} className={`ob-compass-dir${windowDir === d ? " selected" : ""}`} style={{ ...DIR_POSITIONS[d], position: "absolute" }} onClick={() => setWindowDir(d)}>{d}</div>
                 ))}
                 <div className="ob-compass-center">
-                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Tap</div>}
+                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "oklch(0.50 0.008 145)" }}>Tap</div>}
                 </div>
               </div>
             </div>
@@ -2360,11 +2359,11 @@ function AddRoomModal({ onSave, onClose }) {
           setSaving(false);
         }} style={{
           width: "100%", padding: "14px", marginTop: 24,
-          background: valid ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
+          background: valid ? "rgba(100,220,80,0.22)" : "oklch(0.95 0.006 145 / 0.06)",
          
-          border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
-          borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
-          borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
+          border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "oklch(0.95 0.006 145 / 0.10)"}`,
+          borderTopColor: valid ? "rgba(200,255,160,0.7)" : "oklch(0.95 0.006 145 / 0.15)",
+          borderRadius: 20, color: valid ? "#d4ffb0" : "oklch(0.95 0.006 145 / 0.25)",
           fontSize: 14, fontWeight: 500,
           cursor: valid && !saving ? "pointer" : "default", letterSpacing: "0.3px",
           opacity: saving ? 0.5 : 1,
@@ -2402,23 +2401,23 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 210, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "88vh", overflowY: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>Room settings</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>{room.name}</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room name</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Room name</div>
             <input className="ob-input" value={roomName} onChange={e => setRoomName(e.target.value.slice(0, 40))} />
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Room size</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Room size</div>
             <div style={{ display: "flex", gap: 8 }}>
               {["Small", "Medium", "Large"].map(s => (
                 <div key={s} className={`ob-size-card${roomSize === s ? " selected" : ""}`} onClick={() => setRoomSize(s)}>
@@ -2429,7 +2428,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Average temperature</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Average temperature</div>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <input className="ob-input" style={{ flex: 1 }} type="text" inputMode="decimal" value={roomTemp} onChange={e => setRoomTemp(e.target.value.replace(/[^0-9.]/g, ""))} />
               <div className="ob-toggle" style={{ width: 100, flexShrink: 0 }}>
@@ -2440,7 +2439,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Does the room have windows?</div>
+            <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Does the room have windows?</div>
             <div className="ob-toggle" style={{ width: 160 }}>
               <button className={hasWindows ? "active" : ""} onClick={() => setHasWindows(true)}>Yes</button>
               <button className={!hasWindows ? "active" : ""} onClick={() => { setHasWindows(false); setWindowDir(""); }}>No</button>
@@ -2449,13 +2448,13 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
 
           {hasWindows && (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", marginBottom: 4 }}>Window direction</div>
+              <div style={{ fontSize: 10, letterSpacing: "1.5px", textTransform: "uppercase", color: "oklch(0.60 0.008 145)", marginBottom: 4 }}>Window direction</div>
               <div className="ob-compass-ring" style={{ width: 180, height: 180 }}>
                 {DIRECTIONS.map(d => (
                   <div key={d} className={`ob-compass-dir${windowDir === d ? " selected" : ""}`} style={{ ...DIR_POSITIONS[d], position: "absolute" }} onClick={() => setWindowDir(d)}>{d}</div>
                 ))}
                 <div className="ob-compass-center">
-                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>Tap</div>}
+                  {windowDir ? <div style={{ fontSize: 14, fontWeight: 500, color: "var(--green)" }}>{windowDir}</div> : <div style={{ fontSize: 11, color: "oklch(0.50 0.008 145)" }}>Tap</div>}
                 </div>
               </div>
             </div>
@@ -2474,11 +2473,11 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
           setSaving(false);
         }} style={{
           width: "100%", padding: "14px", marginTop: 24,
-          background: valid ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
+          background: valid ? "rgba(100,220,80,0.22)" : "oklch(0.95 0.006 145 / 0.06)",
          
-          border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
-          borderTopColor: valid ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
-          borderRadius: 20, color: valid ? "#d4ffb0" : "rgba(255,255,255,0.25)",
+          border: `1px solid ${valid ? "rgba(150,255,100,0.4)" : "oklch(0.95 0.006 145 / 0.10)"}`,
+          borderTopColor: valid ? "rgba(200,255,160,0.7)" : "oklch(0.95 0.006 145 / 0.15)",
+          borderRadius: 20, color: valid ? "#d4ffb0" : "oklch(0.95 0.006 145 / 0.25)",
           fontSize: 14, fontWeight: 500,
           cursor: valid && !saving ? "pointer" : "default", letterSpacing: "0.3px",
           opacity: saving ? 0.5 : 1,
@@ -2497,8 +2496,8 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
             <div onClick={e => e.stopPropagation()} style={{ background: "#1a0a0a", borderTop: "1px solid rgba(248,113,113,0.25)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
               <div style={{ marginBottom: 20 }}>
                 <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "rgba(248,113,113,0.8)", marginBottom: 6 }}>Delete room</div>
-                <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "#fff", marginBottom: 8 }}>Remove "{room.name}"?</div>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.45)", lineHeight: 1.6 }}>
+                <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)", marginBottom: 8 }}>Remove "{room.name}"?</div>
+                <div style={{ fontSize: 13, color: "oklch(0.60 0.008 145)", lineHeight: 1.6 }}>
                   Plants in this room will become unassigned. This cannot be undone.
                 </div>
               </div>
@@ -2509,7 +2508,7 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
                 fontSize: 14, fontWeight: 500,
                 cursor: "pointer",
               }}>Delete room</button>
-              <button onClick={() => setDeleteMode(false)} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "rgba(255,255,255,0.35)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
+              <button onClick={() => setDeleteMode(false)} style={{ width: "100%", padding: "10px", marginTop: 8, background: "none", border: "none", color: "oklch(0.50 0.008 145)", fontSize: 13, cursor: "pointer" }}>Cancel</button>
             </div>
           </div>
         )}
@@ -2530,13 +2529,13 @@ function AddPlantModal({ onSave, onClose, scanButton }) {
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 201, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.55)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "28px 24px 44px", maxWidth: 430, width: "100%", margin: "0 auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 28 }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 4 }}>New plant</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 20, fontWeight: 500, color: "var(--text)" }}>How do you want to add it?</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {scanButton}
@@ -2618,22 +2617,22 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
   }
 
   const inputStyle = {
-    background: "rgba(255,255,255,0.10)", border: "1px solid rgba(255,255,255,0.20)",
+    background: "oklch(0.95 0.006 145 / 0.10)", border: "1px solid oklch(0.95 0.006 145 / 0.20)",
     borderRadius: 12, padding: "11px 14px", fontSize: 15,
-    color: "#fff", outline: "none",
+    color: "var(--text)", outline: "none",
     width: "100%", boxSizing: "border-box",
   };
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 202, display: "flex", flexDirection: "column", justifyContent: "flex-end", background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }} onClick={onClose}>
-      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid rgba(255,255,255,0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "85vh", overflowY: "auto" }}>
+      <div onClick={e => e.stopPropagation()} style={{ background: "#0f1a0f", borderTop: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "24px 24px 0 0", padding: "24px 24px 40px", maxWidth: 430, width: "100%", margin: "0 auto", maxHeight: "85vh", overflowY: "auto" }}>
         <div style={{ display: "flex", alignItems: "center", marginBottom: 24 }}>
-          <button onClick={onBack} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: 13, cursor: "pointer", padding: "0 12px 0 0" }}>←</button>
+          <button onClick={onBack} style={{ background: "none", border: "none", color: "oklch(0.63 0.008 145)", fontSize: 13, cursor: "pointer", padding: "0 12px 0 0" }}>←</button>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 10, letterSpacing: "2px", textTransform: "uppercase", color: "var(--green)", marginBottom: 2 }}>Manual add</div>
             <div style={{ fontFamily: "'Literata', serif", fontSize: 18, fontWeight: 500, color: "var(--text)" }}>What's the plant called?</div>
           </div>
-          <button onClick={onClose} style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
+          <button onClick={onClose} style={{ background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)", borderRadius: "50%", width: 32, height: 32, color: "var(--text-2)", fontSize: 16, cursor: "pointer" }}>✕</button>
         </div>
 
         <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
@@ -2663,7 +2662,7 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
         )}
 
         {analysing && (
-          <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", textAlign: "center", padding: "20px 0", fontStyle: "italic" }}>
+          <div style={{ fontSize: 12, color: "oklch(0.60 0.008 145)", textAlign: "center", padding: "20px 0", fontStyle: "italic" }}>
             Looking up care details…
           </div>
         )}
@@ -2673,20 +2672,20 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
             <div style={{ background: "rgba(74,222,128,0.08)", border: "1px solid rgba(74,222,128,0.2)", borderRadius: 14, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 8 }}>
               {details.species && (
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                  <span style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Species</span>
+                  <span style={{ color: "oklch(0.60 0.008 145)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Species</span>
                   <span style={{ color: "var(--text)", fontStyle: "italic" }}>{details.species}</span>
                 </div>
               )}
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                <span style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Water every</span>
+                <span style={{ color: "oklch(0.60 0.008 145)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Water every</span>
                 <span style={{ color: "var(--text)" }}>{details.waterEveryDays} days</span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12 }}>
-                <span style={{ color: "rgba(255,255,255,0.45)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Light</span>
+                <span style={{ color: "oklch(0.60 0.008 145)", letterSpacing: "1px", textTransform: "uppercase", fontSize: 10 }}>Light</span>
                 <span style={{ color: "var(--text)" }}>{details.light}</span>
               </div>
               {details.care && (
-                <div style={{ marginTop: 4, fontSize: 12, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, borderTop: "1px solid rgba(255,255,255,0.08)", paddingTop: 10 }}>
+                <div style={{ marginTop: 4, fontSize: 12, color: "oklch(0.70 0.008 145)", lineHeight: 1.6, borderTop: "1px solid oklch(0.95 0.006 145 / 0.08)", paddingTop: 10 }}>
                   {details.care}
                 </div>
               )}
@@ -2696,12 +2695,12 @@ function AddPlantManualModal({ onSave, onClose, onBack }) {
 
         <button onClick={handleSave} disabled={!name.trim() || saving || analysing} style={{
           width: "100%", padding: "14px",
-          background: name.trim() && !analysing ? "rgba(100,220,80,0.22)" : "rgba(255,255,255,0.06)",
+          background: name.trim() && !analysing ? "rgba(100,220,80,0.22)" : "oklch(0.95 0.006 145 / 0.06)",
          
-          border: `1px solid ${name.trim() && !analysing ? "rgba(150,255,100,0.4)" : "rgba(255,255,255,0.10)"}`,
-          borderTopColor: name.trim() && !analysing ? "rgba(200,255,160,0.7)" : "rgba(255,255,255,0.15)",
+          border: `1px solid ${name.trim() && !analysing ? "rgba(150,255,100,0.4)" : "oklch(0.95 0.006 145 / 0.10)"}`,
+          borderTopColor: name.trim() && !analysing ? "rgba(200,255,160,0.7)" : "oklch(0.95 0.006 145 / 0.15)",
           borderRadius: 20,
-          color: name.trim() && !analysing ? "#d4ffb0" : "rgba(255,255,255,0.25)",
+          color: name.trim() && !analysing ? "#d4ffb0" : "oklch(0.95 0.006 145 / 0.25)",
           fontSize: 14, fontWeight: 500,
           cursor: !name.trim() || saving || analysing ? "default" : "pointer",
           letterSpacing: "0.3px",
@@ -2745,14 +2744,14 @@ function AuthScreen() {
       alignItems: "center", justifyContent: "center", padding: "32px 24px",
     }}>
       <div style={{ marginBottom: 48, textAlign: "center" }}>
-        <div style={{ fontFamily: "'Literata', serif", fontSize: 22, fontWeight: 500, color: "#fff", letterSpacing: "4px", textTransform: "uppercase" }}>Plantj</div>
-        <div style={{ fontSize: 11, color: "rgba(255,255,255,0.45)", marginTop: 8, letterSpacing: "2px", textTransform: "uppercase" }}>Your garden journal</div>
+        <div style={{ fontFamily: "'Literata', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", letterSpacing: "4px", textTransform: "uppercase" }}>Plantj</div>
+        <div style={{ fontSize: 11, color: "oklch(0.60 0.008 145)", marginTop: 8, letterSpacing: "2px", textTransform: "uppercase" }}>Your garden journal</div>
       </div>
 
       <div style={{
         width: "100%", maxWidth: 360,
-        background: "rgba(255,255,255,0.12)",
-        border: "1px solid rgba(255,255,255,0.15)",
+        background: "oklch(0.95 0.006 145 / 0.12)",
+        border: "1px solid oklch(0.95 0.006 145 / 0.15)",
         borderRadius: 24, padding: "32px 24px",
       }}>
         <button
@@ -2760,12 +2759,12 @@ function AuthScreen() {
           disabled={loading}
           style={{
             width: "100%", padding: "14px 16px",
-            background: loading ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.92)",
-            border: "1px solid rgba(255,255,255,0.3)",
+            background: loading ? "oklch(0.95 0.006 145 / 0.08)" : "oklch(0.97 0.005 145 / 0.92)",
+            border: "1px solid oklch(0.95 0.006 145 / 0.30)",
             borderRadius: 16, cursor: loading ? "default" : "pointer",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 12,
             fontSize: 14, fontWeight: 500,
-            color: loading ? "rgba(255,255,255,0.4)" : "#1a1a1a",
+            color: loading ? "oklch(0.95 0.006 145 / 0.40)" : "#1a1a1a",
             transition: "all 0.18s",
             boxShadow: loading ? "none" : "0 2px 8px rgba(0,0,0,0.12)",
           }}
@@ -3190,7 +3189,7 @@ useEffect(() => {
         {/* Auth loading splash */}
         {authLoading && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 13, letterSpacing: "3px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>Loading</div>
+            <div style={{ fontSize: 13, letterSpacing: "3px", color: "oklch(0.63 0.008 145)", textTransform: "uppercase" }}>Loading</div>
           </div>
         )}
 
@@ -3204,7 +3203,7 @@ useEffect(() => {
         {onboardingDone === null && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
             <div style={{ fontSize: 32, marginBottom: 4 }}>🌿</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", letterSpacing: 0.5 }}>Loading...</div>
+            <div style={{ fontSize: 13, color: "oklch(0.73 0.008 145)", letterSpacing: 0.5 }}>Loading...</div>
           </div>
         )}
 
@@ -3220,8 +3219,8 @@ useEffect(() => {
         {dbLoading ? (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
             <div style={{ fontSize: 32, marginBottom: 4 }}>🌿</div>
-            <div style={{ fontSize: 11, letterSpacing: "3px", color: "rgba(255,255,255,0.5)", textTransform: "uppercase" }}>Loading</div>
-            <div style={{ fontSize: 13, color: "rgba(255,255,255,0.65)", letterSpacing: 0.5 }}>Loading your garden…</div>
+            <div style={{ fontSize: 11, letterSpacing: "3px", color: "oklch(0.63 0.008 145)", textTransform: "uppercase" }}>Loading</div>
+            <div style={{ fontSize: 13, color: "oklch(0.73 0.008 145)", letterSpacing: 0.5 }}>Loading your garden…</div>
           </div>
         ) : (<>
 
@@ -3298,8 +3297,8 @@ useEffect(() => {
 
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "24px 22px 10px" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "rgba(255,255,255,0.7)" }}>Your plants</div>
-                <div style={{ fontSize: 11, color: "rgba(255,255,255,0.35)" }}>{plants.length}</div>
+                <div style={{ fontSize: 10, letterSpacing: "2.5px", textTransform: "uppercase", color: "oklch(0.78 0.008 145)" }}>Your plants</div>
+                <div style={{ fontSize: 11, color: "oklch(0.50 0.008 145)" }}>{plants.length}</div>
               </div>
               <button onClick={() => setAddPlantOpen(true)} style={{
                 background: "rgba(74,222,128,0.15)", border: "1px solid rgba(74,222,128,0.3)",
@@ -3318,10 +3317,10 @@ useEffect(() => {
                     <div key={r.id} onClick={() => setSelectedRoom(isActive ? null : r.name)} style={{
                       display: "inline-flex", alignItems: "center", gap: 5,
                       padding: "5px 14px", borderRadius: 20,
-                      background: isActive ? "rgba(74,222,128,0.12)" : "rgba(255,255,255,0.06)",
-                      border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "rgba(255,255,255,0.12)"}`,
+                      background: isActive ? "rgba(74,222,128,0.12)" : "oklch(0.95 0.006 145 / 0.06)",
+                      border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "oklch(0.95 0.006 145 / 0.12)"}`,
                       fontSize: 11, letterSpacing: "0.8px",
-                      color: isActive ? "var(--green)" : "rgba(255,255,255,0.4)",
+                      color: isActive ? "var(--green)" : "oklch(0.95 0.006 145 / 0.40)",
                       cursor: "pointer", transition: "all 0.15s",
                     }}>
                       {r.name}
@@ -3332,8 +3331,8 @@ useEffect(() => {
                 <div onClick={() => setAddRoomOpen(true)} style={{
                   display: "inline-flex", alignItems: "center", justifyContent: "center",
                   width: 28, height: 28, borderRadius: "50%",
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.15)",
-                  fontSize: 14, color: "rgba(255,255,255,0.35)",
+                  background: "oklch(0.95 0.006 145 / 0.06)", border: "1px solid oklch(0.95 0.006 145 / 0.15)",
+                  fontSize: 14, color: "oklch(0.50 0.008 145)",
                   cursor: "pointer", transition: "background 0.15s",
                 }}>+</div>
               </div>
@@ -3341,7 +3340,7 @@ useEffect(() => {
 
             {plants.length === 0 ? (
               <div style={{ padding: "40px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", lineHeight: 1.7, fontWeight: 300 }}>
+                <div style={{ fontSize: 13, color: "oklch(0.55 0.008 145)", lineHeight: 1.7, fontWeight: 300 }}>
                   No plants yet.<br />Tap + Add plant to start your garden.
                 </div>
               </div>
@@ -3356,7 +3355,7 @@ useEffect(() => {
               return (
                 <div style={{ padding: "0 14px 32px" }}>
                   {filteredPlants.length === 0 ? (
-                    <div style={{ padding: "24px 16px", textAlign: "center", fontSize: 13, color: "rgba(255,255,255,0.35)", fontStyle: "italic" }}>
+                    <div style={{ padding: "24px 16px", textAlign: "center", fontSize: 13, color: "oklch(0.50 0.008 145)", fontStyle: "italic" }}>
                       No plants in this room
                     </div>
                   ) : (
@@ -3388,7 +3387,7 @@ useEffect(() => {
                               </div>
                               <div className="prow-right">
                                 <div className="sdot" style={{ background: STATUS_COLOR[s] }} />
-                                <span className="slabel" style={{ color: "#ffffff" }}>{STATUS_LABEL[s]}</span>
+                                <span className="slabel" style={{ color: "var(--text)" }}>{STATUS_LABEL[s]}</span>
                               </div>
                               <div className="parrow">›</div>
                             </div>
@@ -3405,7 +3404,7 @@ useEffect(() => {
 
             {plants.length > 0 && <AirQualitySlider plants={plants} />}
             <div style={{ padding: "24px 24px 40px", textAlign: "center" }}>
-              <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "rgba(255,255,255,0.5)", cursor: "pointer", letterSpacing: "1.5px", textTransform: "uppercase" }}>Sign out</button>
+              <button onClick={signOut} style={{ background: "none", border: "none", fontSize: 11, color: "oklch(0.63 0.008 145)", cursor: "pointer", letterSpacing: "1.5px", textTransform: "uppercase" }}>Sign out</button>
             </div>
           </div>
         )}
@@ -3448,10 +3447,10 @@ useEffect(() => {
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                 <div className="d-name">{nicknames[plant.id] || plant.name}</div>
                 <button onClick={() => setPlantSettingsOpen(true)} style={{
-                  background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)",
+                  background: "oklch(0.95 0.006 145 / 0.08)", border: "1px solid oklch(0.95 0.006 145 / 0.15)",
                   borderRadius: "50%", width: 32, height: 32, flexShrink: 0,
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 14, color: "rgba(255,255,255,0.5)", cursor: "pointer",
+                  fontSize: 14, color: "oklch(0.63 0.008 145)", cursor: "pointer",
                   transition: "all 0.15s",
                 }}>⚙</button>
               </div>
@@ -3672,8 +3671,8 @@ useEffect(() => {
         {/* ── GARDEN ── */}
         {screen === "garden" && (
           <div className="fade-up">
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: "6px 0" }}>← Overview</button>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid oklch(0.95 0.006 145 / 0.08)" }}>
+              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "oklch(0.63 0.008 145)", cursor: "pointer", padding: "6px 0" }}>← Overview</button>
               <div style={{ flex: 1 }} />
               <ScanButton
                 onResult={async (entry) => {
@@ -3713,17 +3712,17 @@ useEffect(() => {
               <div style={{ padding: "16px 16px 40px", display: "flex", flexDirection: "column", gap: 14 }}>
                 {gardenLog.map((entry) => (
                   <div key={entry.id} style={{
-                    background: "rgba(255,255,255,0.09)",
+                    background: "oklch(0.95 0.006 145 / 0.09)",
                     borderRadius: 20, overflow: "hidden",
-                    border: "1px solid rgba(255,255,255,0.15)",
+                    border: "1px solid oklch(0.95 0.006 145 / 0.15)",
                   }}>
                     <div style={{ position: "relative", height: 160 }}>
                       <img src={entry.dataUrl} alt={entry.commonName} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      <div style={{ position: "absolute", top: 12, right: 12, background: entry.confidence === "high" ? "rgba(148,184,138,0.9)" : entry.confidence === "medium" ? "rgba(212,147,90,0.9)" : "rgba(196,104,96,0.9)", color: "#fff", fontSize: 10, letterSpacing: 1, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(4px)" }}>
+                      <div style={{ position: "absolute", top: 12, right: 12, background: entry.confidence === "high" ? "rgba(148,184,138,0.9)" : entry.confidence === "medium" ? "rgba(212,147,90,0.9)" : "rgba(196,104,96,0.9)", color: "var(--text)", fontSize: 10, letterSpacing: 1, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(4px)" }}>
                         {entry.confidence} confidence
                       </div>
                       {entry.toxic && (
-                        <div style={{ position: "absolute", top: 12, left: 12, background: "rgba(196,104,96,0.9)", color: "#fff", fontSize: 10, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(4px)" }}>
+                        <div style={{ position: "absolute", top: 12, left: 12, background: "rgba(196,104,96,0.9)", color: "var(--text)", fontSize: 10, padding: "4px 10px", borderRadius: 20, backdropFilter: "blur(4px)" }}>
                           ! Toxic{entry.toxicTo ? ` to ${entry.toxicTo}` : ""}
                         </div>
                       )}
@@ -3734,18 +3733,18 @@ useEffect(() => {
                       <div style={{ fontFamily: "'Literata', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>{entry.commonName}</div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
                         {[
-                          { label: entry.family, color: "rgba(255,255,255,0.08)", text: "rgba(255,255,255,0.65)" },
+                          { label: entry.family, color: "oklch(0.95 0.006 145 / 0.08)", text: "oklch(0.73 0.008 145)" },
                           { label: entry.origin, color: "rgba(74,222,128,0.12)", text: "var(--green-dim)" },
-                          { label: `Care: ${entry.careLevel}`, color: entry.careLevel === "easy" ? "rgba(74,222,128,0.12)" : entry.careLevel === "moderate" ? "rgba(212,147,90,0.12)" : "rgba(196,104,96,0.12)", text: "rgba(255,255,255,0.6)" },
+                          { label: `Care: ${entry.careLevel}`, color: entry.careLevel === "easy" ? "rgba(74,222,128,0.12)" : entry.careLevel === "moderate" ? "rgba(212,147,90,0.12)" : "rgba(196,104,96,0.12)", text: "oklch(0.70 0.008 145)" },
                           entry.edible && { label: "Edible", color: "rgba(74,222,128,0.15)", text: "var(--green-dim)" },
                         ].filter(Boolean).map((tag, i) => (
                           <div key={i} style={{ background: tag.color, color: tag.text, fontSize: 10, letterSpacing: "0.8px", padding: "4px 10px", borderRadius: 20 }}>{tag.label}</div>
                         ))}
                       </div>
-                      <div style={{ background: "rgba(255,255,255,0.06)", borderRadius: 12, padding: "11px 14px", fontSize: 12, color: "rgba(255,255,255,0.55)", lineHeight: 1.65, fontWeight: 300, fontStyle: "italic" }}>
+                      <div style={{ background: "oklch(0.95 0.006 145 / 0.06)", borderRadius: 12, padding: "11px 14px", fontSize: 12, color: "oklch(0.67 0.008 145)", lineHeight: 1.65, fontWeight: 300, fontStyle: "italic" }}>
                         "{entry.funFact}"
                       </div>
-                      <div style={{ fontSize: 10, color: "rgba(255,255,255,0.3)", marginTop: 10, letterSpacing: "0.5px" }}>
+                      <div style={{ fontSize: 10, color: "oklch(0.45 0.008 145)", marginTop: 10, letterSpacing: "0.5px" }}>
                         Scanned {new Date(entry.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                       </div>
                     </div>
@@ -3759,8 +3758,8 @@ useEffect(() => {
         {/* ── ATTENTION ── */}
         {screen === "attention" && (
           <div className="fade-up">
-            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
-              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "rgba(255,255,255,0.5)", cursor: "pointer", padding: "6px 0" }}>← Overview</button>
+            <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "16px 20px", borderBottom: "1px solid oklch(0.95 0.006 145 / 0.08)" }}>
+              <button onClick={() => setScreen("overview")} style={{ background: "none", border: "none", fontSize: 13, color: "oklch(0.63 0.008 145)", cursor: "pointer", padding: "6px 0" }}>← Overview</button>
             </div>
             <div style={{ padding: "24px 24px 8px" }}>
               <div style={{ fontSize: 10, letterSpacing: "3px", textTransform: "uppercase", color: "var(--warn)", marginBottom: 6 }}>Needs attention</div>
