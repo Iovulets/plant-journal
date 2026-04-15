@@ -617,7 +617,7 @@ function WeatherCard({ userProfile, onWeatherLoad }) {
   if (loading) return (
     <div style={{ padding: "16px 16px 0" }}>
       <div style={{ padding: "14px 18px", borderRadius: 20, background: "oklch(0.95 0.015 145 / 0.06)", border: "1px solid oklch(0.95 0.015 145 / 0.10)" }}>
-        <div style={{ fontSize: 11, color: "oklch(0.60 0.03 145)" }}>Loading weather...</div>
+        <div style={{ fontSize: 11, color: "var(--text-2)" }}>Loading weather...</div>
       </div>
     </div>
   );
@@ -3295,7 +3295,7 @@ useEffect(() => {
         {/* Auth loading splash */}
         {authLoading && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 13, letterSpacing: "3px", color: "oklch(0.63 0.03 145)", textTransform: "uppercase" }}>Loading</div>
+            <div style={{ fontSize: 13, letterSpacing: "3px", color: "var(--text-2)", textTransform: "uppercase" }}>Loading</div>
           </div>
         )}
 
@@ -3353,16 +3353,16 @@ useEffect(() => {
                     }
                   }}
                   renderTrigger={(onClick, scanning) => (
-                    <div className="stat" style={{ cursor: "pointer", padding: "16px 14px 14px" }} onClick={onClick}>
+                    <div style={{ cursor: "pointer", padding: "16px 14px 14px", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: "100%", boxSizing: "border-box" }} onClick={onClick}>
                       {scanning ? (
                         <>
-                          <div style={{ fontSize: 24, fontWeight: 600, lineHeight: 1, color: "var(--green)" }}>…</div>
-                          <div className="stat-l" style={{ marginTop: 4 }}>Scanning</div>
+                          <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 600, lineHeight: 1, color: "var(--green)" }}>…</div>
+                          <div className="stat-l" style={{ marginTop: 6 }}>Scanning</div>
                         </>
                       ) : (
                         <>
-                          <div style={{ fontSize: 22, lineHeight: 1, color: "var(--green)" }}>⟡</div>
-                          <div className="stat-l" style={{ marginTop: 6 }}>Scan</div>
+                          <div style={{ fontSize: 22, lineHeight: 1, color: "var(--green)", marginBottom: 6 }}>⟡</div>
+                          <div className="stat-l">Find plant</div>
                         </>
                       )}
                     </div>
@@ -3370,9 +3370,9 @@ useEffect(() => {
                 />
               </GlassCard>
               <GlassCard borderRadius={16} variant="interactive" onClick={() => setScreen("garden")} style={{ border: "none" }}>
-                <div className="stat" style={{ cursor: "pointer", padding: "16px 14px 14px" }}>
-                  <div className="stat-n" style={{ fontSize: 28 }}>{gardenLog.length}</div>
-                  <div className="stat-l">Garden</div>
+                <div style={{ cursor: "pointer", padding: "16px 14px 14px", display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                  <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 600, lineHeight: 1, color: "var(--text)" }}>{gardenLog.length}</div>
+                  <div className="stat-l" style={{ marginTop: 6 }}>Botanical garden</div>
                 </div>
               </GlassCard>
               {(() => {
@@ -3388,9 +3388,9 @@ useEffect(() => {
                   <GlassCard borderRadius={16} variant="interactive"
                     onClick={warnPlants.length > 0 ? () => { if (warnPlants.length === 1) { setIdx(plants.indexOf(warnPlants[0])); setScreen("detail"); } else setScreen("attention"); } : undefined}
                     style={{ border: "none", ...(warnPlants.length > 0 ? { background: "rgba(248,113,113,0.15)" } : {}) }}>
-                    <div className="stat" style={{ cursor: warnPlants.length > 0 ? "pointer" : "default", padding: "16px 14px 14px", opacity: warnPlants.length === 0 ? 0.4 : 1 }}>
-                      <div className="stat-n" style={{ fontSize: 28, color: warnPlants.length > 0 ? "var(--warn)" : "var(--text)" }}>{warnPlants.length}</div>
-                      <div className="stat-l">Attention</div>
+                    <div style={{ cursor: warnPlants.length > 0 ? "pointer" : "default", padding: "16px 14px 14px", opacity: warnPlants.length === 0 ? 0.4 : 1, display: "flex", flexDirection: "column", justifyContent: "flex-end" }}>
+                      <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 600, lineHeight: 1, color: warnPlants.length > 0 ? "var(--warn)" : "var(--text)" }}>{warnPlants.length}</div>
+                      <div className="stat-l" style={{ marginTop: 6 }}>Require attention</div>
                     </div>
                   </GlassCard>
                 );
@@ -3415,34 +3415,41 @@ useEffect(() => {
             </div>
 
             {/* Room filter tabs */}
-            {rooms.length > 0 && (
-              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 16px 10px", alignItems: "center" }}>
-                {rooms.map(r => {
-                  const isActive = selectedRoom === r.name;
-                  return (
-                    <div key={r.id} onClick={() => setSelectedRoom(isActive ? null : r.name)} style={{
-                      display: "inline-flex", alignItems: "center", gap: 5,
-                      padding: "5px 14px", borderRadius: 20,
-                      background: isActive ? "rgba(74,222,128,0.12)" : "oklch(0.95 0.015 145 / 0.06)",
-                      border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "oklch(0.95 0.015 145 / 0.12)"}`,
-                      fontSize: 11, letterSpacing: "0.8px",
-                      color: isActive ? "var(--green)" : "oklch(0.95 0.015 145 / 0.40)",
-                      cursor: "pointer", transition: "all 0.15s",
-                    }}>
-                      {r.name}
-                      <span onClick={(e) => { e.stopPropagation(); setEditRoomData(r); }} style={{ fontSize: 10, opacity: 0.5, cursor: "pointer" }}>✎</span>
-                    </div>
-                  );
-                })}
-                <div onClick={() => setAddRoomOpen(true)} style={{
-                  display: "inline-flex", alignItems: "center", justifyContent: "center",
-                  width: 28, height: 28, borderRadius: "50%",
-                  background: "oklch(0.95 0.015 145 / 0.06)", border: "1px solid oklch(0.95 0.015 145 / 0.15)",
-                  fontSize: 14, color: "oklch(0.63 0.03 145)",
-                  cursor: "pointer", transition: "background 0.15s",
-                }}>+</div>
-              </div>
-            )}
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", padding: "0 16px 10px", alignItems: "center" }}>
+              <div onClick={() => setSelectedRoom(null)} style={{
+                display: "inline-flex", alignItems: "center", gap: 5,
+                padding: "5px 14px", borderRadius: 20,
+                background: selectedRoom === null ? "rgba(74,222,128,0.12)" : "oklch(0.95 0.015 145 / 0.06)",
+                border: `1px solid ${selectedRoom === null ? "rgba(74,222,128,0.25)" : "oklch(0.95 0.015 145 / 0.12)"}`,
+                fontSize: 11, letterSpacing: "0.8px",
+                color: selectedRoom === null ? "var(--green)" : "oklch(0.67 0.03 145)",
+                cursor: "pointer", transition: "all 0.15s",
+              }}>All</div>
+              {rooms.map(r => {
+                const isActive = selectedRoom === r.name;
+                return (
+                  <div key={r.id} onClick={() => setSelectedRoom(isActive ? null : r.name)} style={{
+                    display: "inline-flex", alignItems: "center", gap: 5,
+                    padding: "5px 14px", borderRadius: 20,
+                    background: isActive ? "rgba(74,222,128,0.12)" : "oklch(0.95 0.015 145 / 0.06)",
+                    border: `1px solid ${isActive ? "rgba(74,222,128,0.25)" : "oklch(0.95 0.015 145 / 0.12)"}`,
+                    fontSize: 11, letterSpacing: "0.8px",
+                    color: isActive ? "var(--green)" : "oklch(0.67 0.03 145)",
+                    cursor: "pointer", transition: "all 0.15s",
+                  }}>
+                    {r.name}
+                    <span onClick={(e) => { e.stopPropagation(); setEditRoomData(r); }} style={{ fontSize: 10, opacity: 0.5, cursor: "pointer" }}>✎</span>
+                  </div>
+                );
+              })}
+              <div onClick={() => setAddRoomOpen(true)} style={{
+                display: "inline-flex", alignItems: "center", justifyContent: "center",
+                width: 28, height: 28, borderRadius: "50%",
+                background: "oklch(0.95 0.015 145 / 0.06)", border: "1px solid oklch(0.95 0.015 145 / 0.15)",
+                fontSize: 14, color: "oklch(0.63 0.03 145)",
+                cursor: "pointer", transition: "background 0.15s",
+              }}>+</div>
+            </div>
 
             {plants.length === 0 ? (
               <div style={{ padding: "40px 24px", textAlign: "center" }}>
