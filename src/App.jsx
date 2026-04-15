@@ -646,6 +646,65 @@ function WeatherCard({ userProfile, onWeatherLoad }) {
   );
 }
 
+// Inline version for the hero grid — no outer padding or GlassCard wrapper
+function WeatherCardInline({ userProfile, onWeatherLoad }) {
+  const [weather, setWeather] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    if (!userProfile?.postal_code || !userProfile?.country) { setLoading(false); return; }
+    async function fetchWeather() {
+      try {
+        const searchQuery = `${userProfile.postal_code} ${userProfile.country}`;
+        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchQuery)}&count=1&language=en`);
+        const geoData = await geoRes.json();
+        let lat, lng, cityName;
+        if (geoData.results && geoData.results.length > 0) {
+          lat = geoData.results[0].latitude; lng = geoData.results[0].longitude; cityName = geoData.results[0].name;
+        } else {
+          const COUNTRY_COORDS = { MD: { lat: 47.01, lng: 28.86, name: "Chisinau" } };
+          const fallback = COUNTRY_COORDS[userProfile.country];
+          if (fallback) { lat = fallback.lat; lng = fallback.lng; cityName = fallback.name; }
+          else { setError("Location not found"); setLoading(false); return; }
+        }
+        const unit = userProfile.temp_unit === "F" ? "fahrenheit" : "celsius";
+        const wxRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,weather_code,is_day&temperature_unit=${unit}&timezone=auto`);
+        const wxData = await wxRes.json();
+        const current = wxData.current;
+        const wxObj = { temp: Math.round(current.temperature_2m), unit: userProfile.temp_unit === "F" ? "°F" : "°C", humidity: current.relative_humidity_2m, condition: WMO_CONDITIONS[current.weather_code] || "Unknown", weatherCode: current.weather_code, isDay: current.is_day === 1, city: cityName };
+        setWeather(wxObj);
+        onWeatherLoad?.(wxObj);
+      } catch (err) { console.error("Weather fetch error:", err); setError("Could not load weather"); }
+      setLoading(false);
+    }
+    fetchWeather();
+  }, [userProfile?.postal_code, userProfile?.country, userProfile?.temp_unit]);
+
+  if (!userProfile?.postal_code || error || (!loading && !weather)) return (
+    <div style={{ padding: "16px 14px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%", opacity: 0.4 }}>
+      <div style={{ fontSize: 11, color: "var(--text-2)" }}>No weather</div>
+    </div>
+  );
+  if (loading) return (
+    <div style={{ padding: "16px 14px", display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+      <div style={{ fontSize: 11, color: "var(--text-2)" }}>Loading…</div>
+    </div>
+  );
+
+  return (
+    <div style={{ padding: "16px 14px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, height: "100%" }}>
+      <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={32} />
+      <div style={{ fontFamily: "'Literata', serif", fontSize: 28, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
+      <div style={{ fontSize: 10, color: "oklch(0.82 0.03 145)", letterSpacing: "0.5px" }}>{weather.city}</div>
+      <div style={{ marginTop: 4 }}>
+        <div style={{ fontSize: 16, fontWeight: 400, color: "var(--text)", lineHeight: 1, textAlign: "center" }}>{weather.humidity}%</div>
+        <div style={{ fontSize: 8, color: "oklch(0.82 0.03 145)", marginTop: 2, letterSpacing: "1px", textTransform: "uppercase", textAlign: "center" }}>Humidity</div>
+      </div>
+    </div>
+  );
+}
+
 
 // ── Air Quality ────────────────────────────────────────────────────────────
 
@@ -3333,8 +3392,13 @@ useEffect(() => {
         {/* ── OVERVIEW ── */}
         {screen === "overview" && (
           <div className="fade-up">
-            <WeatherCard userProfile={userProfile} onWeatherLoad={setWeather} />
-            <GlassContainer gap={8} style={{ padding: "16px 16px 0", gridTemplateColumns: "1fr 1fr", gridAutoRows: "auto" }}>
+            {/* Hero grid: Weather left, action tiles stacked right */}
+            <div style={{ padding: "16px 16px 0", display: "grid", gridTemplateColumns: "1fr 1fr", gridTemplateRows: "1fr 1fr", gap: 8 }}>
+              {/* Weather — spans both rows on the left */}
+              <GlassCard borderRadius={16} style={{ gridRow: "1 / 3", border: "none", display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <WeatherCardInline userProfile={userProfile} onWeatherLoad={setWeather} />
+              </GlassCard>
+              {/* Scan tile — top right */}
               <GlassCard borderRadius={16} variant="interactive" style={{ border: "none" }}>
                 <ScanButton
                   onResult={async (entry) => {
@@ -3365,17 +3429,20 @@ useEffect(() => {
                   )}
                 />
               </GlassCard>
+              {/* Botanical garden tile — bottom right */}
               <GlassCard borderRadius={16} variant="interactive" onClick={() => setScreen("garden")} style={{ border: "none" }}>
                 <div style={{ cursor: "pointer", padding: "14px 12px", display: "flex", flexDirection: "column", gap: 8 }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M12 22c-4-2-8-6-8-11a8 8 0 0 1 16 0c0 5-4 9-8 11z" />
-                    <path d="M12 8v6" />
-                    <path d="M9 11l3-3 3 3" />
+                    <path d="M7 20h10" />
+                    <path d="M12 20v-4" />
+                    <path d="M12 16c-3.5 0-6-2.5-6-6 0-4 3-7 6-9 3 2 6 5 6 9 0 3.5-2.5 6-6 6z" />
+                    <path d="M12 7v5" />
+                    <path d="M9 10l3 2 3-2" />
                   </svg>
                   <div className="stat-l">Botanical garden · {gardenLog.length}</div>
                 </div>
               </GlassCard>
-            </GlassContainer>
+            </div>
 
             <div style={{ padding: "20px 24px 0", display: "flex", alignItems: "flex-end", justifyContent: "space-between" }}>
               <div className="ov-heading">My little <em>garden</em></div>
