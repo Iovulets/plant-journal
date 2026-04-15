@@ -1200,7 +1200,7 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
               <div style={{ marginLeft: "auto", fontSize: 11, color: "var(--muted)", background: "var(--peach-light)", borderRadius: 10, padding: "2px 8px", flexShrink: 0 }}>~{latestAnalysis.waitDays}d</div>
             )}
           </div>
-          <div style={{ fontSize: 12, color: "oklch(0.73 0.03 145)", lineHeight: 1.65, fontWeight: 300 }}>{latestAnalysis.recommendation}</div>
+          <div style={{ fontSize: 12, color: "var(--text-2)", lineHeight: 1.65, fontWeight: 300 }}>{latestAnalysis.recommendation}</div>
           <div style={{ fontSize: 10, color: "rgba(176,153,142,0.6)", marginTop: 8, letterSpacing: "0.5px" }}>
             {new Date(allPhotos[0].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
           </div>
@@ -1456,7 +1456,7 @@ function FertilizeModal({ onConfirm, onClose }) {
             ))}
           </div>
         </div>
-        <div style={{ background: "rgba(212,147,90,0.08)", border: "1px solid rgba(212,147,90,0.2)", borderRadius: 12, padding: "10px 14px", fontSize: 12, color: "oklch(0.67 0.03 145)", marginBottom: 20, minHeight: 38 }}>
+        <div style={{ background: "rgba(212,147,90,0.08)", border: "1px solid rgba(212,147,90,0.2)", borderRadius: 12, padding: "10px 14px", fontSize: 12, color: "var(--text-2)", marginBottom: 20, minHeight: 38 }}>
           {DOSE_DESC[selected]}
         </div>
         <button onClick={() => onConfirm(selected)} style={{
@@ -3309,7 +3309,7 @@ useEffect(() => {
         {onboardingDone === null && (
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
             <div style={{ fontSize: 32, marginBottom: 4 }}>🌿</div>
-            <div style={{ fontSize: 13, color: "oklch(0.73 0.03 145)", letterSpacing: 0.5 }}>Loading...</div>
+            <div style={{ fontSize: 13, color: "var(--text-2)", letterSpacing: 0.5 }}>Loading...</div>
           </div>
         )}
 
@@ -3326,7 +3326,7 @@ useEffect(() => {
           <div style={{ position: "fixed", inset: 0, zIndex: 999, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 10 }}>
             <div style={{ fontSize: 32, marginBottom: 4 }}>🌿</div>
             <div style={{ fontSize: 11, letterSpacing: "3px", color: "oklch(0.63 0.03 145)", textTransform: "uppercase" }}>Loading</div>
-            <div style={{ fontSize: 13, color: "oklch(0.73 0.03 145)", letterSpacing: 0.5 }}>Loading your garden…</div>
+            <div style={{ fontSize: 13, color: "var(--text-2)", letterSpacing: 0.5 }}>Loading your garden…</div>
           </div>
         ) : (<>
 
@@ -3446,7 +3446,7 @@ useEffect(() => {
 
             {plants.length === 0 ? (
               <div style={{ padding: "40px 24px", textAlign: "center" }}>
-                <div style={{ fontSize: 13, color: "oklch(0.67 0.03 145)", lineHeight: 1.7, fontWeight: 300 }}>
+                <div style={{ fontSize: 13, color: "var(--text-2)", lineHeight: 1.7, fontWeight: 300 }}>
                   No plants yet.<br />Tap + Add plant to start your garden.
                 </div>
               </div>
@@ -3839,7 +3839,7 @@ useEffect(() => {
                       <div style={{ fontFamily: "'Literata', serif", fontSize: 22, fontWeight: 500, color: "var(--text)", marginBottom: 12 }}>{entry.commonName}</div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 14 }}>
                         {[
-                          { label: entry.family, color: "oklch(0.95 0.015 145 / 0.08)", text: "oklch(0.73 0.03 145)" },
+                          { label: entry.family, color: "oklch(0.95 0.015 145 / 0.08)", text: "var(--text-2)" },
                           { label: entry.origin, color: "rgba(74,222,128,0.12)", text: "var(--green-dim)" },
                           { label: `Care: ${entry.careLevel}`, color: entry.careLevel === "easy" ? "rgba(74,222,128,0.12)" : entry.careLevel === "moderate" ? "rgba(212,147,90,0.12)" : "rgba(196,104,96,0.12)", text: "oklch(0.70 0.03 145)" },
                           entry.edible && { label: "Edible", color: "rgba(74,222,128,0.15)", text: "var(--green-dim)" },
@@ -3847,7 +3847,7 @@ useEffect(() => {
                           <div key={i} style={{ background: tag.color, color: tag.text, fontSize: 10, letterSpacing: "0.8px", padding: "4px 10px", borderRadius: 20 }}>{tag.label}</div>
                         ))}
                       </div>
-                      <div style={{ background: "oklch(0.95 0.015 145 / 0.06)", borderRadius: 12, padding: "11px 14px", fontSize: 12, color: "oklch(0.67 0.03 145)", lineHeight: 1.65, fontWeight: 300, fontStyle: "italic" }}>
+                      <div style={{ background: "oklch(0.95 0.015 145 / 0.06)", borderRadius: 12, padding: "11px 14px", fontSize: 12, color: "var(--text-2)", lineHeight: 1.65, fontWeight: 300, fontStyle: "italic" }}>
                         "{entry.funFact}"
                       </div>
                       <div style={{ fontSize: 10, color: "oklch(0.60 0.03 145)", marginTop: 10, letterSpacing: "0.5px" }}>
