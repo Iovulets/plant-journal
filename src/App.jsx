@@ -1,6 +1,15 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 import bgPhoto from "./assets/background.webp";
+import {
+  STATUS_LABEL, STATUS_COLOR, TILTS, PIN_COLORS,
+  URGENCY_COLOR, STATUS_ICON, FERTILIZE_EVERY,
+  POT_TYPES, LIGHT_DISTANCES, DIRECTIONS, DIR_POSITIONS,
+  WMO_CONDITIONS, COUNTRY_COORDS,
+  AIR_CARDS, VOC_COLORS,
+  POSTAL_RULES, COUNTRIES,
+  validatePostal, getPostalHint,
+} from "./constants.js";
 
 const supabase = createClient(
   import.meta.env.VITE_SUPABASE_URL,
@@ -27,17 +36,26 @@ function getStatus(plant, lastWatered) {
   if (d >= plant.waterEveryDays * 0.7) return "soon";
   return "happy";
 }
-const STATUS_LABEL = { happy: "Hydrated", soon: "Water soon", thirsty: "Needs water", unknown: "Not logged" };
-const STATUS_COLOR = { happy: "#94b88a", soon: "#d4935a", thirsty: "#c46860", unknown: "#b0998e" };
-const TILTS = [1.5, -2, 2.5, -1.2, 1.8, -2.3];
-const PIN_COLORS = ["#e05c5c", "#5c7de0", "#e0b45c", "#5cba7d", "#c45ce0", "#e07a5c"];
 
-function Pin({ color }) {
+// ─── Pin ──────────────────────────────────────────────────────────────────
+// Thumbtack visual. Two size variants: "large" (detail/hero polaroids) and
+// "mini" (plant list rows). `color` is the head color.
+function Pin({ color, size = "large" }) {
+  if (size === "mini") {
+    return (
+      <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
+        <div style={{ width: 10, height: 10, borderRadius: "50%", background: color, boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
+        <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
+      </div>
+    );
+  }
+  // Large: 18px head with radial gradient + inset shading + highlight dot
   return (
-    <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", zIndex: 10, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
+    <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", zIndex: 11, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
       <div style={{
-        width: 18, height: 18, borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${color}dd, ${color})`,
-        boxShadow: `inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px oklch(0.95 0.015 145 / 0.35)`,
+        width: 18, height: 18, borderRadius: "50%",
+        background: `radial-gradient(circle at 35% 35%, ${color}dd, ${color})`,
+        boxShadow: "inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px oklch(0.95 0.015 145 / 0.35)",
         margin: "0 auto", position: "relative"
       }}>
         <div style={{ position: "absolute", top: 3, left: 3, width: 5, height: 5, borderRadius: "50%", background: "oklch(0.95 0.015 145 / 0.50)" }} />
@@ -47,31 +65,70 @@ function Pin({ color }) {
   );
 }
 
-function Polaroid({ src, tilt, pinColor, size = "large" }) {
+// ─── Polaroid ─────────────────────────────────────────────────────────────
+// Unified polaroid frame used for hero photos, photo stacks, gallery lightbox,
+// and plant list thumbnails.
+//
+// Props:
+//   src         — image URL (omit or falsy to show `placeholder` instead)
+//   size        — "large" (300x375) | "mini" (44x40)
+//   tilt        — rotation in degrees (default 0)
+//   pinColor    — if set, renders a Pin in matching size
+//   caption     — text shown under the photo (typically a date)
+//   captionStyle— "caveat" (inside frame, handwritten) | "italic" (outside frame, gray italic)
+//   shadow      — "soft" | "medium" | "strong"
+//   placeholder — node shown when src is missing (e.g. a "+" icon)
+function Polaroid({
+  src,
+  size = "large",
+  tilt = 0,
+  pinColor,
+  caption,
+  captionStyle = "caveat",
+  shadow = "medium",
+  placeholder,
+}) {
   const isLarge = size === "large";
-  const photoW = isLarge ? 260 : 40;
-  const photoH = isLarge ? 325 : 36;
+  const photoW = isLarge ? 300 : 44;
+  const photoH = isLarge ? 375 : 40;
   const padSide = isLarge ? 12 : 3;
-  const padBottom = isLarge ? 44 : 12;
   const padTop = isLarge ? 12 : 3;
+  const padBottom = isLarge ? 44 : 10;
+
+  const shadows = {
+    soft:   "0 2px 8px rgba(60,30,10,0.15)",
+    medium: "0 4px 16px rgba(60,30,10,0.14)",
+    strong: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)",
+    deep:   "0 8px 40px rgba(0,0,0,0.5)", // GalleryLightbox variant
+  };
+
+  const imageOrPlaceholder = src
+    ? <img src={src} alt="" style={{ display: "block", width: photoW, height: photoH, objectFit: "cover" }} />
+    : placeholder || <div style={{ width: photoW, height: photoH, background: "rgba(74,222,128,0.12)" }} />;
+
+  const captionNode = caption ? (
+    captionStyle === "italic" ? (
+      <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center", fontSize: 11, color: "#aaa", fontStyle: "italic" }}>
+        {caption}
+      </div>
+    ) : (
+      <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center", fontFamily: "'Caveat', cursive", fontSize: 16, color: "#3a3a3a", letterSpacing: "0.5px" }}>
+        {caption}
+      </div>
+    )
+  ) : null;
 
   return (
-    <div style={{ position: "relative", display: "inline-block" }}>
-      <Pin color={pinColor} />
+    <div style={{ position: "relative", display: "inline-block", transform: tilt ? `rotate(${tilt}deg)` : undefined }}>
+      {pinColor && <Pin color={pinColor} size={size === "mini" ? "mini" : "large"} />}
       <div style={{
         background: "#fff",
         padding: `${padTop}px ${padSide}px ${padBottom}px`,
-        boxShadow: isLarge
-          ? "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)"
-          : "0 2px 8px rgba(60,30,10,0.16)",
-        transform: `rotate(${tilt}deg)`,
-        display: "inline-block",
+        boxShadow: shadows[shadow] || shadows.medium,
+        position: "relative",
       }}>
-        <img
-          src={src}
-          alt=""
-          style={{ display: "block", width: photoW, height: photoH, objectFit: "cover" }}
-        />
+        {imageOrPlaceholder}
+        {captionNode}
       </div>
     </div>
   );
@@ -432,17 +489,6 @@ const css = `
 
 // ── Weather Card ──────────────────────────────────────────────────────────
 
-const WMO_CONDITIONS = {
-  0: "Clear sky", 1: "Mostly clear", 2: "Partly cloudy", 3: "Overcast",
-  45: "Foggy", 48: "Rime fog",
-  51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
-  61: "Light rain", 63: "Rain", 65: "Heavy rain",
-  66: "Freezing rain", 67: "Heavy freezing rain",
-  71: "Light snow", 73: "Snow", 75: "Heavy snow", 77: "Snow grains",
-  80: "Light showers", 81: "Showers", 82: "Heavy showers",
-  85: "Light snow showers", 86: "Snow showers",
-  95: "Thunderstorm", 96: "Thunderstorm + hail", 99: "Thunderstorm + heavy hail",
-};
 
 function WeatherIcon({ code, isDay, size = 32 }) {
   let type = "sunny";
@@ -559,93 +605,6 @@ function WeatherIcon({ code, isDay, size = 32 }) {
   return icons[type] || icons.cloudy;
 }
 
-function WeatherCard({ userProfile, onWeatherLoad }) {
-  const [weather, setWeather] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!userProfile?.postal_code || !userProfile?.country) { setLoading(false); return; }
-
-    async function fetchWeather() {
-      try {
-        const searchQuery = `${userProfile.postal_code} ${userProfile.country}`;
-        const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(searchQuery)}&count=1&language=en`);
-        const geoData = await geoRes.json();
-
-        let lat, lng, cityName;
-        if (geoData.results && geoData.results.length > 0) {
-          lat = geoData.results[0].latitude;
-          lng = geoData.results[0].longitude;
-          cityName = geoData.results[0].name;
-        } else {
-          const COUNTRY_COORDS = { MD: { lat: 47.01, lng: 28.86, name: "Chisinau" } };
-          const fallback = COUNTRY_COORDS[userProfile.country];
-          if (fallback) { lat = fallback.lat; lng = fallback.lng; cityName = fallback.name; }
-          else { setError("Location not found"); setLoading(false); return; }
-        }
-
-        const unit = userProfile.temp_unit === "F" ? "fahrenheit" : "celsius";
-        const wxRes = await fetch(
-          `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,relative_humidity_2m,weather_code,is_day&temperature_unit=${unit}&timezone=auto`
-        );
-        const wxData = await wxRes.json();
-        const current = wxData.current;
-
-        const wxObj = {
-          temp: Math.round(current.temperature_2m),
-          unit: userProfile.temp_unit === "F" ? "°F" : "°C",
-          humidity: current.relative_humidity_2m,
-          condition: WMO_CONDITIONS[current.weather_code] || "Unknown",
-          weatherCode: current.weather_code,
-          isDay: current.is_day === 1,
-          city: cityName,
-        };
-        setWeather(wxObj);
-        onWeatherLoad?.(wxObj);
-      } catch (err) {
-        console.error("Weather fetch error:", err);
-        setError("Could not load weather");
-      }
-      setLoading(false);
-    }
-
-    fetchWeather();
-  }, [userProfile?.postal_code, userProfile?.country, userProfile?.temp_unit]);
-
-  if (!userProfile?.postal_code || error || (!loading && !weather)) return null;
-  if (loading) return (
-    <div style={{ padding: "16px 16px 0" }}>
-      <div style={{ padding: "14px 18px", borderRadius: 20, background: "oklch(0.95 0.015 145 / 0.06)", border: "1px solid oklch(0.95 0.015 145 / 0.10)" }}>
-        <div style={{ fontSize: 11, color: "var(--text-2)" }}>Loading weather...</div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div style={{ padding: "16px 16px 0" }}>
-      <GlassCard borderRadius={20} style={{ padding: "14px 18px" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          {/* Icon */}
-          <div style={{ flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center", width: 40, height: 40 }}>
-            <WeatherIcon code={weather.weatherCode} isDay={weather.isDay} size={36} />
-          </div>
-          {/* Temp */}
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontFamily: "'Literata', serif", fontSize: 26, fontWeight: 500, color: "var(--text)", lineHeight: 1 }}>{weather.temp}{weather.unit}</div>
-            <div style={{ fontSize: 10, color: "oklch(0.82 0.03 145)", marginTop: 3, letterSpacing: "0.5px" }}>{weather.city}</div>
-          </div>
-          {/* Humidity */}
-          <div style={{ flexShrink: 0, textAlign: "right" }}>
-            <div style={{ fontSize: 20, fontWeight: 400, color: "var(--text)", lineHeight: 1 }}>{weather.humidity}%</div>
-            <div style={{ fontSize: 9, color: "oklch(0.82 0.03 145)", marginTop: 3, letterSpacing: "1px", textTransform: "uppercase" }}>Humidity</div>
-          </div>
-        </div>
-      </GlassCard>
-    </div>
-  );
-}
-
 // Inline version for the hero grid — no outer padding or GlassCard wrapper
 function WeatherCardInline({ userProfile, onWeatherLoad }) {
   const [weather, setWeather] = useState(null);
@@ -663,7 +622,6 @@ function WeatherCardInline({ userProfile, onWeatherLoad }) {
         if (geoData.results && geoData.results.length > 0) {
           lat = geoData.results[0].latitude; lng = geoData.results[0].longitude; cityName = geoData.results[0].name;
         } else {
-          const COUNTRY_COORDS = { MD: { lat: 47.01, lng: 28.86, name: "Chisinau" } };
           const fallback = COUNTRY_COORDS[userProfile.country];
           if (fallback) { lat = fallback.lat; lng = fallback.lng; cityName = fallback.name; }
           else { setError("Location not found"); setLoading(false); return; }
@@ -712,16 +670,6 @@ function WeatherCardInline({ userProfile, onWeatherLoad }) {
 
 
 // ── Air Quality ────────────────────────────────────────────────────────────
-
-const AIR_CARDS = [
-  { id: "voc", label: "VOC Removal", subtitle: "toxin filtration", unit: "μg/hr", description: "WHO guideline: <300μg/m³ total VOC. Your plants remove toxins at roughly the rate of a mid-range air purifier running continuously. Tap a toxin to see which plants target it.", color: "#94b88a", colorLight: "rgba(148,184,138,0.15)" },
-  { id: "co2", label: "CO₂ Offset", subtitle: "carbon absorption", unit: "g/day", description: "Your 35m² apartment holds ~87.5m³ of air. Plants offset a small % of your CO₂, but ventilation matters more here. Where plants truly shine is VOC and particulate filtration.", color: "#b8c894", colorLight: "rgba(184,200,148,0.15)" },
-  { id: "humidity", label: "Humidity", subtitle: "transpiration boost", unit: "ml/day", description: "With no heating running, your indoor RH tracks outdoor levels (~68% in late March). You're already above the 40-60% optimal range — no humidity problem right now. This card becomes important when heating starts in autumn.", color: "#8ab4c8", colorLight: "rgba(138,180,200,0.15)" },
-  { id: "pm25", label: "PM2.5 Filter", subtitle: "fine dust trapping", unit: "% reduction", description: "Leaf surfaces trap fine airborne particles (PM2.5). NASA studies show 20-30% reduction in a closed room. Larger, textured leaves (Ficus, Dracaena) are most effective.", color: "#c8a894", colorLight: "rgba(200,168,148,0.15)" },
-  { id: "wellbeing", label: "Wellbeing", subtitle: "stress & cortisol", unit: "score", description: "Journal of Physiological Anthropology (2015): interacting with houseplants measurably reduces cortisol and systolic blood pressure. This is the most underrated benefit.", color: "#b894c8", colorLight: "rgba(184,148,200,0.15)" },
-];
-
-const VOC_COLORS = { "Benzene": "#e8a87a", "Formaldehyde": "#94b88a", "Ammonia": "#a89ed4", "Toluene": "#d4b88a", "Xylene": "#b8d4c8", "General VOCs": "#c4b4a4" };
 
 function getMetrics(plants) {
   const totalVoc = plants.reduce((s, p) => s + (p.vocPerHour || 0), 0);
@@ -896,7 +844,7 @@ function WellbeingDetail({ plants }) {
 
 function AirQualitySlider({ plants }) {
   const [activeCard, setActiveCard] = useState("voc");
-  const metrics = getMetrics(plants);
+  const metrics = useMemo(() => getMetrics(plants), [plants]);
   const card = AIR_CARDS.find(c => c.id === activeCard);
   const m = metrics[activeCard];
 
@@ -1112,8 +1060,6 @@ async function analyseWithClaude(base64Image, plant, careContext = {}) {
   );
 }
 
-const URGENCY_COLOR = { low: "#94b88a", medium: "#d4935a", high: "#c46860" };
-const STATUS_ICON = { action: "✦", wait: "◷", healthy: "✓" };
 
 function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
   const [current, setCurrent] = useState(startIndex);
@@ -1124,12 +1070,13 @@ function GalleryLightbox({ photos, onClose, startIndex = 0 }) {
         {current + 1} / {photos.length}
       </div>
       <div onClick={e => e.stopPropagation()} style={{ position: "relative" }}>
-        <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}>
-          <img src={photos[current].dataUrl} alt="" style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
-          <div style={{ textAlign: "center", marginTop: 10, fontSize: 11, color: "#aaa", fontStyle: "italic" }}>
-            {new Date(photos[current].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
-          </div>
-        </div>
+        <Polaroid
+          src={photos[current].dataUrl}
+          size="large"
+          shadow="deep"
+          caption={new Date(photos[current].date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+          captionStyle="italic"
+        />
       </div>
       <div style={{ display: "flex", gap: 16, marginTop: 24 }} onClick={e => e.stopPropagation()}>
         <button onClick={() => setCurrent(i => Math.max(0, i - 1))} disabled={current === 0} style={{ background: "oklch(0.95 0.015 145 / 0.10)", border: "none", color: "var(--text)", borderRadius: "50%", width: 40, height: 40, fontSize: 18, cursor: "pointer", opacity: current === 0 ? 0.3 : 1 }}>‹</button>
@@ -1193,31 +1140,28 @@ function PlantPhotoStack({ plant, tilt, pinColor, userPhotos, setUserPhotos, car
           const offset = stackIdx * 4;
           const rot = tilt + (stackIdx % 2 === 0 ? -stackIdx * 1.5 : stackIdx * 1.5);
           return (
-            <div key={i} style={{ position: "absolute", top: offset, left: "50%", transform: `translateX(-50%) rotate(${rot}deg)`, zIndex: stackIdx }}>
-              <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 4px 16px rgba(60,30,10,0.14)", position: "relative" }}>
-                <img src={photo.dataUrl} alt="" style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
-                <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center", fontFamily: "'Caveat', cursive", fontSize: 16, color: "#3a3a3a", letterSpacing: "0.5px" }}>
-                  {new Date(photo.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
-                </div>
-              </div>
+            <div key={i} style={{ position: "absolute", top: offset, left: "50%", transform: "translateX(-50%)", zIndex: stackIdx }}>
+              <Polaroid
+                src={photo.dataUrl}
+                size="large"
+                tilt={rot}
+                shadow="medium"
+                caption={new Date(photo.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
+                captionStyle="caveat"
+              />
             </div>
           );
         })}
         <div style={{ position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-          <div style={{ position: "absolute", top: -16, left: "50%", transform: "translateX(-50%)", zIndex: 11, filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.3))" }}>
-            <div style={{ width: 18, height: 18, borderRadius: "50%", background: `radial-gradient(circle at 35% 35%, ${pinColor}dd, ${pinColor})`, boxShadow: "inset -2px -2px 4px rgba(0,0,0,0.25), inset 1px 1px 3px oklch(0.95 0.015 145 / 0.35)", margin: "0 auto", position: "relative" }}>
-              <div style={{ position: "absolute", top: 3, left: 3, width: 5, height: 5, borderRadius: "50%", background: "oklch(0.95 0.015 145 / 0.50)" }} />
-            </div>
-            <div style={{ width: 2, height: 9, background: "linear-gradient(to bottom, #aaa, #ddd)", margin: "0 auto", borderRadius: "0 0 1px 1px" }} />
-          </div>
-          <div style={{ transform: `rotate(${tilt}deg)` }}>
-            <div style={{ background: "#fff", padding: "12px 12px 44px", boxShadow: "0 6px 24px rgba(60,30,10,0.18), 0 2px 6px rgba(60,30,10,0.10)", position: "relative" }}>
-              <img src={topPhoto ? topPhoto.dataUrl : plant.image} alt={plant.name} style={{ display: "block", width: 300, height: 375, objectFit: "cover" }} />
-              <div style={{ position: "absolute", bottom: 10, left: 0, right: 0, textAlign: "center", fontFamily: "'Caveat', cursive", fontSize: 16, color: "#3a3a3a", letterSpacing: "0.5px" }}>
-                {topPhoto ? new Date(topPhoto.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "No photo yet"}
-              </div>
-            </div>
-          </div>
+          <Polaroid
+            src={topPhoto ? topPhoto.dataUrl : plant.image}
+            size="large"
+            tilt={tilt}
+            pinColor={pinColor}
+            shadow="strong"
+            caption={topPhoto ? new Date(topPhoto.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "No photo yet"}
+            captionStyle="caveat"
+          />
         </div>
       </div>
 
@@ -1536,9 +1480,6 @@ function FertilizeModal({ onConfirm, onClose }) {
 }
 
 // ── PlantSettingsModal ─────────────────────────────────────────────────────
-const POT_TYPES = ["Terracotta", "Ceramic", "Plastic", "Fabric", "Self-watering", "Other"];
-const LIGHT_DISTANCES = ["Near window", "1m", "2m", "3m", "4m", "5m", "No light"];
-
 function PlantSettingsModal({ plant, settings, nicknames, rooms, onSave, onDelete, onClose }) {
   const [nickname, setNickname] = useState(nicknames[plant.id] || "");
   const [plantedDate, setPlantedDate] = useState(settings.plantedDate || "");
@@ -1967,58 +1908,6 @@ Rules:
   );
 }
 
-// ── Postal code validation ────────────────────────────────────────────────
-const POSTAL_RULES = {
-  US: { pattern: /^\d{5}$/, hint: "5 digits (e.g. 90210)" },
-  GB: { pattern: /^[A-Z]{1,2}\d[A-Z\d]?\s?\d[A-Z]{2}$/i, hint: "e.g. SW1A 1AA" },
-  DE: { pattern: /^\d{5}$/, hint: "5 digits" },
-  FR: { pattern: /^\d{5}$/, hint: "5 digits" },
-  MD: { pattern: /^(MD-?)?\d{4}$/, hint: "4 digits (e.g. 2001)" },
-  CA: { pattern: /^[A-Z]\d[A-Z]\s?\d[A-Z]\d$/i, hint: "e.g. K1A 0B1" },
-};
-
-function validatePostal(code, countryCode) {
-  if (!code || code.trim().length < 2) return false;
-  const rule = POSTAL_RULES[countryCode];
-  if (rule) return rule.pattern.test(code.trim());
-  return code.trim().length >= 2 && code.trim().length <= 10;
-}
-
-function getPostalHint(countryCode) {
-  return POSTAL_RULES[countryCode]?.hint || "2-10 characters";
-}
-
-// ── Country list (ISO 3166-1) ─────────────────────────────────────────────
-const COUNTRIES = [
-  { code: "AF", name: "Afghanistan" }, { code: "AL", name: "Albania" }, { code: "DZ", name: "Algeria" },
-  { code: "AR", name: "Argentina" }, { code: "AM", name: "Armenia" }, { code: "AU", name: "Australia" },
-  { code: "AT", name: "Austria" }, { code: "AZ", name: "Azerbaijan" }, { code: "BD", name: "Bangladesh" },
-  { code: "BY", name: "Belarus" }, { code: "BE", name: "Belgium" }, { code: "BA", name: "Bosnia and Herzegovina" },
-  { code: "BR", name: "Brazil" }, { code: "BG", name: "Bulgaria" }, { code: "CA", name: "Canada" },
-  { code: "CL", name: "Chile" }, { code: "CN", name: "China" }, { code: "CO", name: "Colombia" },
-  { code: "HR", name: "Croatia" }, { code: "CZ", name: "Czech Republic" }, { code: "DK", name: "Denmark" },
-  { code: "EC", name: "Ecuador" }, { code: "EG", name: "Egypt" }, { code: "EE", name: "Estonia" },
-  { code: "FI", name: "Finland" }, { code: "FR", name: "France" }, { code: "GE", name: "Georgia" },
-  { code: "DE", name: "Germany" }, { code: "GR", name: "Greece" }, { code: "HU", name: "Hungary" },
-  { code: "IS", name: "Iceland" }, { code: "IN", name: "India" }, { code: "ID", name: "Indonesia" },
-  { code: "IE", name: "Ireland" }, { code: "IL", name: "Israel" }, { code: "IT", name: "Italy" },
-  { code: "JP", name: "Japan" }, { code: "KZ", name: "Kazakhstan" }, { code: "KE", name: "Kenya" },
-  { code: "KR", name: "South Korea" }, { code: "LV", name: "Latvia" }, { code: "LT", name: "Lithuania" },
-  { code: "LU", name: "Luxembourg" }, { code: "MY", name: "Malaysia" }, { code: "MX", name: "Mexico" },
-  { code: "MD", name: "Moldova" }, { code: "ME", name: "Montenegro" }, { code: "MA", name: "Morocco" },
-  { code: "NL", name: "Netherlands" }, { code: "NZ", name: "New Zealand" }, { code: "NG", name: "Nigeria" },
-  { code: "MK", name: "North Macedonia" }, { code: "NO", name: "Norway" }, { code: "PK", name: "Pakistan" },
-  { code: "PE", name: "Peru" }, { code: "PH", name: "Philippines" }, { code: "PL", name: "Poland" },
-  { code: "PT", name: "Portugal" }, { code: "RO", name: "Romania" }, { code: "RU", name: "Russia" },
-  { code: "RS", name: "Serbia" }, { code: "SG", name: "Singapore" }, { code: "SK", name: "Slovakia" },
-  { code: "SI", name: "Slovenia" }, { code: "ZA", name: "South Africa" }, { code: "ES", name: "Spain" },
-  { code: "SE", name: "Sweden" }, { code: "CH", name: "Switzerland" }, { code: "TW", name: "Taiwan" },
-  { code: "TH", name: "Thailand" }, { code: "TR", name: "Turkey" }, { code: "UA", name: "Ukraine" },
-  { code: "AE", name: "United Arab Emirates" }, { code: "GB", name: "United Kingdom" },
-  { code: "US", name: "United States" }, { code: "UY", name: "Uruguay" }, { code: "UZ", name: "Uzbekistan" },
-  { code: "VN", name: "Vietnam" },
-];
-
 // ── Onboarding Flow ───────────────────────────────────────────────────────
 const TOTAL_STEPS = 4; // name, location, postal, room (room only if in-house)
 
@@ -2137,18 +2026,6 @@ function OnboardingFlow({ user, onComplete }) {
     await supabase.from("user_profiles").upsert(partial, { onConflict: "user_id" });
     setStep(nextStep);
   }
-
-  const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-  const DIR_POSITIONS = {
-    N:  { top: 4, left: "50%", transform: "translateX(-50%)" },
-    NE: { top: 28, right: 16 },
-    E:  { top: "50%", right: 0, transform: "translateY(-50%)" },
-    SE: { bottom: 28, right: 16 },
-    S:  { bottom: 4, left: "50%", transform: "translateX(-50%)" },
-    SW: { bottom: 28, left: 16 },
-    W:  { top: "50%", left: 0, transform: "translateY(-50%)" },
-    NW: { top: 28, left: 16 },
-  };
 
   return (
     <div className="fade-up">
@@ -2408,18 +2285,6 @@ function AddRoomModal({ onSave, onClose }) {
   const [windowDir, setWindowDir] = useState("");
   const [saving, setSaving] = useState(false);
 
-  const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-  const DIR_POSITIONS = {
-    N:  { top: 4, left: "50%", transform: "translateX(-50%)" },
-    NE: { top: 28, right: 16 },
-    E:  { top: "50%", right: 0, transform: "translateY(-50%)" },
-    SE: { bottom: 28, right: 16 },
-    S:  { bottom: 4, left: "50%", transform: "translateX(-50%)" },
-    SW: { bottom: 28, left: 16 },
-    W:  { top: "50%", left: 0, transform: "translateY(-50%)" },
-    NW: { top: 28, left: 16 },
-  };
-
   const valid = roomName.trim().length >= 2 && roomSize && roomTemp && (!hasWindows || windowDir);
 
   return (
@@ -2526,18 +2391,6 @@ function EditRoomModal({ room, onSave, onDelete, onClose }) {
   const [windowDir, setWindowDir] = useState(room.windowDirection || "");
   const [saving, setSaving] = useState(false);
   const [deleteMode, setDeleteMode] = useState(false);
-
-  const DIRECTIONS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"];
-  const DIR_POSITIONS = {
-    N:  { top: 4, left: "50%", transform: "translateX(-50%)" },
-    NE: { top: 28, right: 16 },
-    E:  { top: "50%", right: 0, transform: "translateY(-50%)" },
-    SE: { bottom: 28, right: 16 },
-    S:  { bottom: 4, left: "50%", transform: "translateX(-50%)" },
-    SW: { bottom: 28, left: 16 },
-    W:  { top: "50%", left: 0, transform: "translateY(-50%)" },
-    NW: { top: 28, left: 16 },
-  };
 
   const valid = roomName.trim().length >= 2 && roomSize && roomTemp && (!hasWindows || windowDir);
 
@@ -3118,14 +2971,13 @@ useEffect(() => {
   const pct = (days !== null && plant) ? Math.min((days / plant.waterEveryDays) * 100, 100) : 0;
   const fillColor = pct >= 100 ? "#c46860" : pct >= 70 ? "#d4935a" : "#4ade80";
 
-  const FERTILIZE_EVERY = 30;
   const fertDaysLeft = fertDays !== null ? FERTILIZE_EVERY - fertDays : null;
   const fertDoseLabel = lastFertilizedDose === 0.5 ? " · ½ dose" : lastFertilizedDose === 0 ? " · no dose" : "";
 
   // Build room context for this plant
   const plantRoom = plant ? rooms.find(r => r.name === (plantSettings[plant.id]?.room || "")) : null;
 
-  const careContext = {
+  const careContext = useMemo(() => ({
     lastWateredDaysAgo: days,
     lastFertilizedDaysAgo: fertDays,
     settings: plantSettings[plant?.id] || {},
@@ -3135,7 +2987,7 @@ useEffect(() => {
     userProfile: userProfile ? { country: userProfile.country, postalCode: userProfile.postal_code, city: weather?.city } : null,
     room: plantRoom ? { name: plantRoom.name, hasWindows: plantRoom.hasWindows, windowDirection: plantRoom.windowDirection } : null,
     previousAnalyses: plant ? (plantPhotos[plant.id] || []).filter(p => p.analysis).map(p => ({ date: p.date, ...p.analysis })).slice(-3) : [],
-  };
+  }), [days, fertDays, plantSettings, plant, waterHistory, fertilizeHistory, weather, userProfile, plantRoom, plantPhotos]);
 
   const currentPhotos = plantPhotos[plant?.id] || [];
   const latestPhoto = currentPhotos.length > 0 ? currentPhotos[currentPhotos.length - 1] : null;
@@ -3528,16 +3380,14 @@ useEffect(() => {
                           <GlassCard key={p.id} borderRadius={18} variant="interactive">
                             <div className="prow" onClick={() => openDetail(i)}>
                               <div style={{ position: "relative", flexShrink: 0 }}>
-                                <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-                                  <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[i % PIN_COLORS.length], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
-                                  <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
-                                </div>
-                                <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[i % TILTS.length]}deg)` }}>
-                                  {topPhoto
-                                    ? <img src={topPhoto.dataUrl} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
-                                    : <div style={{ width: 44, height: 40, background: "rgba(74,222,128,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>+</div>
-                                  }
-                                </div>
+                                <Polaroid
+                                  src={topPhoto?.dataUrl}
+                                  size="mini"
+                                  tilt={TILTS[i % TILTS.length]}
+                                  pinColor={PIN_COLORS[i % PIN_COLORS.length]}
+                                  shadow="soft"
+                                  placeholder={<div style={{ width: 44, height: 40, background: "rgba(74,222,128,0.12)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>+</div>}
+                                />
                               </div>
                               <div className="prow-info">
                                 <div className="prow-name">{nick || p.name}</div>
@@ -3943,13 +3793,13 @@ useEffect(() => {
                   <GlassCard key={p.id} borderRadius={18} variant="interactive" onClick={() => { setIdx(pIdx); setScreen("detail"); }}>
                     <div className="prow" style={{ borderLeft: "3px solid var(--warn)", paddingLeft: 11 }}>
                       <div style={{ position: "relative", flexShrink: 0 }}>
-                        <div style={{ position: "absolute", top: -8, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}>
-                          <div style={{ width: 10, height: 10, borderRadius: "50%", background: PIN_COLORS[pIdx], boxShadow: "0 1px 3px rgba(0,0,0,0.3)", margin: "0 auto" }} />
-                          <div style={{ width: 1.5, height: 5, background: "#bbb", margin: "0 auto" }} />
-                        </div>
-                        <div style={{ background: "#fff", padding: "3px 3px 10px", boxShadow: "0 2px 8px rgba(60,30,10,0.15)", transform: `rotate(${TILTS[pIdx]}deg)` }}>
-                          <img src={p.image} alt={p.name} style={{ display: "block", width: 44, height: 40, objectFit: "cover" }} />
-                        </div>
+                        <Polaroid
+                          src={p.image}
+                          size="mini"
+                          tilt={TILTS[pIdx]}
+                          pinColor={PIN_COLORS[pIdx]}
+                          shadow="soft"
+                        />
                       </div>
                       <div className="prow-info">
                         <div className="prow-name">{nicknames[p.id] || p.name}</div>
